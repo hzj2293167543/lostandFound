@@ -1,0 +1,117 @@
+# ============================
+# 项目依赖与包管理器
+# ============================
+# pnpm
+.pnpm-store/
+pnpm-debug.log*
+pnpm-lock.yaml       # 【关键决策】通常建议提交以锁定依赖。如果忽略，请确保团队策略一致。
+
+# 其他包管理器
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+yarn.lock
+package-lock.json
+
+# ============================
+# 构建输出、编译产物与分发目录
+# ============================
+dist/                 # 通用构建输出
+dist-ssr/             # SSR 构建输出
+*.local               # 本地测试构建
+.cache/               # 各类工具缓存（如 PostCSS、Babel）
+.parcel-cache/
+.rspack-cache/
+*.tsbuildinfo         # TypeScript 增量编译信息，必须忽略
+coverage/             # 测试覆盖率报告
+.nyc_output/
+*.lcov
+
+# 框架/工具特定的构建输出
+.next/                # Next.js
+.nuxt/                # Nuxt.js
+.out/                 # Vercel、某些静态生成器
+.storybook-static/    # Storybook 静态构建
+.vuepress/dist        # VuePress
+docs/.vuepress/dist
+
+# ============================
+# 开发服务器、运行时与调试文件
+# ============================
+# 环境变量文件（务必忽略，含敏感信息）
+.env
+.env.local
+.env.*.local
+# 注：应提交 .env.example 或 .env.template 作为模板
+
+# 日志文件
+logs
+*.log
+lerna-debug.log*
+
+# 运行时数据
+*.pid
+.DS_Store            # macOS 属性文件
+Thumbs.db            # Windows 缩略图缓存
+Desktop.ini
+[Dd]esktop.ini
+
+# ============================
+# 测试运行器缓存与输出
+# ============================
+.jest/               # Jest 缓存
+.vitest/             # Vitest 缓存
+__snapshots__/       # Jest 快照
+*.snap
+
+# ============================
+# 代码质量与格式化工具缓存
+# ============================
+# 这些缓存可提升工具速度，不应提交
+.eslintcache
+.prettiercache
+.stylelintcache
+
+# ============================
+# 编辑器与IDE目录
+# ============================
+# VS Code
+.vscode/*
+!.vscode/extensions.json   # 可提交推荐扩展列表
+.vscode/settings.json.local # 忽略本地覆盖设置
+.vscode/launch.json.local
+
+# JetBrains IDEs (WebStorm, IntelliJ)
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# 其他
+.history/            # 某些编辑器历史目录
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ============================
+# 操作系统临时文件与备份
+# ============================
+# 临时文件
+*~
+*.swp
+*.swo
+*.bak
+*.tmp
+
+# ============================
+# Monorepo 与高级构建工具缓存
+# ============================
+# Turborepo 远程缓存（本地通常为 .turbo）
+.turbo/
+
+# 其他工具缓存或临时目录
+.output/             # 某些 Nitro、Nuxt 构建输出
+.nitro/              # Nitro 开发缓存

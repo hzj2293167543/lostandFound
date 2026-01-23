@@ -1,0 +1,23 @@
+# 项目与团队词汇
+monorepo
+mycompany
+myawesomeapp
+
+# 技术栈与工具
+pnpm
+vite
+vuex
+eslint
+oxlint
+prettier
+typescript
+jsx
+tsx
+vite
+winget
+Schniz
+
+# API与业务领域
+userid
+authtoken
+apiendpoint

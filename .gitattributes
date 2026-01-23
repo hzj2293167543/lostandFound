@@ -1,0 +1,116 @@
+# ========================
+# 1. 语言统计（GitHub Linguist）
+# ========================
+# 忽略依赖、构建产物等，使仓库语言统计更准确（反映真实源码）
+public/** linguist-vendored
+dist/** linguist-generated=true
+stats.json linguist-generated=true
+coverage/** linguist-generated=true
+*.snap linguist-generated=true
+
+# 可选：明确指定某些目录为“非文档”，进一步优化统计
+.github/** linguist-documentation=false
+docs/** linguist-documentation=true 
+# 如果你的 /docs 是文档，则设为 true
+
+# ========================
+# 2. 换行符标准化（核心）
+# ========================
+# 核心规则：所有文本文件自动检测，仓库内统一为 LF
+* text=auto eol=lf
+
+# 为常见文本文件类型显式声明，确保万无一失
+*.js text eol=lf
+*.jsx text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.vue text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.scss text eol=lf
+*.less text eol=lf
+*.sh text eol=lf
+*.bash text eol=lf
+
+# ========================
+# 3. Monorepo 与包管理器文件
+# ========================
+# pnpm 锁定文件应视为二进制，防止任何换行符转换导致损坏
+pnpm-lock.yaml binary
+# 工作区配置文件使用 LF 文本
+pnpm-workspace.yaml text eol=lf
+# 确保所有子包的 package.json 一致
+**/package.json text eol=lf
+
+# ========================
+# 4. 二进制文件声明
+# ========================
+# 图像
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.bmp binary
+*.tiff binary
+*.psd binary
+# 图标文件 (macOS/Windows)
+*.icns binary
+*.icon binary
+# 字体
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.otf binary
+# 媒体
+*.mp3 binary
+*.mp4 binary
+*.webm binary
+*.avi binary
+*.mov binary
+# 文档与压缩包
+*.pdf binary
+*.zip binary
+*.tar.gz binary
+*.rar binary
+*.7z binary
+# 可执行文件与系统文件
+*.exe binary
+*.dll binary
+*.so binary
+*.dylib binary
+
+# ========================
+# 5. 特殊文本文件处理
+# ========================
+# 这些是文本文件，但需要特殊处理
+*.patch text
+*.diff text
+# 自引用：此文件本身也应使用 LF
+.gitattributes text eol=lf
+.editorconfig text eol=lf
+.gitignore text eol=lf
+.eslintignore text eol=lf
+.prettierignore text eol=lf
+
+# ========================
+# 6. 合并策略（减少冲突）
+# ========================
+# 锁定文件：通常接受传入版本，或标记为不合并
+package-lock.json binary merge=union 
+# 或 binary
+yarn.lock binary merge=union        
+# 或 binary
+# 配置文件：接受“我们的”版本，避免自动合并导致格式错乱
+tsconfig.json merge=ours
+tsconfig.*.json merge=ours
+.prettierrc merge=ours
+.eslintrc.* merge=ours
+oxlint.json merge=ours
+cspell.json merge=ours

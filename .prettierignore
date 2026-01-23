@@ -1,0 +1,35 @@
+# 依赖目录
+node_modules
+**/node_modules/**
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# 构建输出
+dist
+build
+out
+.next
+.output
+
+# 配置文件
+*.local
+.env*.local
+
+# 日志文件
+*.log
+npm-debug.log*
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 测试相关
+coverage
+.nyc_output
+
+# IDE/编辑器文件
+.idea
+.vscode
+*.swp
+*.swo

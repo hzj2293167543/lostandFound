@@ -1,0 +1,43 @@
+{
+    "compilerOptions": {
+        /* 语言和环境 */
+        "target": "ES2020", // 生成代码的 ECMAScript 目标版本
+        "lib": ["ES2020"], // 要包含的库文件，纯Node项目足够
+        "module": "commonjs", // 模块代码生成规范
+        "moduleResolution": "node", // 模块解析策略，与Node一致
+        "types": ["node"], // 包含全局的类型声明，已安装 @types/node
+        /* 输出与工程 */
+        "declaration": true, // 生成对应的 '.d.ts' 声明文件（发布包时需要）
+        "declarationMap": true, // 为声明文件生成源码映射（方便调试）
+        "sourceMap": true, // 生成 '.map' 文件，用于调试
+        "outDir": "./dist", // 重定向输出目录（子包通常需要覆盖此路径）
+        "removeComments": true, // 删除编译后的所有注释
+        "importsNotUsedAsValues": "remove", // 删除未使用的导入
+        /* 类型检查（严格模式，保障代码质量） */
+        "strict": true, // 启用所有严格类型检查选项
+        "noImplicitAny": true, // 不允许隐式的 any 类型
+        "strictNullChecks": true, // 严格的 null 检查
+        "strictFunctionTypes": true, // 严格的函数类型检查
+        "strictBindCallApply": true, // 严格的 bind/call/apply 检查
+        "noImplicitThis": true, // 不允许 this 有隐式的 any 类型
+        "alwaysStrict": true, // 以严格模式解析并为每个源文件生成 "use strict"
+        "noUnusedLocals": true, // 报告未使用的局部变量
+        "noUnusedParameters": true, // 报告未使用的参数
+        "noImplicitReturns": true, // 函数中并非所有路径都有返回值时报错
+        "noFallthroughCasesInSwitch": true, // 防止switch语句贯穿
+        "forceConsistentCasingInFileNames": true, // 禁止对同一文件使用不一致的大小写引用
+        /* 互操作性 */
+        "esModuleInterop": true, // 启用兼容性，允许 CommonJS/AMD/UMD 模块通过 import 导入
+        "allowSyntheticDefaultImports": true, // 允许从没有默认导出的模块进行默认导入（配合上一条）
+        "resolveJsonModule": true, // 允许导入 .json 文件
+        /* 实验性（按需启用） */
+        // "experimentalDecorators": true, // 启用装饰器支持（如使用TypeORM, NestJS）
+        // "emitDecoratorMetadata": true,  // 为装饰器提供元数据支持（同上）
+        // "useDefineForClassFields": true, // 根据 ES2022 标准定义类字段
+        /* 高级 */
+        "skipLibCheck": true // 跳过所有声明文件的类型检查，加快编译速度
+    },
+    /* 要编译的文件范围（根目录通常为空，具体编译由子包定义） */
+    "include": [],
+    "exclude": ["node_modules", "**/dist", "**/*.test.ts", "**/*.spec.ts"]
+}

@@ -1,0 +1,63 @@
+{
+    "name": "monorepo",
+    "version": "1.0.0",
+    "private": true,
+    "description": "",
+    "main": "index.js",
+    "type": "module",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "lint:prettier": "prettier --write \"**/*.{js,ts,mjs,cjs,json,tsx,css,Less,scss,vue,html,md}\"",
+        "lint:quick": "oxlint --max-warnings 0 .",
+        "lint:quick:fix": "oxlint --fix .",
+        "lint:deep": "eslint . --max-warnings=0",
+        "lint": "pnpm run lint:quick && pnpm run lint:deep",
+        "fix:all": "pnpm run lint:quick:fix && pnpm run lint:eslint:fix && pnpm run format",
+        "spell:check": "cspell \"**/*\"",
+        "spell:fix": "cspell \"**/*\" --no-progress --unique --wordsOnly | sort | uniq > project-words.txt",
+        "commit": "git-cz"
+    },
+    "config": {
+        "commitizen": {
+            "path": "node_modules/cz-git"
+        }
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "packageManager": "pnpm@10.19.0",
+    "corepack": "enabled",
+    "engines": {
+        "node": ">=18",
+        "pnpm": ">=7.19.0",
+        "npm": ">=9.4.0"
+    },
+    "volta": {
+        "node": "23.11.1",
+        "pnpm": "10.19.0",
+        "yarn": "1.22.19"
+    },
+    "devDependencies": {
+        "@commitlint/cli": "^20.3.1",
+        "@commitlint/config-conventional": "^20.3.1",
+        "@cspell/dict-lorem-ipsum": "^4.0.5",
+        "@eslint/js": "^9.39.2",
+        "@types/node": "^25.0.10",
+        "@typescript-eslint/eslint-plugin": "^8.53.1",
+        "@typescript-eslint/parser": "^8.53.1",
+        "commitizen": "^4.3.1",
+        "cspell": "^9.6.0",
+        "cz-git": "^1.12.0",
+        "eslint": "^9.39.2",
+        "eslint-config-prettier": "^10.1.8",
+        "eslint-plugin-prettier": "^5.5.5",
+        "eslint-plugin-react": "^7.37.5",
+        "eslint-plugin-vue": "^10.7.0",
+        "globals": "^17.1.0",
+        "oxlint": "^1.41.0",
+        "prettier": "^3.8.1",
+        "typescript": "^5.9.3",
+        "typescript-eslint": "^8.53.1",
+        "vue-eslint-parser": "^10.2.0"
+    }
+}

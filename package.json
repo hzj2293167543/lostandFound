@@ -15,7 +15,7 @@
         "lint": "pnpm run lint:prettier && pnpm run lint:quick && pnpm run lint:deep && pnpm run spell:check",
         "fix:all": "pnpm run lint:quick:fix && pnpm run lint:deep:fix && pnpm run spell:fix",
         "spell:check": "cspell \"**/*\"",
-        "spell:fix": "node .scripts/spell-fix.js",
+        "spell:fix": "node scripts/spell-fix.js",
         "commit": "git-cz",
         "prepare": "husky",
         "precommit": "lint-staged"

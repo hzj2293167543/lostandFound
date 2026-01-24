@@ -46,7 +46,19 @@ export default {
             2,
             'always',
             // 这里定义你的项目/模块范围，例如：
-            ['root', 'app', 'pkg', 'ui', 'utils', 'docs', 'config', 'release'],
+            [
+                'root',
+                'backend',
+                'frontend',
+                'components',
+                'app',
+                'pkg',
+                'ui',
+                'utils',
+                'docs',
+                'config',
+                'release',
+            ],
             // 你可以根据 Monorepo 的子包目录来定义，如：
             // ['apps/*', 'packages/*', 'tooling']
         ],
@@ -88,7 +100,19 @@ export default {
         ],
         useEmoji: false, // 设为 true 可以在提示中显示 emoji，提交信息中也会包含
         themeColorCode: '', // 主题色，留空使用默认
-        scopes: [], // 如果在此预定义 scope 列表，将取代上面的 ‘scope-enum’ 数组
+        scopes: [
+            'root',
+            'backend',
+            'frontend',
+            'components',
+            'app',
+            'pkg',
+            'ui',
+            'utils',
+            'docs',
+            'config',
+            'release',
+        ], // 如果在此预定义 scope 列表，将取代上面的 ‘scope-enum’ 数组
         allowCustomScopes: true, // 是否允许输入自定义 scope
         allowEmptyScopes: true, // 是否允许 scope 为空（与 rules 中的 ‘scope-empty’ 对应）
         customScopesAlign: 'bottom',

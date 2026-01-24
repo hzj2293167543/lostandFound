@@ -157,6 +157,7 @@
         "**/*.d.ts",
         "**/coverage/**",
         "**/.next/**",
-        "**/out/**"
+        "**/out/**",
+        "commitlint.config.js"
     ]
 }

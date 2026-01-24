@@ -21,3 +21,5 @@ Schniz
 userid
 authtoken
 apiendpoint
+
+breakline

@@ -1,0 +1,8 @@
+{
+    "*.{js,ts,vue,md}": [
+        "pnpm run lint"
+    ],
+    "*.{md,json,yml,yaml,txt,js,ts,jsx,tsx,vue,css,scss,less}": [
+        "pnpm run spell:check"
+    ]
+}

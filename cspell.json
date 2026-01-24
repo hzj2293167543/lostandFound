@@ -2,9 +2,7 @@
     "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json",
     "version": "0.2",
     "language": "en",
-    "files": [
-        "**/*.{js,ts,jsx,tsx,vue,md,json}"
-    ],
+    "files": ["**/*.{js,ts,jsx,tsx,vue,md,json}"],
     "ignorePaths": [
         "**/node_modules/**",
         "**/dist/**",
@@ -17,12 +15,7 @@
         "pnpm-lock.yaml",
         "*.{png,jpg,svg,woff,woff2,eot,ttf}"
     ],
-    "dictionaries": [
-        "typescript",
-        "html",
-        "node",
-        "project-words"
-    ],
+    "dictionaries": ["typescript", "html", "node", "project-words"],
     "dictionaryDefinitions": [
         {
             "name": "project-words",

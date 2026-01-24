@@ -22,4 +22,10 @@ userid
 authtoken
 apiendpoint
 
+# oxlint
+nonconstructor
+nonoctal
+uninvoked
+
+# other
 breakline

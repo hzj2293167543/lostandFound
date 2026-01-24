@@ -12,12 +12,13 @@
         "lint:quick:fix": "oxlint --fix .",
         "lint:deep": "eslint . --max-warnings=0",
         "lint:deep:fix": "eslint --fix .",
-        "lint": "pnpm run lint:quick && pnpm run lint:deep && pnpm run spell:check",
+        "lint": "pnpm run lint:prettier && pnpm run lint:quick && pnpm run lint:deep && pnpm run spell:check",
         "fix:all": "pnpm run lint:quick:fix && pnpm run lint:deep:fix && pnpm run spell:fix",
         "spell:check": "cspell \"**/*\"",
         "spell:fix": "node .scripts/spell-fix.js",
         "commit": "git-cz",
-        "prepare": "husky"
+        "prepare": "husky",
+        "precommit": "lint-staged"
     },
     "config": {
         "commitizen": {
@@ -57,6 +58,7 @@
         "eslint-plugin-vue": "^10.7.0",
         "globals": "^17.1.0",
         "husky": "^9.1.7",
+        "lint-staged": "^16.2.7",
         "oxlint": "^1.41.0",
         "prettier": "^3.8.1",
         "typescript": "^5.9.3",

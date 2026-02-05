@@ -18,6 +18,7 @@
         "fix:all": "pnpm run lint:quick:fix && pnpm run lint:deep:fix && pnpm run spell:fix",
         "spell:check": "cspell \"**/*\"",
         "spell:fix": "node scripts/spell-fix.js",
+        "precommit-guard": "powershell -Command \"if (git status --porcelain | Select-String 'dist\\\\') { Write-Error 'ERROR: dist files detected!'; exit 1 }\"",
         "commit": "git-cz",
         "prepare": "husky",
         "precommit": "lint-staged",

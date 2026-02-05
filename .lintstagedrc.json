@@ -1,4 +1,5 @@
 {
-    "*.{js,ts,vue,md}": ["pnpm run lint"],
-    "*.{md,json,yml,yaml,txt,js,ts,jsx,tsx,vue,css,scss,less}": ["pnpm run spell:check"]
+    "*.{js,ts,vue}": ["pnpm run lint"],
+    "*.{json,yml,yaml,css,scss,less,md}": ["prettier --write"],
+    "*.{md,json,yml,yaml,txt}": ["pnpm run spell:check"]
 }

@@ -1,4 +1,5 @@
 {
+    "extends": "./tsconfig.base.json",
     "compilerOptions": {
         /* 语言和环境 */
         "target": "ES2020", // 生成代码的 ECMAScript 目标版本

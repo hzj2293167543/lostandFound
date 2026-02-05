@@ -17,8 +17,10 @@ package-lock.json
 # ============================
 # 构建输出、编译产物与分发目录
 # ============================
+**/dist/              # 通用构建输出
 dist/                 # 通用构建输出
 dist-ssr/             # SSR 构建输出
+**/dist-ssr/             # SSR 构建输出
 *.local               # 本地测试构建
 .cache/               # 各类工具缓存（如 PostCSS、Babel）
 .parcel-cache/

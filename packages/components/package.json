@@ -1,14 +1,34 @@
 {
     "name": "@monorepo/components",
     "version": "1.0.0",
-    "description": "",
-    "main": "index.js",
+    "description": "Monorepo shared components",
+    "main": "dist/index.cjs",
+    "module": "dist/index.js",
+    "types": "dist/types/index.d.ts",
     "type": "module",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "node ../../scripts/build.js",
+        "dev": "node ../../scripts/dev.js"
+    },
+    "buildOptions": {
+        "name": "@monorepo/components",
+        "formats": [
+            "esm",
+            "cjs",
+            "iife",
+            "ts"
+        ]
     },
     "keywords": [],
     "author": "",
     "license": "ISC",
-    "packageManager": "pnpm@10.19.0"
+    "packageManager": "pnpm@10.19.0",
+    "dependencies": {
+        "@monorepo/utils": "workspace:*",
+        "vue": "^3.x"
+    },
+    "files": [
+        "dist"
+    ]
 }

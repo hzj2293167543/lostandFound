@@ -1,0 +1,54 @@
+name: CI
+
+on:
+    push:
+        branches: [master]
+    pull_request:
+        branches: [master]
+
+jobs:
+    # Job 1: 代码质量检查
+    lint:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: pnpm/action-setup@v2
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 18
+                  cache: 'pnpm'
+            - run: pnpm install
+            - run: pnpm run lint # ESLint
+            - run: pnpm run format:check # Prettier
+
+    # Job 2: 测试
+    test:
+        runs-on: ubuntu-latest
+        needs: lint # lint 通过才跑
+        steps:
+            - uses: actions/checkout@v4
+            - uses: pnpm/action-setup@v2
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 18
+                  cache: 'pnpm'
+            - run: pnpm install
+            - run: pnpm run test
+
+    # Job 3: 构建
+    build:
+        runs-on: ubuntu-latest
+        needs: test # 测试通过才构建
+        steps:
+            - uses: actions/checkout@v4
+            - uses: pnpm/action-setup@v2
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 18
+                  cache: 'pnpm'
+            - run: pnpm install
+            - run: pnpm run build
+            - uses: actions/upload-artifact@v4 # 保存构建产物
+              with:
+                  name: dist
+                  path: dist/

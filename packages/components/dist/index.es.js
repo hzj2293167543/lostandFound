@@ -1,4 +1,4 @@
-import { defineComponent as c, ref as a, onMounted as i, watch as v, openBlock as _, createElementBlock as d, createElementVNode as t, toDisplayString as p } from "vue";
+import { defineComponent as c, ref as a, onMounted as i, watch as v, openBlock as _, createElementBlock as p, createElementVNode as t, toDisplayString as d } from "vue";
 function r(o, n) {
   return o + n;
 }
@@ -10,10 +10,8 @@ const m = { class: "wrapper" }, f = { class: "content" }, b = { class: "num" }, 
       u.value = r(n.value, s.value);
     }), v(
       () => [n.value, s.value],
-      ([l, e]) => {
-        u.value = r(l, e);
-      }
-    ), (l, e) => (_(), d("div", m, [
+      ([l, e]) => u.value = r(l || 0, e || 0)
+    ), (l, e) => (_(), p("div", m, [
       t("div", f, [
         e[2] || (e[2] = t("div", { class: "title" }, "测试组件", -1)),
         t("div", b, [
@@ -31,7 +29,7 @@ const m = { class: "wrapper" }, f = { class: "content" }, b = { class: "num" }, 
           }, null, 8, k)
         ]),
         t("div", x, [
-          t("span", null, "result:" + p(u.value), 1)
+          t("span", null, "result:" + d(u.value), 1)
         ])
       ])
     ]));
@@ -41,7 +39,7 @@ const m = { class: "wrapper" }, f = { class: "content" }, b = { class: "num" }, 
   for (const [u, l] of n)
     s[u] = l;
   return s;
-}, B = /* @__PURE__ */ g(N, [["__scopeId", "data-v-eadd76e6"]]);
+}, B = /* @__PURE__ */ g(N, [["__scopeId", "data-v-3785dabc"]]);
 export {
   B as Test
 };

@@ -4,11 +4,11 @@
             <div class="title">测试组件</div>
             <div class="num">
                 <span>Number 1</span>
-                <input type="number" :value="num1" data-testid="num1" />
+                <input v-model="num1" type="number" data-testid="num1" />
             </div>
             <div class="num">
                 <span>Number 2</span>
-                <input type="number" :value="num2" data-testid="num2" />
+                <input v-model="num2" type="number" data-testid="num2" />
             </div>
             <div class="num">
                 <span data-testid="num3">result:{{ num3 }}</span>
@@ -30,7 +30,9 @@
     watch(
         () => [num1.value, num2.value],
         ([n1, n2]) => {
-            num3.value = sum(n1, n2);
+            console.log(n1, n2, num3.value);
+            num3.value = sum(n1 || 0, n2 || 0);
+            console.log(n1, n2, num3.value);
         }
     );
     // const num3 = computed(() => {

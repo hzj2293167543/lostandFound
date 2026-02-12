@@ -8,17 +8,7 @@
     "type": "module",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "build": "node ../../scripts/build.js",
-        "dev": "node ../../scripts/dev.js"
-    },
-    "buildOptions": {
-        "name": "@monorepo/components",
-        "formats": [
-            "esm",
-            "cjs",
-            "iife",
-            "ts"
-        ]
+        "build": "node scripts/build.js"
     },
     "keywords": [],
     "author": "",
@@ -26,7 +16,12 @@
     "packageManager": "pnpm@10.19.0",
     "dependencies": {
         "@monorepo/utils": "workspace:*",
-        "vue": "^3.x"
+        "vue": "^3.x",
+        "@vitejs/plugin-vue": "^6.0.3",
+        "typescript": "^5.9.3",
+        "vite": "^7.3.1",
+        "vitest": "^4.0.18",
+        "vue-tsc": "^3.2.3"
     },
     "files": [
         "dist"

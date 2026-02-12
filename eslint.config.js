@@ -8,6 +8,7 @@ import reactPlugin from 'eslint-plugin-react';
 import prettierPlugin from 'eslint-plugin-prettier';
 import prettierConfig from 'eslint-config-prettier';
 import globals from 'globals';
+import tseslint from 'typescript-eslint';
 
 export default [
     // 1. 忽略文件
@@ -103,6 +104,11 @@ export default [
         rules: {
             'prettier/prettier': 'warn',
         },
+    },
+    // 8. 忽略 TypeScript 类型检查配置
+    {
+        files: ['vitest.config.ts', 'vite.config.ts', 'playwright.config.ts'],
+        ...tseslint.configs.disableTypeChecked,
     },
     // 必须放在最后！
     prettierConfig,

@@ -29,3 +29,10 @@ uninvoked
 
 # other
 breakline
+
+
+# Auto-added words
+Vercel
+amondnet
+appleboy
+vercel

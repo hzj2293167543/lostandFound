@@ -1,4 +1,4 @@
-var utils = (function (exports) {
+var Utils = (function (exports) {
     'use strict';
 
     function sum(a, b) {

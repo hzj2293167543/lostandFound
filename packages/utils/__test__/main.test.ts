@@ -1,7 +1,7 @@
 import { expect } from 'vitest';
 import { it } from 'vitest';
 import { describe } from 'vitest';
-import * as math from '../dist/math.js';
+import * as math from '../src/math.js';
 
 describe('math utils', () => {
     it('add:1+2=3', () => {

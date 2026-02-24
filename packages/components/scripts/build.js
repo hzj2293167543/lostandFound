@@ -9,7 +9,7 @@ const distDir = path.join(pkgDir, 'dist');
 
 // 清理 dist
 if (fs.existsSync(distDir)) {
-    fs.rmSync(distDir, { recursive: true, force: true });
+  fs.rmSync(distDir, { recursive: true, force: true });
 }
 fs.mkdirSync(distDir, { recursive: true });
 

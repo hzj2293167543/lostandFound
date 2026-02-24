@@ -1,0 +1,29 @@
+import { defineMock } from 'vite-plugin-mock-dev-server';
+export default defineMock({
+  url: '/mock/announcements',
+  method: 'GET',
+  body: () => ({
+    code: 200,
+    message: 'success',
+    data: [
+      {
+        id: 1,
+        title: '关于加强校园失物招领管理的通知',
+        content: '为了更好地服务广大师生，即日起加强失物招领信息的审核和管理...',
+        time: '2024-02-20',
+      },
+      {
+        id: 2,
+        title: '本周失物招领统计',
+        content: '本周共收到失物信息23条，招领信息18条，已成功匹配12条...',
+        time: '2024-02-18',
+      },
+      {
+        id: 3,
+        title: '重要提醒：考试周注意保管个人物品',
+        content: '考试周期间，图书馆、教室人流量大，请同学们注意保管好个人物品...',
+        time: '2024-02-15',
+      },
+    ],
+  }),
+});

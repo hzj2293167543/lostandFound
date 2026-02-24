@@ -5,111 +5,126 @@ import tsParser from '@typescript-eslint/parser';
 import vuePlugin from 'eslint-plugin-vue';
 import vueParser from 'vue-eslint-parser';
 import reactPlugin from 'eslint-plugin-react';
+import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import prettierPlugin from 'eslint-plugin-prettier';
 import prettierConfig from 'eslint-config-prettier';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default [
-    // 1. 忽略文件
-    { ignores: ['**/dist/**', '**/node_modules/**', '**/*.min.js'] },
-    // 2. 全局/通用配置
-    {
-        languageOptions: {
-            ecmaVersion: 'latest',
-            sourceType: 'module',
-            globals: {
-                ...globals.browser,
-                ...globals.node,
-                ...globals.es2025,
-            },
-        },
-        linterOptions: {
-            reportUnusedDisableDirectives: 'error',
-        },
-        rules: {
-            'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-            'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-        },
+  // 1. 忽略文件
+  { ignores: ['**/dist/**', '**/node_modules/**', '**/*.min.js'] },
+  // 2. 全局/通用配置
+  {
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: {
+        ...globals.es2025,
+      },
     },
-    // 3. ESLint 内置推荐规则 (纯JS)
-    js.configs.recommended,
-    // 4. TypeScript 配置 (统一配置，不再区分src和__test__)
-    {
-        // 匹配所有 .ts 和 .tsx 文件，包括源码和测试
-        files: ['**/*.{ts,tsx}'],
-        languageOptions: {
-            parser: tsParser,
-            parserOptions: {
-                // 统一启用 projectService，让它去自动发现每个文件自己的 tsconfig.json
-                projectService: true,
-                // 移除 allowDefaultProject，因为现在每个测试文件都有家了
-            },
-        },
-        plugins: {
-            '@typescript-eslint': tsPlugin,
-        },
-        rules: {
-            ...tsPlugin.configs?.recommended?.rules,
-            // 你可以在这里统一调整规则，这些规则将同时作用于源码和测试
-            // 例如，如果你希望在所有地方都禁用某个规则：
-            // '@typescript-eslint/some-rule': 'off',
-        },
+    linterOptions: {
+      reportUnusedDisableDirectives: 'error',
     },
-    // 5. Vue 配置 (使用扁平化预设)
-    ...vuePlugin.configs['flat/recommended'],
-    {
-        files: ['**/*.vue'],
-        // 使用 Vue 插件官方提供的扁平化配置
-        languageOptions: {
-            parser: vueParser,
-            parserOptions: {
-                parser: tsParser,
-                ecmaVersion: 'latest',
-                sourceType: 'module',
-            },
-        },
-        rules: {
-            // 可覆盖 Vue 规则
-            'vue/multi-word-component-names': 'off',
-        },
+    rules: {
+      'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+      'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     },
-    // 6. React 配置 (使用扁平化预设)
-    {
-        files: ['**/*.{jsx,tsx}'],
-        // 使用 React 插件官方提供的扁平化配置
-        ...reactPlugin.configs.flat.recommended,
-        settings: {
-            react: {
-                version: 'detect',
-            },
-        },
-        languageOptions: {
-            parserOptions: {
-                ecmaFeatures: {
-                    jsx: true,
-                },
-            },
-        },
-        rules: {
-            'react/react-in-jsx-scope': 'off',
-            'react/prop-types': 'off',
-        },
+  },
+  // 前端目录
+  {
+    files: ['apps/frontend/**', 'packages/components/**', 'packages/utils/**'],
+    languageOptions: {
+      globals: { ...globals.browser },
     },
-    // 7. Prettier 集成
-    {
-        plugins: {
-            prettier: prettierPlugin,
-        },
-        rules: {
-            'prettier/prettier': 'warn',
-        },
+  },
+  // 后端目录
+  {
+    files: ['apps/backend/**'],
+    languageOptions: {
+      globals: { ...globals.node },
     },
-    // 8. 忽略 TypeScript 类型检查配置
-    {
-        files: ['vitest.config.ts', 'vite.config.ts', 'playwright.config.ts'],
-        ...tseslint.configs.disableTypeChecked,
+  },
+  // 配置文件单独给 node 环境
+  {
+    files: ['*.config.{js,ts}', 'scripts/**'],
+    languageOptions: {
+      globals: { ...globals.node },
     },
-    // 必须放在最后！
-    prettierConfig,
+  },
+  // 3. ESLint 内置推荐规则 (纯JS)
+  js.configs.recommended,
+  // 4. TypeScript 配置 (统一配置，不再区分src和__test__)
+  {
+    // 匹配所有 .ts 和 .tsx 文件，包括源码和测试
+    files: ['**/*.{ts,tsx}'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        // 统一启用 projectService，让它去自动发现每个文件自己的 tsconfig.json
+        projectService: true,
+        // 移除 allowDefaultProject，因为现在每个测试文件都有家了
+      },
+    },
+    plugins: {
+      '@typescript-eslint': tsPlugin,
+    },
+    rules: {
+      ...tsPlugin.configs?.recommended?.rules,
+      // 你可以在这里统一调整规则，这些规则将同时作用于源码和测试
+      // 例如，如果你希望在所有地方都禁用某个规则：
+      // '@typescript-eslint/some-rule': 'off',
+    },
+  },
+  // 5. Vue 配置 (使用扁平化预设)
+  ...vuePlugin.configs['flat/recommended'],
+  {
+    files: ['**/*.vue'],
+    // 使用 Vue 插件官方提供的扁平化配置
+    languageOptions: {
+      parser: vueParser,
+      parserOptions: {
+        parser: tsParser,
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+      },
+    },
+    rules: {
+      // 可覆盖 Vue 规则
+      'vue/multi-word-component-names': 'off',
+    },
+  },
+  // 6. React 配置 (使用扁平化预设)
+  {
+    ...reactPlugin.configs.flat.recommended,
+    files: ['**/*.{jsx,tsx}'],
+  },
+  {
+    ...reactHooksPlugin.configs.flat.recommended,
+    files: ['**/*.{jsx,tsx}'],
+  },
+  {
+    files: ['**/*.{jsx,tsx}'],
+    settings: { react: { version: 'detect' } },
+    rules: {
+      'react/react-in-jsx-scope': 'off',
+      'react/prop-types': 'off',
+    },
+  },
+  // 7. Prettier 集成
+  {
+    plugins: {
+      prettier: prettierPlugin,
+    },
+    rules: {
+      'prettier/prettier': 'warn',
+    },
+  },
+  // 8. 忽略 TypeScript 类型检查配置
+  {
+    files: ['vitest.config.ts', 'vite.config.ts', 'playwright.config.ts'],
+    ...tseslint.configs.disableTypeChecked,
+  },
+  // 必须放在最后！
+  prettierConfig,
 ];

@@ -1,31 +1,100 @@
 name: Release
 
 on:
-    workflow_dispatch:
+    push:
+        branches: [master] # 🎯 监听 main 分支，自动处理版本和发布
+    workflow_dispatch: # 保留手动触发能力
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: false # 发布不取消，避免中途打断
 
 jobs:
     release:
         runs-on: ubuntu-latest
+        timeout-minutes: 15
+        permissions:
+            contents: write # 用于创建 tag 和 PR
+            pull-requests: write # 用于 Changesets 自动 PR
+            id-token: write # 用于 npm provenance（可选）
+
         steps:
-            - uses: actions/checkout@v4
+            - name: Checkout
+              uses: actions/checkout@v4
               with:
                   fetch-depth: 0
+                  persist-credentials: false # 改用 GITHUB_TOKEN，避免密钥泄露
 
-            - uses: pnpm/action-setup@v2
-            - uses: actions/setup-node@v4
+            - name: Install pnpm
+              uses: pnpm/action-setup@v4
+              with:
+                  version: 10
+                  run_install: false
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
               with:
                   node-version: 23
                   cache: 'pnpm'
                   registry-url: 'https://registry.npmjs.org'
 
-            - run: pnpm install --frozen-lockfile
-            - run: npx playwright install chromium
-            - run: pnpm run test:run
-            - run: pnpm run build
+            # ----- 依赖缓存（复用 CI 优化方案）-----
+            - name: Get pnpm store directory
+              id: pnpm-store
+              run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
 
-            - uses: changesets/action@v1
+            - name: Cache pnpm store
+              uses: actions/cache@v4
               with:
-                  publish: pnpm changeset publish
+                  path: ${{ steps.pnpm-store.outputs.STORE_PATH }}
+                  key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: |
+                      ${{ runner.os }}-pnpm-store-
+
+            - name: Cache node_modules
+              id: node-modules-cache
+              uses: actions/cache@v4
+              with:
+                  path: |
+                      **/node_modules
+                      !**/node_modules/.cache
+                  key: ${{ runner.os }}-node_modules-${{ hashFiles('**/pnpm-lock.yaml') }}
+
+            - name: Install dependencies
+              if: steps.node-modules-cache.outputs.cache-hit != 'true'
+              run: pnpm install --frozen-lockfile --prefer-offline
+
+            # ----- 浏览器缓存（仅当测试需要）-----
+            - name: Cache Playwright
+              uses: actions/cache@v4
+              with:
+                  path: ~/.cache/ms-playwright
+                  key: ${{ runner.os }}-playwright-${{ hashFiles('**/pnpm-lock.yaml') }}
+
+            - name: Install Playwright (if needed)
+              run: npx playwright install chromium --with-deps
+
+            # ----- 测试（确保发版前通过）-----
+            - name: Run tests
+              run: pnpm run test:run
+
+            # ----- 构建（供 npm 发布）-----
+            - name: Build packages
+              run: pnpm run build
+
+            # ----- 🚀 Changesets 自动版本管理与发布 -----
+            - name: Create Release Pull Request or Publish
+              id: changesets
+              uses: changesets/action@v1
+              with:
+                  # 📦 版本更新命令（应用 changeset，更新 version + changelog）
+                  version: pnpm ver
+                  # 📤 发布命令（你已有的 release 脚本：pnpm build && changeset publish）
+                  publish: pnpm release
+                  # 📝 可选：提交信息
+                  commit: 'chore: version packages'
+                  title: 'chore: version packages'
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+                  NPM_CONFIG_PROVENANCE: true # 可选，增强安全

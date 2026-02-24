@@ -116,6 +116,30 @@
         "unicorn/prefer-string-starts-ends-with": "warn",
         "unicorn/no-array-sort": "off"
     },
+    "overrides": [
+        {
+            "files": ["**/*.ts"],
+            "rules": {
+                "max-lines-per-function": [
+                    "warn",
+                    {
+                        "max": 50
+                    }
+                ]
+            }
+        },
+        {
+            "files": ["**/*.tsx"],
+            "rules": {
+                "max-lines-per-function": [
+                    "warn",
+                    {
+                        "max": 300
+                    }
+                ]
+            }
+        }
+    ],
     "settings": {
         "jsx-a11y": {
             "polymorphicPropName": null,

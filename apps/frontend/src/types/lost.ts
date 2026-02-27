@@ -1,4 +1,4 @@
-export interface LostItem {
+interface LostItemBase {
   id: number;
   title: string;
   category: string;
@@ -7,10 +7,35 @@ export interface LostItem {
   location: string;
   status: string;
   image: string;
-  user?: {
+}
+
+export interface LostItem extends LostItemBase {
+  commentCount?: number;
+  user: {
     id: number;
     name: string;
     avatar: string;
   };
-  comments?: number;
+}
+
+export interface Comment {
+  id: number;
+  content: string;
+  time: string;
+  user: {
+    id: number;
+    name: string;
+    avatar: string;
+  };
+}
+
+export interface LostDetail extends LostItem {
+  comments: Comment[];
+  user: {
+    id: number;
+    name: string;
+    avatar: string;
+    description: string;
+    contact: string;
+  };
 }

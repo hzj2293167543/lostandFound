@@ -1,27 +1,27 @@
 {
-    "name": "@monorepo/utils",
-    "version": "1.0.0",
-    "description": "Monorepo shared utilities",
-    "main": "dist/index.cjs",
-    "module": "dist/index.js",
-    "types": "dist/types/index.d.ts",
-    "type": "module",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "build": "node scripts/build.js",
-        "dev": "node scripts/dev.js"
-    },
-    "devDependencies": {
-        "@rollup/plugin-typescript": "^12.3.0",
-        "rollup": "^4.56.0",
-        "typescript": "^5.9.3",
-        "vitest": "^4.0.18"
-    },
-    "files": [
-        "dist"
-    ],
-    "keywords": [],
-    "author": "",
-    "license": "ISC",
-    "packageManager": "pnpm@10.19.0"
+  "name": "@monorepo/utils",
+  "version": "1.0.0",
+  "description": "Monorepo shared utilities",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/types/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "node scripts/build.js",
+    "dev": "node scripts/dev.js"
+  },
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^12.3.0",
+    "rollup": "^4.56.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.19.0"
 }

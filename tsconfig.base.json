@@ -1,25 +1,25 @@
 {
-    "compilerOptions": {
-        /* 语言和环境 */
-        "target": "ES2020", // 根据你的项目需求调整
-        "lib": ["ES2020", "DOM", "DOM.Iterable"],
-        "module": "ESNext",
-        "moduleResolution": "bundler", // 对Vite/现代打包工具友好
-        "types": [], // 通常在此留空，各子包在各自配置中添加
-        /* 严格的类型检查核心 */
-        "strict": true,
-        "skipLibCheck": true, // 提升编译速度
-        "esModuleInterop": true,
-        "allowSyntheticDefaultImports": true,
-        "forceConsistentCasingInFileNames": true,
-        /* 模块解析 */
-        "resolveJsonModule": true,
-        "isolatedModules": true, // 对现代打包工具必需
-        /* 编译输出控制 (此处不输出，仅检查) */
-        "noEmit": true, // 关键：这是一个纯类型检查配置，不生成文件
-        /* 代码质量 */
-        "exactOptionalPropertyTypes": true,
-        "noUncheckedIndexedAccess": true // 更安全的索引访问
-    },
-    "exclude": ["node_modules"] // 排除node_modules，子包配置会继承此规则
+  "compilerOptions": {
+    /* 语言和环境 */
+    "target": "ES2020", // 根据你的项目需求调整
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler", // 对Vite/现代打包工具友好
+    "types": [], // 通常在此留空，各子包在各自配置中添加
+    /* 严格的类型检查核心 */
+    "strict": true,
+    "skipLibCheck": true, // 提升编译速度
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    /* 模块解析 */
+    "resolveJsonModule": true,
+    "isolatedModules": true, // 对现代打包工具必需
+    /* 编译输出控制 (此处不输出，仅检查) */
+    "noEmit": true, // 关键：这是一个纯类型检查配置，不生成文件
+    /* 代码质量 */
+    "exactOptionalPropertyTypes": true,
+    "noUncheckedIndexedAccess": true // 更安全的索引访问
+  },
+  "exclude": ["node_modules"] // 排除node_modules，子包配置会继承此规则
 }

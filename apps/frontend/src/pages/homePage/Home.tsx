@@ -1,19 +1,18 @@
+import { useLoaderData } from 'react-router-dom';
 import Header from './components/Header';
 import FoundList from './components/FoundList';
 import LostList from './components/LostList';
 import AnnouncementList from './components/AnnouncementList';
-import { useHomeData } from './hooks/useHomeData';
+import { LostItem } from '@/types';
+import { FoundItem } from '@/types';
+import { Announcement } from '@/types';
 
 export default function Home() {
-  const { lostItems, foundItems, announcements, loading } = useHomeData();
-
-  if (loading) {
-    return (
-      <div className="min-h-svh bg-gray-50 flex items-center justify-center">
-        <div className="text-2xl font-bold text-gray-800">加载中...</div>
-      </div>
-    );
-  }
+  const { lostItems, foundItems, announcements } = useLoaderData() as {
+    lostItems: LostItem[];
+    foundItems: FoundItem[];
+    announcements: Announcement[];
+  };
 
   return (
     <div className="min-h-svh bg-gray-50">

@@ -41,7 +41,7 @@ const config = {
     {
       files: '*.json',
       options: {
-        tabWidth: 4,
+        tabWidth: 2,
       },
     },
     {

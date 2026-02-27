@@ -14,9 +14,9 @@ export function useHomeData() {
       try {
         // 三个 fetch 并行或串行，这里保持原样
         const [lostData, foundData, annData] = await Promise.all([
-          lostApi.getLostItems(),
-          foundApi.getFoundItems(),
-          announcementApi.getAnnouncements(),
+          lostApi.getLostItemsTop3(),
+          foundApi.getFoundItemsTop3(),
+          announcementApi.getAnnouncementsTop3(),
         ]);
         setLostItems(lostData);
         setFoundItems(foundData);

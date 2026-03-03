@@ -1,3 +1,4 @@
+import { LOST_FILTER_STATUS } from '@/pages/Lost/type';
 import { LostItem } from '@/types';
 import { Link } from 'react-router-dom';
 
@@ -23,13 +24,13 @@ export default function LostList({ lostItems }: { lostItems: LostItem[] }) {
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="font-semibold text-lg">{item.title}</h3>
                   <span
-                    className={`px-2 py-1 rounded-full text-xs ${item.status === '寻找中' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
-                    {item.status}
+                    className={`px-2 py-1 rounded-full text-xs ${item.status.code === LOST_FILTER_STATUS.寻找中 ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
+                    {item.status.name}
                   </span>
                 </div>
                 <p className="text-sm text-gray-600 mb-2">{item.description}</p>
                 <div className="text-xs text-gray-500 space-y-1">
-                  <p>分类：{item.category}</p>
+                  <p>分类：{item.category.name}</p>
                   <p>时间：{item.time}</p>
                   <p>地点：{item.location}</p>
                 </div>

@@ -3,31 +3,49 @@
     {
       "id": 1,
       "title": "蓝色笔记本电脑",
-      "category": "电子产品",
+      "category": {
+        "id": 1,
+        "name": "电子产品"
+      },
       "description": "联想小新Pro，蓝色外壳，有轻微划痕",
       "time": "2024-02-20",
       "location": "图书馆三楼",
-      "status": "寻找中",
+      "status": {
+        "code": 0,
+        "name": "寻找中"
+      },
       "image": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=laptop%20blue%20lenovo%20小新Pro&image_size=square"
     },
     {
       "id": 2,
       "title": "黑色钱包",
-      "category": "证件卡包",
+      "category": {
+        "id": 2,
+        "name": "证件卡包"
+      },
       "description": "黑色皮质钱包，内有身份证、学生证和银行卡",
       "time": "2024-02-19",
       "location": "食堂二楼",
-      "status": "寻找中",
+      "status": {
+        "code": 0,
+        "name": "寻找中"
+      },
       "image": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=black%20leather%20wallet%20men%20style&image_size=square"
     },
     {
       "id": 3,
       "title": "红色雨伞",
-      "category": "生活用品",
+      "category": {
+        "id": 3,
+        "name": "生活用品"
+      },
       "description": "折叠式红色雨伞，伞柄有小熊图案",
       "time": "2024-02-18",
       "location": "教学楼A座",
-      "status": "已找到",
+      "status": {
+        "code": 1,
+        "name": "已找到"
+      },
       "image": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=red%20foldable%20umbrella%20bear%20pattern&image_size=square"
     }
   ],
@@ -35,93 +53,129 @@
     {
       "id": 1,
       "title": "蓝色笔记本电脑",
-      "category": "电子产品",
+      "category": {
+        "id": 1,
+        "name": "电子产品"
+      },
       "description": "联想小新Pro，蓝色外壳，有轻微划痕，于2024年2月20日在图书馆三楼丢失",
       "time": "2024-02-20",
       "location": "图书馆三楼",
-      "status": "寻找中",
+      "status": {
+        "code": 0,
+        "name": "寻找中"
+      },
       "image": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=laptop%20blue%20lenovo%20小新Pro&image_size=square",
       "user": {
         "id": 1,
         "name": "张三",
         "avatar": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=user%20avatar%20male%20student&image_size=square"
       },
-      "comments": 5
+      "commentCount": 5
     },
     {
       "id": 2,
       "title": "黑色钱包",
-      "category": "证件卡包",
+      "category": {
+        "id": 2,
+        "name": "证件卡包"
+      },
       "description": "黑色皮质钱包，内有身份证、学生证和银行卡，于2024年2月19日在食堂二楼丢失",
       "time": "2024-02-19",
       "location": "食堂二楼",
-      "status": "寻找中",
+      "status": {
+        "code": 0,
+        "name": "寻找中"
+      },
       "image": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=black%20leather%20wallet%20men%20style&image_size=square",
       "user": {
         "id": 2,
         "name": "李四",
         "avatar": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=user%20avatar%20female%20student&image_size=square"
       },
-      "comments": 3
+      "commentCount": 3
     },
     {
       "id": 3,
       "title": "红色雨伞",
-      "category": "生活用品",
+      "category": {
+        "id": 3,
+        "name": "生活用品"
+      },
       "description": "折叠式红色雨伞，伞柄有小熊图案，于2024年2月18日在教学楼A座丢失",
       "time": "2024-02-18",
       "location": "教学楼A座",
-      "status": "已找到",
+      "status": {
+        "code": 1,
+        "name": "已找到"
+      },
       "image": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=red%20foldable%20umbrella%20bear%20pattern&image_size=square",
       "user": {
         "id": 3,
         "name": "王五",
         "avatar": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=user%20avatar%20male%20student%20glasses&image_size=square"
       },
-      "comments": 2
+      "commentCount": 2
     },
     {
       "id": 4,
       "title": "白色运动鞋",
-      "category": "服饰",
+      "category": {
+        "id": 4,
+        "name": "服饰"
+      },
       "description": "耐克白色运动鞋，尺码42，于2024年2月17日在体育馆丢失",
       "time": "2024-02-17",
       "location": "体育馆",
-      "status": "寻找中",
+      "status": {
+        "code": 0,
+        "name": "寻找中"
+      },
       "image": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=white%20sports%20shoes%20nike&image_size=square",
       "user": {
         "id": 4,
         "name": "赵六",
         "avatar": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=user%20avatar%20female%20student%20smile&image_size=square"
       },
-      "comments": 1
+      "commentCount": 1
     },
     {
       "id": 5,
       "title": "数学课本",
-      "category": "学习用品",
+      "category": {
+        "id": 5,
+        "name": "学习用品"
+      },
       "description": "高等数学上册，封面有笔记，于2024年2月16日在教室302丢失",
       "time": "2024-02-16",
       "location": "教室302",
-      "status": "已找到",
+      "status": {
+        "code": 1,
+        "name": "已找到"
+      },
       "image": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=mathematics%20textbook%20college%20level&image_size=square",
       "user": {
         "id": 5,
         "name": "孙七",
         "avatar": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=user%20avatar%20male%20student%20casual&image_size=square"
       },
-      "comments": 0
+      "commentCount": 0
     }
   ],
   "lostItemDetail": [
     {
       "id": 1,
       "title": "蓝色笔记本电脑",
-      "category": "电子产品",
+      "category": {
+        "id": 1,
+        "name": "电子产品"
+      },
       "description": "联想小新Pro，蓝色外壳，有轻微划痕，于2024年2月20日在图书馆三楼丢失。电脑内有重要的学习资料和项目文件，希望捡到的同学能够联系我，必有重谢！",
       "time": "2024-02-20",
       "location": "图书馆三楼",
-      "status": "寻找中",
+      "status": {
+        "code": 0,
+        "name": "寻找中"
+      },
       "image": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=laptop%20blue%20lenovo%20小新Pro&image_size=landscape_16_9",
       "user": {
         "id": 1,
@@ -176,11 +230,17 @@
     {
       "id": 2,
       "title": "黑色钱包",
-      "category": "证件卡包",
+      "category": {
+        "id": 2,
+        "name": "证件卡包"
+      },
       "description": "黑色皮质钱包，内有身份证、学生证和银行卡，于2024年2月19日在食堂二楼丢失。钱包是我刚买的，里面还有一些现金和重要证件，希望捡到的同学能够联系我，必有酬谢！",
       "time": "2024-02-19",
       "location": "食堂二楼",
-      "status": "寻找中",
+      "status": {
+        "code": 0,
+        "name": "寻找中"
+      },
       "image": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=black%20leather%20wallet%20men%20style&image_size=landscape_16_9",
       "user": {
         "id": 2,
@@ -225,11 +285,17 @@
     {
       "id": 3,
       "title": "红色雨伞",
-      "category": "生活用品",
+      "category": {
+        "id": 3,
+        "name": "生活用品"
+      },
       "description": "折叠式红色雨伞，伞柄有小熊图案，于2024年2月18日在教学楼A座丢失。这把雨伞是我生日时朋友送的，对我来说很有意义，希望捡到的同学能够联系我，非常感谢！",
       "time": "2024-02-18",
       "location": "教学楼A座",
-      "status": "已找到",
+      "status": {
+        "code": 1,
+        "name": "已找到"
+      },
       "image": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=red%20foldable%20umbrella%20bear%20pattern&image_size=landscape_16_9",
       "user": {
         "id": 3,
@@ -284,11 +350,17 @@
     {
       "id": 4,
       "title": "白色运动鞋",
-      "category": "服饰",
+      "category": {
+        "id": 4,
+        "name": "服饰"
+      },
       "description": "耐克白色运动鞋，尺码42，于2024年2月17日在体育馆丢失。这双鞋是我上个月刚买的，很喜欢，希望捡到的同学能够联系我，必有酬谢！",
       "time": "2024-02-17",
       "location": "体育馆",
-      "status": "寻找中",
+      "status": {
+        "code": 0,
+        "name": "寻找中"
+      },
       "image": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=white%20sports%20shoes%20nike&image_size=landscape_16_9",
       "user": {
         "id": 4,
@@ -333,11 +405,17 @@
     {
       "id": 5,
       "title": "数学课本",
-      "category": "学习用品",
+      "category": {
+        "id": 5,
+        "name": "学习用品"
+      },
       "description": "高等数学上册，封面有笔记，于2024年2月16日在教室302丢失。这本书对我来说非常重要，里面有很多课堂笔记和习题解答，希望捡到的同学能够联系我，非常感谢！",
       "time": "2024-02-16",
       "location": "教室302",
-      "status": "已找到",
+      "status": {
+        "code": 1,
+        "name": "已找到"
+      },
       "image": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=mathematics%20textbook%20college%20level&image_size=landscape_16_9",
       "user": {
         "id": 5,

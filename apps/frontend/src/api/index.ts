@@ -1,5 +1,13 @@
 import { get, post, put, remove } from './client';
-import { Category, LostItem, FoundItem, Announcement } from '@/types';
+import {
+  Category,
+  LostItem,
+  FoundItem,
+  Announcement,
+  AnnouncementDetail,
+  FoundDetail,
+  LostDetail,
+} from '@/types';
 
 // 失物相关 API
 export const lostApi = {
@@ -10,7 +18,7 @@ export const lostApi = {
   getLostItemsTop3: () => get<LostItem[]>('/lost-items-top3'),
 
   // 获取失物详情
-  getLostItemDetailById: (id: number) => get<LostItem>(`/lost-item-detail/${id}`),
+  getLostItemDetailById: (id: number) => get<LostDetail>(`/lost-item-detail/${id}`),
 
   // 创建失物信息
   createLostItem: (data: Omit<LostItem, 'id'>) => post<LostItem>('/lost-items', data),
@@ -31,7 +39,7 @@ export const foundApi = {
   getFoundItemsTop3: () => get<FoundItem[]>('/found-items-top3'),
 
   // 获取招领详情
-  getFoundItemById: (id: number) => get<FoundItem>(`/found-items/${id}`),
+  getFoundItemDetailById: (id: number) => get<FoundDetail>(`/found-item-detail/${id}`),
 
   // 创建招领信息
   createFoundItem: (data: Omit<FoundItem, 'id'>) => post<FoundItem>('/found-items', data),
@@ -53,7 +61,7 @@ export const announcementApi = {
   getAnnouncementsTop3: () => get<Announcement[]>('/announcements-top3'),
 
   // 获取公告详情
-  getAnnouncementById: (id: number) => get<Announcement>(`/announcements/${id}`),
+  getAnnouncementDetailById: (id: number) => get<AnnouncementDetail>(`/announcement-detail/${id}`),
 
   // 创建公告（管理员）
   createAnnouncement: (data: Omit<Announcement, 'id'>) =>

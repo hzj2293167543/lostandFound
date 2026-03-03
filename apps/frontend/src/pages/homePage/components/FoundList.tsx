@@ -22,7 +22,7 @@ export default function FoundList({ foundItems }: { foundItems: FoundItem[] }) {
               <h3 className="font-semibold text-lg mb-2">{item.title}</h3>
               <p className="text-sm text-gray-600 mb-2">{item.description}</p>
               <div className="text-xs text-gray-500 space-y-1">
-                <p>分类：{item.category}</p>
+                <p>分类：{item.category.name}</p>
                 <p>时间：{item.time}</p>
                 <p>地点：{item.location}</p>
               </div>

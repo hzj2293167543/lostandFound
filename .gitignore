@@ -117,3 +117,5 @@ __snapshots__/       # Jest 快照
 # 其他工具缓存或临时目录
 .output/             # 某些 Nitro、Nuxt 构建输出
 .nitro/              # Nitro 开发缓存
+
+*.sql

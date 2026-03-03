@@ -8,8 +8,42 @@ import {
   CardFooter,
 } from '@/components/ui/card';
 import { LostDetail } from '@/types';
+import { LOST_FILTER_STATUS } from '../../type';
+import { toast } from 'sonner';
 
 export default function LostDetailItem({ lostDetail }: { lostDetail: LostDetail }) {
+  // 联系发布者
+  const handleContact = async () => {
+    if (lostDetail.user?.contact) {
+      // 使用临时联系电话
+      await navigator.clipboard.writeText(lostDetail.user.contact);
+      toast.success(`联系电话：${lostDetail.user.contact} 已复制到剪贴板`);
+    } else {
+      toast.error('暂无联系方式');
+    }
+  };
+
+  // 分享信息
+  const handleShare = async () => {
+    const shareUrl = window.location.href;
+    try {
+      // 尝试使用Web Share API
+      if (navigator.share) {
+        await navigator.share({
+          title: lostDetail.title,
+          text: lostDetail.description,
+          url: shareUrl,
+        });
+      } else {
+        // 回退方案：复制链接
+        await navigator.clipboard.writeText(shareUrl);
+        toast.success('链接已复制到剪贴板');
+      }
+    } catch {
+      // 最终回退：显示链接
+      prompt('复制链接', shareUrl);
+    }
+  };
   return (
     <div className="lg:col-span-2">
       <Card className="mb-8">
@@ -24,11 +58,11 @@ export default function LostDetailItem({ lostDetail }: { lostDetail: LostDetail 
           <div className="flex justify-between items-start">
             <CardTitle className="text-2xl">{lostDetail.title}</CardTitle>
             <span
-              className={`px-3 py-1 rounded-full text-sm ${lostDetail.status === '寻找中' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
-              {lostDetail.status}
+              className={`px-3 py-1 rounded-full text-sm ${lostDetail.status.code === LOST_FILTER_STATUS.寻找中 ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
+              {lostDetail.status.name}
             </span>
           </div>
-          <CardDescription>分类：{lostDetail.category}</CardDescription>
+          <CardDescription>分类：{lostDetail.category.name}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="text-gray-600 mb-6">
@@ -63,8 +97,12 @@ export default function LostDetailItem({ lostDetail }: { lostDetail: LostDetail 
           </div>
         </CardContent>
         <CardFooter>
-          <Button className="bg-blue-600 hover:bg-blue-700">联系发布者</Button>
-          <Button variant="outline">分享信息</Button>
+          <Button className="bg-blue-600 hover:bg-blue-700" onClick={handleContact}>
+            联系发布者
+          </Button>
+          <Button variant="outline" onClick={handleShare}>
+            分享信息
+          </Button>
         </CardFooter>
       </Card>
     </div>

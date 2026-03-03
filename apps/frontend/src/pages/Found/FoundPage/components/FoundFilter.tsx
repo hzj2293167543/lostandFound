@@ -8,9 +8,9 @@ import {
   Select,
 } from '@/components/ui/select';
 import { Category } from '@/types';
-import { ALL_CATEGORY, FilterState, LOST_FILTER_STATUS, SetFilterState } from '../../type';
+import { ALL_CATEGORY, FilterState, FOUND_FILTER_STATUS, SetFilterState } from '../../type';
 
-export default function LostFilter({
+export default function FoundFilter({
   categories,
   filterState,
   setFilterState,
@@ -20,10 +20,8 @@ export default function LostFilter({
   setFilterState: SetFilterState;
 }) {
   const { status, searchTerm, category } = filterState;
-  const categoryOptions = [
-    { value: ALL_CATEGORY, label: '全部分类' },
-    ...categories.map((cat) => ({ value: cat.id, label: cat.name })),
-  ];
+  const categoryOptions = [{ id: ALL_CATEGORY, name: '全部分类' }, ...categories];
+
   return (
     <div className="bg-white rounded-lg shadow-md p-4 mb-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -42,12 +40,12 @@ export default function LostFilter({
             value={String(category)}
             onValueChange={(value) => setFilterState('category', Number(value))}>
             <SelectTrigger id="filter-category">
-              <SelectValue placeholder="全部分类" />
+              <SelectValue placeholder={categoryOptions.find((cat) => cat.id === category)?.name} />
             </SelectTrigger>
             <SelectContent>
               {categoryOptions.map((cat) => (
-                <SelectItem key={cat.value} value={String(cat.value)}>
-                  {cat.label}
+                <SelectItem key={cat.id} value={String(cat.id)}>
+                  {cat.name}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -59,11 +57,11 @@ export default function LostFilter({
             value={String(status)}
             onValueChange={(value) => setFilterState('status', Number(value))}>
             <SelectTrigger id="filter-status">
-              <SelectValue placeholder="全部状态" />
+              <SelectValue placeholder={status} />
             </SelectTrigger>
             <SelectContent>
-              {Object.entries(LOST_FILTER_STATUS).map(([name, value]) => (
-                <SelectItem key={name} value={String(value)}>
+              {Object.entries(FOUND_FILTER_STATUS).map(([name, status]) => (
+                <SelectItem key={name} value={String(status)}>
                   {name}
                 </SelectItem>
               ))}

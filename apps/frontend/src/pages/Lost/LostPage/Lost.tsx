@@ -1,16 +1,16 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useLoaderData } from 'react-router-dom';
 import { Category, LostItem } from '@/types';
-import LostCreate from './components/LostCreate';
+import LostCreate from '../components/LostCreate';
 import LostFilter from './components/LostFilter';
 import LostList from './components/LostList';
-import { FilterState, SetFilterState } from '../type';
+import { ALL_CATEGORY, FilterState, LOST_FILTER_STATUS, SetFilterState } from '../type';
 
 export default function LostPage() {
   const [filterState, setFilterState] = useState<FilterState>({
-    status: '',
+    status: LOST_FILTER_STATUS.全部状态,
     searchTerm: '',
-    category: '',
+    category: ALL_CATEGORY,
   });
   const { lostItems, categories } = useLoaderData() as {
     lostItems: LostItem[];
@@ -25,15 +25,21 @@ export default function LostPage() {
   };
 
   // 筛选失物
-  const filteredItems = lostItems.filter((item) => {
-    const { searchTerm, category, status } = filterState;
-    const matchesSearch =
-      item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = !category || item.category === category || category === 'all';
-    const matchesStatus = !status || item.status === status || status === 'all';
-    return matchesSearch && matchesCategory && matchesStatus;
-  });
+  const filteredItems = useMemo(
+    () =>
+      lostItems.filter((item) => {
+        const { searchTerm, category, status } = filterState;
+        const matchesSearch =
+          item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.description.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesCategory =
+          !category || item.category.id === category || category === ALL_CATEGORY;
+        const matchesStatus =
+          !status || item.status.code === status || status === LOST_FILTER_STATUS.全部状态;
+        return matchesSearch && matchesCategory && matchesStatus;
+      }),
+    [filterState, lostItems]
+  );
 
   return (
     <div className="container mx-auto px-4 py-8">

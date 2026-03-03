@@ -1,4 +1,136 @@
 {
+  "foundItems": [
+    {
+      "id": 1,
+      "title": "白色AirPods",
+      "category": {
+        "id": 1,
+        "name": "电子产品"
+      },
+      "description": "白色AirPods耳机，带充电盒，于2024年2月20日在操场捡到。",
+      "time": "2024-02-20 10:00:00",
+      "location": "操场",
+      "status": {
+        "code": 0,
+        "name": "招领中"
+      },
+      "statusText": "招领中",
+      "image": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=white%20AirPods%20with%20charging%20case&image_size=landscape_16_9",
+      "user_id": 3,
+      "user": {
+        "id": 3,
+        "name": "李四",
+        "avatar": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=user%20avatar%20female%20student&image_size=square"
+      },
+      "comment_count": 0,
+      "created_at": "2024-02-20 10:30:00",
+      "updated_at": "2024-02-20 10:30:00"
+    },
+    {
+      "id": 2,
+      "title": "数学课本",
+      "category": {
+        "id": 5,
+        "name": "学习用品"
+      },
+      "description": "高等数学上册，封面有笔记，于2024年2月19日在教室302捡到。",
+      "time": "2024-02-19 15:30:00",
+      "location": "教室302",
+      "status": {
+        "code": 0,
+        "name": "招领中"
+      },
+      "statusText": "招领中",
+      "image": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=mathematics%20textbook%20college%20level&image_size=landscape_16_9",
+      "user_id": 3,
+      "user": {
+        "id": 3,
+        "name": "李四",
+        "avatar": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=user%20avatar%20female%20student&image_size=square"
+      },
+      "comment_count": 0,
+      "created_at": "2024-02-19 16:00:00",
+      "updated_at": "2024-02-19 16:00:00"
+    },
+    {
+      "id": 3,
+      "title": "运动水杯",
+      "category": {
+        "id": 3,
+        "name": "生活用品"
+      },
+      "description": "蓝色运动水杯，带刻度，于2024年2月18日在体育馆捡到。",
+      "time": "2024-02-18 18:00:00",
+      "location": "体育馆",
+      "status": {
+        "code": 1,
+        "name": "已归还"
+      },
+      "statusText": "已归还",
+      "image": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=blue%20sports%20water%20bottle%20with%20scale&image_size=landscape_16_9",
+      "user_id": 3,
+      "user": {
+        "id": 3,
+        "name": "李四",
+        "avatar": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=user%20avatar%20female%20student&image_size=square"
+      },
+      "comment_count": 2,
+      "created_at": "2024-02-18 18:30:00",
+      "updated_at": "2024-02-19 10:00:00"
+    },
+    {
+      "id": 4,
+      "title": "黑色钱包",
+      "category": {
+        "id": 2,
+        "name": "证件卡包"
+      },
+      "description": "黑色钱包，内有身份证和银行卡，于2024年2月21日在食堂捡到。",
+      "time": "2024-02-21 12:00:00",
+      "location": "食堂",
+      "status": {
+        "code": 0,
+        "name": "招领中"
+      },
+      "statusText": "招领中",
+      "image": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=black%20wallet&image_size=landscape_16_9",
+      "user_id": 3,
+      "user": {
+        "id": 3,
+        "name": "李四",
+        "avatar": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=user%20avatar%20female%20student&image_size=square"
+      },
+      "comment_count": 0,
+      "created_at": "2024-02-21 12:30:00",
+      "updated_at": "2024-02-21 12:30:00"
+    },
+    {
+      "id": 5,
+      "title": "蓝色雨伞",
+      "category": {
+        "id": 3,
+        "name": "生活用品"
+      },
+      "description": "蓝色雨伞，于2024年2月22日在教学楼捡到。",
+      "time": "2024-02-22 18:00:00",
+      "location": "教学楼",
+      "status": {
+        "code": 0,
+        "name": "招领中"
+      },
+      "statusText": "招领中",
+      "image": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=blue%20umbrella&image_size=landscape_16_9",
+      "user_id": 3,
+      "user": {
+        "id": 3,
+        "name": "李四",
+        "avatar": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=user%20avatar%20female%20student&image_size=square"
+      },
+      "comment_count": 0,
+      "created_at": "2024-02-22 18:30:00",
+      "updated_at": "2024-02-22 18:30:00"
+    }
+  ],
   "foundTop3": [
     {
       "id": 1,
@@ -26,6 +158,180 @@
       "time": "2024-02-18",
       "location": "体育馆",
       "image": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=blue%20sports%20water%20bottle%20with%20scale&image_size=square"
+    }
+  ],
+  "foundItemDetails": [
+    {
+      "id": 1,
+      "title": "白色AirPods",
+      "category": {
+        "id": 1,
+        "name": "电子产品"
+      },
+      "time": "2024-02-20 10:00:00",
+      "storage_location": "失物招领中心",
+      "contact_phone": "138****1234",
+      "status": {
+        "code": 0,
+        "name": "招领中"
+      },
+      "description": "白色AirPods耳机，带充电盒，于2024年2月20日在操场捡到。",
+      "location": "操场",
+      "image": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=white%20AirPods%20with%20charging%20case&image_size=landscape_16_9",
+      "user": {
+        "id": 3,
+        "name": "李四",
+        "avatar": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=user%20avatar%20female%20student&image_size=square",
+        "description": "汉语言文学专业，喜欢阅读和写作",
+        "contact": "139****5678"
+      },
+      "comments": [
+        {
+          "id": 1,
+          "content": "这是我的！我昨天在操场跑步时丢失的",
+          "time": "2024-02-20 15:30:00",
+          "user": {
+            "id": 2,
+            "name": "张三",
+            "avatar": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=user%20avatar%20male%20student&image_size=square"
+          }
+        },
+        {
+          "id": 2,
+          "content": "请提供更多细节以便确认",
+          "time": "2024-02-20 16:00:00",
+          "user": {
+            "id": 3,
+            "name": "李四",
+            "avatar": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=user%20avatar%20female%20student&image_size=square"
+          }
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "数学课本",
+      "category": {
+        "id": 5,
+        "name": "学习用品"
+      },
+      "time": "2024-02-19 15:30:00",
+      "storage_location": "失物招领中心",
+      "contact_phone": "138****1234",
+      "status": {
+        "code": 0,
+        "name": "招领中"
+      },
+      "description": "高等数学上册，封面有笔记，于2024年2月19日在教室302捡到。",
+      "location": "教室302",
+      "image": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=mathematics%20textbook%20college%20level&image_size=landscape_16_9",
+      "user": {
+        "id": 3,
+        "name": "李四",
+        "avatar": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=user%20avatar%20female%20student&image_size=square",
+        "description": "汉语言文学专业，喜欢阅读和写作",
+        "contact": "139****5678"
+      },
+      "comments": []
+    },
+    {
+      "id": 3,
+      "title": "运动水杯",
+      "category": {
+        "id": 3,
+        "name": "生活用品"
+      },
+      "time": "2024-02-18 18:00:00",
+      "storage_location": "失物招领中心",
+      "contact_phone": "138****1234",
+      "status": {
+        "code": 1,
+        "name": "已归还"
+      },
+      "description": "蓝色运动水杯，带刻度，于2024年2月18日在体育馆捡到。",
+      "location": "体育馆",
+      "image": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=blue%20sports%20water%20bottle%20with%20scale&image_size=landscape_16_9",
+      "user": {
+        "id": 3,
+        "name": "李四",
+        "avatar": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=user%20avatar%20female%20student&image_size=square",
+        "description": "汉语言文学专业，喜欢阅读和写作",
+        "contact": "139****5678"
+      },
+      "comments": [
+        {
+          "id": 1,
+          "content": "这是我的水杯，谢谢！",
+          "time": "2024-02-19 09:00:00",
+          "user": {
+            "id": 4,
+            "name": "王五",
+            "avatar": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=user%20avatar%20male%20student&image_size=square"
+          }
+        },
+        {
+          "id": 2,
+          "content": "不客气，很高兴帮到你",
+          "time": "2024-02-19 10:00:00",
+          "user": {
+            "id": 3,
+            "name": "李四",
+            "avatar": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=user%20avatar%20female%20student&image_size=square"
+          }
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "黑色钱包",
+      "category": {
+        "id": 2,
+        "name": "证件卡包"
+      },
+      "time": "2024-02-21 12:00:00",
+      "storage_location": "失物招领中心",
+      "contact_phone": "138****1234",
+      "status": {
+        "code": 0,
+        "name": "招领中"
+      },
+      "description": "黑色钱包，内有身份证和银行卡，于2024年2月21日在食堂捡到。",
+      "location": "食堂",
+      "image": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=black%20wallet&image_size=landscape_16_9",
+      "user": {
+        "id": 3,
+        "name": "李四",
+        "avatar": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=user%20avatar%20female%20student&image_size=square",
+        "description": "汉语言文学专业，喜欢阅读和写作",
+        "contact": "139****5678"
+      },
+      "comments": []
+    },
+    {
+      "id": 5,
+      "title": "蓝色雨伞",
+      "category": {
+        "id": 3,
+        "name": "生活用品"
+      },
+      "time": "2024-02-22 18:00:00",
+      "storage_location": "失物招领中心",
+      "contact_phone": "138****1234",
+      "status": {
+        "code": 0,
+        "name": "招领中"
+      },
+      "description": "蓝色雨伞，于2024年2月22日在教学楼捡到。",
+      "location": "教学楼",
+      "image": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=blue%20umbrella&image_size=landscape_16_9",
+      "user": {
+        "id": 3,
+        "name": "李四",
+        "avatar": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=user%20avatar%20female%20student&image_size=square",
+        "description": "汉语言文学专业，喜欢阅读和写作",
+        "contact": "139****5678"
+      },
+      "comments": []
     }
   ]
 }

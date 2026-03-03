@@ -1,27 +1,22 @@
+import { Category } from './category';
+import { Comment } from './comment';
+
 interface LostItemBase {
   id: number;
   title: string;
-  category: string;
+  category: Category;
   description: string;
   time: string;
   location: string;
-  status: string;
+  status: {
+    code: number;
+    name: string;
+  };
   image: string;
 }
 
 export interface LostItem extends LostItemBase {
   commentCount?: number;
-  user: {
-    id: number;
-    name: string;
-    avatar: string;
-  };
-}
-
-export interface Comment {
-  id: number;
-  content: string;
-  time: string;
   user: {
     id: number;
     name: string;

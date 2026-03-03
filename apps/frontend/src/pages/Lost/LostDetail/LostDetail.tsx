@@ -1,13 +1,14 @@
-import { LostDetail } from '@/types';
+import { Category, LostDetail } from '@/types';
 import { useState } from 'react';
 import { Link, useLoaderData } from 'react-router-dom';
-import Comments from './components/comments';
+import Comments from './components/Comments';
 import LostAction from './components/LostAction';
 import LostDetailItem from './components/LostDetailItem';
 import LostTips from './components/LostTips';
 
 export default function LostDetailPage() {
-  const lostDetail = useLoaderData() as LostDetail;
+  const [lostDetail, categories] = useLoaderData() as [LostDetail, Category[]];
+  console.log(categories, lostDetail);
   const [comments, setComments] = useState(lostDetail.comments);
 
   return (
@@ -29,7 +30,7 @@ export default function LostDetailPage() {
         {/* 右侧相关信息 */}
         <div className="lg:col-span-1">
           {/* 相关操作 */}
-          <LostAction />
+          <LostAction categories={categories} />
           {/* 失物招领小提示 */}
           <LostTips />
         </div>

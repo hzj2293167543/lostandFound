@@ -88,8 +88,8 @@
       },
       "image": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=black%20leather%20wallet%20men%20style&image_size=square",
       "user": {
-        "id": 2,
-        "name": "李四",
+        "id": 1,
+        "name": "张三",
         "avatar": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=user%20avatar%20female%20student&image_size=square"
       },
       "commentCount": 3

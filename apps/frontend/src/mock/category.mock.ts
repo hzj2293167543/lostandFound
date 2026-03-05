@@ -1,7 +1,7 @@
 import { defineMock } from 'vite-plugin-mock-dev-server';
 import { categoryData } from './mock-data';
 
-export const category = defineMock({
+export const getCategory = defineMock({
   url: '/mock/categories',
   method: 'GET',
   body: () => ({
@@ -11,4 +11,4 @@ export const category = defineMock({
   }),
 });
 
-export default [category];
+export default [getCategory];

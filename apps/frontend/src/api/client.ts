@@ -56,7 +56,7 @@ client.interceptors.response.use(
     const { code, message, data } = response.data;
     if (code === 200) {
       // 直接返回业务数据部分
-      return data as any;
+      return data as unknown as AxiosResponse<unknown>;
     }
     // 业务错误，抛出错误
     const error = new Error(message || '请求失败');

@@ -1,8 +1,8 @@
 // pages/ErrorPage.tsx
-import React from 'react';
+import { memo } from 'react';
 import { useRouteError } from 'react-router-dom';
 
-export default React.memo(function ErrorPage() {
+export default memo(function ErrorPage() {
   const error = useRouteError() as Error;
   return (
     <div>

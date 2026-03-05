@@ -1,0 +1,12 @@
+[
+  {
+    "id": 1,
+    "name": "张三",
+    "role": 0,
+    "avatar": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=user%20avatar%20male%20student&image_size=square",
+    "status": 0,
+    "email": "zhangsan@example.com",
+    "contact": "138****1234",
+    "description": "计算机科学与技术专业，热爱编程和运动"
+  }
+]

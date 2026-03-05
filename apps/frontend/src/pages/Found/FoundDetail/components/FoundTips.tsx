@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import React from 'react';
+import { memo } from 'react';
 
-export default React.memo(function FoundTips() {
+export default memo(function FoundTips() {
   return (
     <Card>
       <CardHeader>

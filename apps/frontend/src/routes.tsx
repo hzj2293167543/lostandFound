@@ -10,7 +10,7 @@ import FoundPage from './pages/Found/FoundPage/Found';
 import HomePage from './pages/homePage/Home';
 import LostDetailPage from './pages/Lost/LostDetail/LostDetail';
 import Lost from './pages/Lost/LostPage/Lost';
-import ProfilePage from './pages/ProfilePage';
+import ProfilePage from './pages/Profile/ProfilePage';
 import Error from './pages/Error/Error';
 
 // 导入 loaders
@@ -21,6 +21,7 @@ import { lostDetailLoader } from './pages/Lost/LostDetail/lostDetail.loader';
 import { lostLoader } from './pages/Lost/LostPage/lost.loader';
 import { announcementsLoader } from './pages/Announcement/Announcements/announcements.loader';
 import { announcementDetailLoader } from './pages/Announcement/AnnouncementDetail/announcementDetail.loader';
+import profileLoader from './pages/Profile/profile.loader';
 
 export const router = createBrowserRouter([
   {
@@ -62,6 +63,7 @@ export const router = createBrowserRouter([
       {
         path: 'profile',
         element: <ProfilePage />,
+        loader: profileLoader,
       },
     ],
   },

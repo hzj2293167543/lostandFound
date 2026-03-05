@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { useState } from 'react';
+import { type SyntheticEvent, useState } from 'react';
 import { Comment } from '@/types';
 export default function Comments({
   comments,
@@ -13,7 +13,7 @@ export default function Comments({
 }) {
   const [comment, setComment] = useState('');
   // 提交评论
-  const handleSubmitComment = (e: React.FormEvent) => {
+  const handleSubmitComment = (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!comment.trim()) return;
 

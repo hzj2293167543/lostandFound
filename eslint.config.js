@@ -47,7 +47,7 @@ export default [
   },
   // 配置文件单独给 node 环境
   {
-    files: ['*.config.{js,ts}', 'scripts/**'],
+    files: ['**/*.config.{js,ts}', 'scripts/**'],
     languageOptions: {
       globals: { ...globals.node },
     },
@@ -71,6 +71,13 @@ export default [
     },
     rules: {
       ...tsPlugin.configs?.recommended?.rules,
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+        },
+      ],
       // 你可以在这里统一调整规则，这些规则将同时作用于源码和测试
       // 例如，如果你希望在所有地方都禁用某个规则：
       // '@typescript-eslint/some-rule': 'off',
@@ -107,8 +114,9 @@ export default [
     files: ['**/*.{jsx,tsx}'],
     settings: { react: { version: 'detect' } },
     rules: {
-      'react/react-in-jsx-scope': 'off',
-      'react/prop-types': 'off',
+      ...reactPlugin.configs['jsx-runtime'].rules, // 新 JSX 转换规则
+      'react/react-in-jsx-scope': 'off', // 关闭旧 JSX 规则
+      'react/prop-types': 'off', // 关闭 prop-types（如果用 TS）
     },
   },
   // 7. Prettier 集成

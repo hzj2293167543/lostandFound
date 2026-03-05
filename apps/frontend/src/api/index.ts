@@ -1,3 +1,4 @@
+import { AxiosRequestConfig } from 'axios';
 import { get, post, put, remove } from './client';
 import {
   Category,
@@ -7,6 +8,7 @@ import {
   AnnouncementDetail,
   FoundDetail,
   LostDetail,
+  User,
 } from '@/types';
 
 // 失物相关 API
@@ -18,7 +20,11 @@ export const lostApi = {
   getLostItemsTop3: () => get<LostItem[]>('/lost-items-top3'),
 
   // 获取失物详情
-  getLostItemDetailById: (id: number) => get<LostDetail>(`/lost-item-detail/${id}`),
+  getLostItemDetailById: (id: number, config?: AxiosRequestConfig) =>
+    get<LostDetail>(`/lost-item-detail/${id}`, config),
+
+  // 获取用户失物列表
+  getLostItemsByUserId: (userId: number) => get<LostItem[]>(`/users/${userId}/lost-items`),
 
   // 创建失物信息
   createLostItem: (data: Omit<LostItem, 'id'>) => post<LostItem>('/lost-items', data),
@@ -39,7 +45,11 @@ export const foundApi = {
   getFoundItemsTop3: () => get<FoundItem[]>('/found-items-top3'),
 
   // 获取招领详情
-  getFoundItemDetailById: (id: number) => get<FoundDetail>(`/found-item-detail/${id}`),
+  getFoundItemDetailById: (id: number, config?: AxiosRequestConfig) =>
+    get<FoundDetail>(`/found-item-detail/${id}`, config),
+
+  // 获取用户招领列表
+  getFoundItemsByUserId: (userId: number) => get<FoundItem[]>(`/users/${userId}/found-items`),
 
   // 创建招领信息
   createFoundItem: (data: Omit<FoundItem, 'id'>) => post<FoundItem>('/found-items', data),
@@ -88,13 +98,22 @@ export const userApi = {
   // 获取当前用户信息
   getCurrentUser: () => get<unknown>('/auth/me'),
 
+  // 获取用户信息
+  getUserById: (id: number) => get<User>(`/user/${id}`),
+
   // 更新用户信息
   updateUser: (data: unknown) => put<unknown>('/auth/me', data),
 };
 
 export const categoryApi = {
   // 获取分类列表
-  getCategories: () => get<Category[]>('/categories'),
+  getCategories: (config?: AxiosRequestConfig) => get<Category[]>('/categories', config),
+};
+
+// 评论相关 API
+export const commentApi = {
+  // 获取用户评论
+  getCommentsByUerId: (userId: number) => get<Comment[]>('/comment/' + userId),
 };
 
 // 导出所有 API
@@ -104,4 +123,5 @@ export default {
   announcement: announcementApi,
   user: userApi,
   category: categoryApi,
+  comment: commentApi,
 };

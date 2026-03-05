@@ -9,7 +9,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Announcement } from '@/types';
-import { useMemo, useState } from 'react';
+import { type ChangeEvent, useMemo, useState } from 'react';
 import { Link, useLoaderData } from 'react-router-dom';
 
 export default function Announcements() {
@@ -24,11 +24,11 @@ export default function Announcements() {
           announcement.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
           announcement.content.toLowerCase().includes(searchTerm.toLowerCase())
       ),
-    [searchTerm]
+    [searchTerm, announcements.announcements]
   );
 
   // 处理输入变化
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
 

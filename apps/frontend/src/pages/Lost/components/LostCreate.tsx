@@ -18,13 +18,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { useState } from 'react';
+import { type SyntheticEvent, useState } from 'react';
 import { Label } from '@/components/ui/label';
 
 export default function LostCreate({ categories }: { categories: Category[] }) {
   const [open, setOpen] = useState(false);
   // 发布失物信息
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     // 这里应该处理表单提交逻辑
     setOpen(false);

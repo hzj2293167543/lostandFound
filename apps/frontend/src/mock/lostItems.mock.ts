@@ -45,4 +45,25 @@ export const getLostItemDetail = defineMock({
   },
 });
 
-export default [getLostItemsTop3, getLostItems, getLostItemDetail];
+export const getLostListByUserId = defineMock({
+  url: '/mock/users/:id/lost-items',
+  method: 'GET',
+  body: (req) => {
+    const id = Number(req.params.id);
+    const lostItems = lostData.lostItems.filter((item) => item.user?.id === id);
+    if (lostItems) {
+      return {
+        code: 200,
+        message: 'success',
+        data: lostItems,
+      };
+    }
+    return {
+      code: 404,
+      message: 'Lost items not found',
+      data: null,
+    };
+  },
+});
+
+export default [getLostItemsTop3, getLostItems, getLostItemDetail, getLostListByUserId];

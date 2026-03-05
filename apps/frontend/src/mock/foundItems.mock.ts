@@ -1,7 +1,7 @@
 import { defineMock } from 'vite-plugin-mock-dev-server';
 import { foundData } from './mock-data';
 
-export const foundTop3 = defineMock({
+export const getFoundTop3 = defineMock({
   url: '/mock/found-items-top3',
   method: 'GET',
   body: () => {
@@ -13,7 +13,7 @@ export const foundTop3 = defineMock({
   },
 });
 
-export const foundItems = defineMock({
+export const getFoundItems = defineMock({
   url: '/mock/found-items',
   method: 'GET',
   body: () => {
@@ -25,7 +25,7 @@ export const foundItems = defineMock({
   },
 });
 
-export const foundItemById = defineMock({
+export const getFoundItemById = defineMock({
   url: '/mock/found-item-detail/:id',
   method: 'GET',
   body: (req) => {
@@ -46,4 +46,25 @@ export const foundItemById = defineMock({
   },
 });
 
-export default [foundTop3, foundItems, foundItemById];
+export const getFoundListByUserId = defineMock({
+  url: '/mock/users/:id/found-items',
+  method: 'GET',
+  body: (req) => {
+    const id = Number(req.params.id);
+    const foundItems = foundData.foundItems.filter((item) => item.user?.id === id);
+    if (foundItems) {
+      return {
+        code: 200,
+        message: 'success',
+        data: foundItems,
+      };
+    }
+    return {
+      code: 404,
+      message: 'Found items not found',
+      data: null,
+    };
+  },
+});
+
+export default [getFoundTop3, getFoundItems, getFoundItemById, getFoundListByUserId];

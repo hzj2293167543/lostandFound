@@ -36,3 +36,17 @@ export interface FoundDetail extends FoundItemBase {
   };
   comments: Comment[];
 }
+
+export interface FoundEditFormData {
+  id: number;
+  title: string;
+  category: number;
+  time: string;
+  storage_location: string;
+  contact_phone: string;
+  status: number;
+  description: string;
+  location: string;
+  image: string;
+  imageFile?: File;
+}

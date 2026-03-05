@@ -1,7 +1,7 @@
 import { defineMock } from 'vite-plugin-mock-dev-server';
 import { announcementData } from './mock-data';
 
-const announcementsTop3 = defineMock({
+const getAnnouncementsTop3 = defineMock({
   url: '/mock/announcements-top3',
   method: 'GET',
   body: () => ({
@@ -11,7 +11,7 @@ const announcementsTop3 = defineMock({
   }),
 });
 
-const announcements = defineMock({
+const getAnnouncements = defineMock({
   url: '/mock/announcements',
   method: 'GET',
   body: () => ({
@@ -21,7 +21,7 @@ const announcements = defineMock({
   }),
 });
 
-const announcementDetail = defineMock({
+const getAnnouncementDetail = defineMock({
   url: '/mock/announcement-detail/:id',
   method: 'GET',
   body: (req) => {
@@ -42,4 +42,4 @@ const announcementDetail = defineMock({
   },
 });
 
-export default [announcementsTop3, announcements, announcementDetail];
+export default [getAnnouncementsTop3, getAnnouncements, getAnnouncementDetail];

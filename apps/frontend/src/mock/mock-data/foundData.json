@@ -16,10 +16,9 @@
       },
       "statusText": "招领中",
       "image": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=white%20AirPods%20with%20charging%20case&image_size=landscape_16_9",
-      "user_id": 3,
       "user": {
-        "id": 3,
-        "name": "李四",
+        "id": 1,
+        "name": "张三",
         "avatar": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=user%20avatar%20female%20student&image_size=square"
       },
       "comment_count": 0,
@@ -42,10 +41,9 @@
       },
       "statusText": "招领中",
       "image": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=mathematics%20textbook%20college%20level&image_size=landscape_16_9",
-      "user_id": 3,
       "user": {
-        "id": 3,
-        "name": "李四",
+        "id": 1,
+        "name": "张三",
         "avatar": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=user%20avatar%20female%20student&image_size=square"
       },
       "comment_count": 0,
@@ -68,7 +66,6 @@
       },
       "statusText": "已归还",
       "image": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=blue%20sports%20water%20bottle%20with%20scale&image_size=landscape_16_9",
-      "user_id": 3,
       "user": {
         "id": 3,
         "name": "李四",
@@ -94,7 +91,6 @@
       },
       "statusText": "招领中",
       "image": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=black%20wallet&image_size=landscape_16_9",
-      "user_id": 3,
       "user": {
         "id": 3,
         "name": "李四",
@@ -120,7 +116,6 @@
       },
       "statusText": "招领中",
       "image": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=blue%20umbrella&image_size=landscape_16_9",
-      "user_id": 3,
       "user": {
         "id": 3,
         "name": "李四",

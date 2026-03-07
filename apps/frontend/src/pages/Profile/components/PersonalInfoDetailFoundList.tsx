@@ -8,10 +8,11 @@ import {
   CardFooter,
 } from '@/components/ui/card';
 import { FOUND_FILTER_STATUS } from '@/pages/Found/type';
-import { FoundItem } from '@/types';
+import { FoundItem } from '@lostfound/schema';
 import { memo } from 'react';
 import FoundEdit from './FoundEdit';
 import { Link } from 'react-router';
+import { FOUND_STATUS_NAME } from '../types';
 
 export default memo(function PersonalInfoDetailFoundList({
   foundItems,
@@ -39,8 +40,8 @@ export default memo(function PersonalInfoDetailFoundList({
               </CardHeader>
               <CardFooter>
                 <span
-                  className={`px-3 py-1 rounded-full text-sm ${item.status.code === FOUND_FILTER_STATUS.招领中 ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}`}>
-                  {item.status.name}
+                  className={`px-3 py-1 rounded-full text-sm ${item.status === FOUND_FILTER_STATUS.招领中 ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}`}>
+                  {FOUND_STATUS_NAME[item.status]}
                 </span>
                 <Link to={`/found/${item.id}`} className="ml-auto mr-2">
                   <Button variant="outline">查看详情</Button>

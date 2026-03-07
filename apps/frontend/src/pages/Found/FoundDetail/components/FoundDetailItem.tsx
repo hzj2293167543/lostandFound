@@ -7,16 +7,16 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { FoundDetail } from '@/types';
+import { FoundDetail } from '@lostfound/schema';
 import { toast } from 'sonner';
 
 export default function FoundDetailItem({ foundDetail }: { foundDetail: FoundDetail }) {
   // 联系发布者
   const handleContact = async () => {
-    if (foundDetail.contact_phone) {
+    if (foundDetail.contactPhone) {
       // 可以显示联系方式弹窗
-      await navigator.clipboard.writeText(foundDetail.contact_phone);
-      toast.success(`联系电话：${foundDetail.contact_phone} 已复制到剪贴板`);
+      await navigator.clipboard.writeText(foundDetail.contactPhone);
+      toast.success(`联系电话：${foundDetail.contactPhone} 已复制到剪贴板`);
     } else if (foundDetail.user?.contact) {
       // 使用临时联系电话
       await navigator.clipboard.writeText(foundDetail.user.contact);
@@ -74,11 +74,11 @@ export default function FoundDetailItem({ foundDetail }: { foundDetail: FoundDet
             </p>
             <p>
               <strong>暂存地点：</strong>
-              {foundDetail.storage_location}
+              {foundDetail.storageLocation}
             </p>
             <p>
               <strong>临时联系方式：</strong>
-              {foundDetail.contact_phone}
+              {foundDetail.contactPhone}
             </p>
           </div>
         </div>

@@ -1,5 +1,6 @@
 import { LOST_FILTER_STATUS } from '@/pages/Lost/type';
-import { LostItem } from '@/types';
+import { LOST_STATUS_NAME } from '@/pages/Profile/types';
+import { LostItem } from '@lostfound/schema';
 import { Link } from 'react-router-dom';
 
 export default function LostList({ lostItems }: { lostItems: LostItem[] }) {
@@ -24,8 +25,8 @@ export default function LostList({ lostItems }: { lostItems: LostItem[] }) {
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="font-semibold text-lg">{item.title}</h3>
                   <span
-                    className={`px-2 py-1 rounded-full text-xs ${item.status.code === LOST_FILTER_STATUS.寻找中 ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
-                    {item.status.name}
+                    className={`px-2 py-1 rounded-full text-xs ${item.status === LOST_FILTER_STATUS.寻找中 ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
+                    {LOST_STATUS_NAME[item.status]}
                   </span>
                 </div>
                 <p className="text-sm text-gray-600 mb-2">{item.description}</p>

@@ -19,36 +19,12 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Category } from '@/types';
-import { LostDetail } from '@/types/lost';
+import { Category, LostDetail } from '@lostfound/schema';
 import { formatDateForInput } from '@/utils';
 import { useEffect, useState } from 'react';
 import type { ChangeEvent, SyntheticEvent } from 'react';
 import { toast } from 'sonner';
-
-interface LostEditFormData {
-  id: number;
-  title: string;
-  category: number;
-  time: string;
-  description: string;
-  location: string;
-  status: number;
-  image: string;
-  imageFile?: File;
-}
-
-const LOST_STATUS = {
-  寻找中: 0,
-  已找到: 1,
-  已撤销: 2,
-};
-
-const LOST_STATUS_NAME: Record<number, string> = {
-  0: '寻找中',
-  1: '已找到',
-  2: '已撤销',
-};
+import { LOST_STATUS, LOST_STATUS_NAME, LostEditFormData } from '../types';
 
 export default function LostEdit({ lostItemId }: { lostItemId: number }) {
   const [open, setOpen] = useState(false);
@@ -72,7 +48,7 @@ export default function LostEdit({ lostItemId }: { lostItemId: number }) {
           ...prev,
           ...lostDetail,
           category: lostDetail.category.id,
-          status: lostDetail.status.code,
+          status: lostDetail.status,
         }));
       } catch (error) {
         if (error instanceof Error && error.name === 'CanceledError') {

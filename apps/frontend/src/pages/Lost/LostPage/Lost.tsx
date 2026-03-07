@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useLoaderData } from 'react-router-dom';
-import { Category, LostItem } from '@/types';
+import { Category, LostItem } from '@lostfound/schema';
 import LostCreate from '../components/LostCreate';
 import LostFilter from './components/LostFilter';
 import LostList from './components/LostList';
@@ -35,7 +35,7 @@ export default function LostPage() {
         const matchesCategory =
           !category || item.category.id === category || category === ALL_CATEGORY;
         const matchesStatus =
-          !status || item.status.code === status || status === LOST_FILTER_STATUS.全部状态;
+          !status || item.status === status || status === LOST_FILTER_STATUS.全部状态;
         return matchesSearch && matchesCategory && matchesStatus;
       }),
     [filterState, lostItems]

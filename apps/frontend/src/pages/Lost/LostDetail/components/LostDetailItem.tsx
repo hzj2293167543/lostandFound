@@ -7,9 +7,10 @@ import {
   CardContent,
   CardFooter,
 } from '@/components/ui/card';
-import { LostDetail } from '@/types';
+import { LostDetail } from '@lostfound/schema';
 import { LOST_FILTER_STATUS } from '../../type';
 import { toast } from 'sonner';
+import { LOST_STATUS_NAME } from '@/pages/Profile/types';
 
 export default function LostDetailItem({ lostDetail }: { lostDetail: LostDetail }) {
   // 联系发布者
@@ -58,8 +59,8 @@ export default function LostDetailItem({ lostDetail }: { lostDetail: LostDetail 
           <div className="flex justify-between items-start">
             <CardTitle className="text-2xl">{lostDetail.title}</CardTitle>
             <span
-              className={`px-3 py-1 rounded-full text-sm ${lostDetail.status.code === LOST_FILTER_STATUS.寻找中 ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
-              {lostDetail.status.name}
+              className={`px-3 py-1 rounded-full text-sm ${lostDetail.status === LOST_FILTER_STATUS.寻找中 ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
+              {LOST_STATUS_NAME[lostDetail.status]}
             </span>
           </div>
           <CardDescription>分类：{lostDetail.category.name}</CardDescription>

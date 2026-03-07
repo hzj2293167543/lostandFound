@@ -115,7 +115,13 @@
     "unicorn/prefer-set-size": "warn",
     "unicorn/prefer-string-starts-ends-with": "warn",
     "unicorn/no-array-sort": "off",
-    "no-inline-comments": "off"
+    "no-inline-comments": "off",
+    "typescript/no-extraneous-class": [
+      "warn",
+      {
+        "allowWithDecorator": true
+      }
+    ] // 允许带有装饰器的类
   },
   "overrides": [
     {

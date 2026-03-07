@@ -32,7 +32,7 @@ export default function FoundPage() {
     const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = !category || item.category.id === category || category === ALL_CATEGORY;
     const matchesStatus =
-      !status || item.status.code === status || status === FOUND_FILTER_STATUS.全部状态;
+      !status || item.status === status || status === FOUND_FILTER_STATUS.全部状态;
     return matchesSearch && matchesCategory && matchesStatus;
   });
 

@@ -19,11 +19,11 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Category, FoundEditFormData } from '@/types';
+import { Category } from '@lostfound/schema';
 import { formatDateForInput } from '@/utils';
 import { type ChangeEvent, type SyntheticEvent, useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { FOUND_STATUS, FOUND_STATUS_NAME } from '../types';
+import { FOUND_STATUS, FOUND_STATUS_NAME, FoundEditFormData } from '../types';
 
 export default function FoundEdit({ foundItemId }: { foundItemId: number }) {
   const [open, setOpen] = useState(false);
@@ -47,7 +47,7 @@ export default function FoundEdit({ foundItemId }: { foundItemId: number }) {
           ...prev,
           ...foundDetail,
           category: foundDetail.category.id,
-          status: foundDetail.status.code,
+          status: foundDetail.status,
         }));
       } catch (error) {
         if (error instanceof Error && error.name === 'CanceledError') {
@@ -236,13 +236,13 @@ export default function FoundEdit({ foundItemId }: { foundItemId: number }) {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="storage_location">存储地点</Label>
+            <Label htmlFor="storageLocation">存储地点</Label>
             <Input
-              id="storage_location"
+              id="storageLocation"
               placeholder="请输入存储地点"
               required
-              name="storage_location"
-              value={formData?.storage_location || ''}
+              name="storageLocation"
+              value={formData?.storageLocation || ''}
               onChange={handleChange}
             />
           </div>
@@ -253,7 +253,7 @@ export default function FoundEdit({ foundItemId }: { foundItemId: number }) {
               placeholder="请输入联系电话"
               required
               name="contact_phone"
-              value={formData?.contact_phone || ''}
+              value={formData?.contactPhone || ''}
               onChange={handleChange}
             />
           </div>

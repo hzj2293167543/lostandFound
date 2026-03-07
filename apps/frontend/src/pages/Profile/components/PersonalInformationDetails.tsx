@@ -1,5 +1,5 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Comment, FoundItem, LostItem, User } from '@/types';
+import { Comment, FoundItem, LostItem, User } from '@lostfound/schema';
 import { memo } from 'react';
 import PersonalInfoDetailComments from './PersonalInfoDetailComments';
 import PersonalInfoDetailFoundList from './PersonalInfoDetailFoundList';

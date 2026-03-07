@@ -6,9 +6,10 @@ import {
   CardContent,
   CardFooter,
 } from '@/components/ui/card';
-import { LostItem } from '@/types';
+import { LostItem } from '@lostfound/schema';
 import { Link } from 'react-router';
 import { LOST_FILTER_STATUS } from '../../type';
+import { LOST_STATUS_NAME } from '@/pages/Profile/types';
 
 export default function LostList({ filteredItems }: { filteredItems: LostItem[] }) {
   return (
@@ -23,8 +24,8 @@ export default function LostList({ filteredItems }: { filteredItems: LostItem[] 
               <div className="flex justify-between items-start">
                 <CardTitle>{item.title}</CardTitle>
                 <span
-                  className={`px-2 py-1 rounded-full text-xs ${item.status.code === LOST_FILTER_STATUS.寻找中 ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
-                  {item.status.name}
+                  className={`px-2 py-1 rounded-full text-xs ${item.status === LOST_FILTER_STATUS.寻找中 ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
+                  {LOST_STATUS_NAME[item.status]}
                 </span>
               </div>
               <CardDescription>分类：{item.category.name}</CardDescription>

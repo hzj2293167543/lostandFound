@@ -7,7 +7,9 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { FoundItem } from '@/types';
+import { FoundItem } from '@lostfound/schema';
+import { FOUND_STATUS_NAME } from '@/pages/Profile/types';
+import { FOUND_FILTER_STATUS } from '../../type';
 
 interface FoundListProps {
   filteredItems: FoundItem[];
@@ -24,7 +26,15 @@ export default function FoundList({ filteredItems }: FoundListProps) {
               <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
             </div>
             <CardHeader>
-              <CardTitle>{item.title}</CardTitle>
+              <div className="flex justify-between items-start">
+                <CardTitle>
+                  <span>{item.title}</span>
+                </CardTitle>
+                <span
+                  className={`px-2 py-1 rounded-full text-xs ${item.status === FOUND_FILTER_STATUS.招领中 ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
+                  {FOUND_STATUS_NAME[item.status]}
+                </span>
+              </div>
               <CardDescription>分类：{item.category.name}</CardDescription>
             </CardHeader>
             <CardContent>

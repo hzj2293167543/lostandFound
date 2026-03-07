@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { ApiResponse } from '@/types/api';
+import { ApiResponse } from '@lostfound/schema';
 
 // 创建 axios 实例
 const client: AxiosInstance = axios.create({
@@ -17,9 +17,6 @@ const pendingRequests = new Map<string, AbortController>();
 const generateRequestKey = (config: AxiosRequestConfig): string => {
   return `${config.method?.toLowerCase() || ''}-${config.url}-${JSON.stringify(config.params || {})}-${JSON.stringify(config.data || {})}`;
 };
-
-// 标记是否正在跳转登录
-let isRefreshing = false;
 
 // 请求拦截器
 client.interceptors.request.use(
@@ -72,32 +69,16 @@ client.interceptors.response.use(
     // HTTP 错误处理
     if (error.response) {
       const { status, data } = error.response;
-      switch (status) {
-        case 401:
-          // 未授权，清除 token 并跳转登录
-          if (!isRefreshing) {
-            isRefreshing = true;
-            localStorage.removeItem('token');
-            // 这里可以改为触发登录弹窗或刷新 token 逻辑
-            window.location.href = '/login';
-          }
-          break;
-        case 403:
-          console.error('没有权限访问该资源');
-          // 这里可以添加全局提示
-          break;
-        case 404:
-          console.error('请求的资源不存在');
-          // 这里可以添加全局提示
-          break;
-        case 500:
-          console.error('服务器内部错误');
-          // 这里可以添加全局提示
-          break;
-        default:
-          console.error('请求失败:', data?.message || error.message);
-        // 这里可以添加全局提示
+      const message = data?.message || error.message || '请求失败';
+
+      if (status === 401) {
+        localStorage.removeItem('token');
+        // 避免重复跳转
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login';
+        }
       }
+      return Promise.reject(new Error(message));
     } else if (error.request) {
       console.error('网络错误，请检查网络连接');
       // 这里可以添加全局提示

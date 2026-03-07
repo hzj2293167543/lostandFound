@@ -23,3 +23,5 @@ export const LOST_FILTER_STATUS = {
   已找到: 1,
   已撤销: 2,
 };
+
+export const LOST_FILTER_STATUS_TO_NAME = ['全部状态', '寻找中', '已找到', '已撤销'];

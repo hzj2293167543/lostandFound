@@ -7,8 +7,8 @@ import {
   CardDescription,
   CardFooter,
 } from '@/components/ui/card';
-import { LOST_FILTER_STATUS } from '@/pages/Lost/type';
-import { LostItem } from '@/types';
+import { LOST_STATUS_NAME, LOST_STATUS } from '../types';
+import { LostItem } from '@lostfound/schema';
 import { memo } from 'react';
 import LostEdit from './LostEdit';
 import { Link } from 'react-router-dom';
@@ -35,8 +35,8 @@ export default memo(function PersonalInfoDetailLostList({ lostItems }: { lostIte
               </CardHeader>
               <CardFooter>
                 <span
-                  className={`px-3 py-1 rounded-full text-sm ${item.status.code === LOST_FILTER_STATUS.寻找中 ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
-                  {item.status.name}
+                  className={`px-3 py-1 rounded-full text-sm ${item.status === LOST_STATUS.寻找中 ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
+                  {LOST_STATUS_NAME[item.status]}
                 </span>
                 <Link to={`/lost/${item.id}`} className="ml-auto mr-2">
                   <Button variant="outline">查看详情</Button>

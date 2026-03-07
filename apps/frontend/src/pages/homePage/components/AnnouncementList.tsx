@@ -1,4 +1,4 @@
-import { Announcement } from '@/types';
+import { Announcement } from '@lostfound/schema';
 import { Link } from 'react-router-dom';
 
 export default function AnnouncementList({ announcements }: { announcements: Announcement[] }) {

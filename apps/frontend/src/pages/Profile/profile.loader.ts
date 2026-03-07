@@ -1,5 +1,5 @@
 import { lostApi, foundApi, userApi, commentApi } from '@/api';
-import { User } from '@/types';
+import { User } from '@lostfound/schema';
 
 export default async function profileLoader() {
   try {
@@ -8,7 +8,7 @@ export default async function profileLoader() {
     const [lostItems, foundItems, comments] = await Promise.all([
       lostApi.getLostItemsByUserId(id),
       foundApi.getFoundItemsByUserId(id),
-      commentApi.getCommentsByUerId(id),
+      commentApi.getCommentsByUserId(id),
     ]);
     return {
       user: user,

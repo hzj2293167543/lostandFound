@@ -3,7 +3,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { type SyntheticEvent, useState } from 'react';
-import { Comment } from '@/types';
+import { Comment } from '@lostfound/schema';
 export default function Comments({
   comments,
   setComments,

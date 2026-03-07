@@ -1,4 +1,4 @@
-import { FoundItem, LostItem, User } from '@/types';
+import { FoundItem, LostItem, User } from '@lostfound/schema';
 import { useLoaderData } from 'react-router-dom';
 import LostFoundList from './components/LostFoundList';
 import PersonalInformation from './components/PersonalInformation';
@@ -6,7 +6,7 @@ import PersonalInformationDetails from './components/PersonalInformationDetails'
 import { FOUND_FILTER_STATUS } from '../Found/type';
 import { LOST_FILTER_STATUS } from '../Lost/type';
 import { useMemo } from 'react';
-import { Comment } from '@/types';
+import { Comment } from '@lostfound/schema';
 
 export default function ProfilePage() {
   const { user, lostItems, foundItems, comments } = useLoaderData() as {
@@ -20,10 +20,9 @@ export default function ProfilePage() {
     () => ({
       lostCount: lostItems.length,
       foundCount: foundItems.length,
-      foundSuccessCount: foundItems.filter(
-        (item) => item.status.code === FOUND_FILTER_STATUS.已归还
-      ).length,
-      LostSuccessCount: lostItems.filter((item) => item.status.code === LOST_FILTER_STATUS.已找到)
+      foundSuccessCount: foundItems.filter((item) => item.status === FOUND_FILTER_STATUS.已归还)
+        .length,
+      lostSuccessCount: lostItems.filter((item) => item.status === LOST_FILTER_STATUS.已找到)
         .length,
     }),
     [lostItems, foundItems]

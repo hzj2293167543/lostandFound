@@ -1,4 +1,4 @@
-import { FoundItem, Category } from '@/types';
+import { FoundItem, Category } from '@lostfound/schema';
 
 /** 查找物品筛选状态
  * 0: 招领中

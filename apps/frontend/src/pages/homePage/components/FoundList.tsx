@@ -1,4 +1,6 @@
-import { FoundItem } from '@/types';
+import { FOUND_FILTER_STATUS } from '@/pages/Found/type';
+import { FOUND_STATUS_NAME } from '@/pages/Profile/types';
+import { FoundItem } from '@lostfound/schema';
 import { Link } from 'react-router-dom';
 
 export default function FoundList({ foundItems }: { foundItems: FoundItem[] }) {
@@ -19,7 +21,13 @@ export default function FoundList({ foundItems }: { foundItems: FoundItem[] }) {
               <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
             </div>
             <div className="p-4">
-              <h3 className="font-semibold text-lg mb-2">{item.title}</h3>
+              <div className="flex justify-between items-start mb-2">
+                <h3 className="font-semibold text-lg mb-2">{item.title}</h3>
+                <span
+                  className={`px-2 py-1 rounded-full text-xs ${item.status === FOUND_FILTER_STATUS.招领中 ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
+                  {FOUND_STATUS_NAME[item.status]}
+                </span>
+              </div>
               <p className="text-sm text-gray-600 mb-2">{item.description}</p>
               <div className="text-xs text-gray-500 space-y-1">
                 <p>分类：{item.category.name}</p>

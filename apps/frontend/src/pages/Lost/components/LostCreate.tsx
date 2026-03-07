@@ -8,7 +8,7 @@ import {
   Select,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Category } from '@/types';
+import { Category } from '@lostfound/schema';
 import {
   Dialog,
   DialogContent,
@@ -20,16 +20,37 @@ import {
 } from '@/components/ui/dialog';
 import { type SyntheticEvent, useState } from 'react';
 import { Label } from '@/components/ui/label';
+import { LostDtoSchema, type LostDto } from '@lostfound/schema';
+import { toast } from 'sonner';
 
 export default function LostCreate({ categories }: { categories: Category[] }) {
   const [open, setOpen] = useState(false);
+
+  const [formData, setFormData] = useState<LostDto>({
+    title: '',
+    category: '',
+    description: '',
+    time: '',
+    location: '',
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
   // 发布失物信息
   const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
+    // 验证表单数据
+    const validationResult = LostDtoSchema.safeParse(formData);
+    if (!validationResult.success) {
+      toast.error(validationResult.error.errors.map((e) => e.message).join('\n'));
+      return;
+    }
     // 这里应该处理表单提交逻辑
     setOpen(false);
     // 模拟提交成功后刷新页面
-    alert('失物信息发布成功！');
+    toast.success('失物信息发布成功！');
   };
 
   return (
@@ -45,11 +66,21 @@ export default function LostCreate({ categories }: { categories: Category[] }) {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="title">物品名称</Label>
-            <Input id="title" placeholder="请输入物品名称" required />
+            <Input
+              id="title"
+              name="title"
+              value={formData.title}
+              onChange={handleChange}
+              placeholder="请输入物品名称"
+              required
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="category">物品分类</Label>
-            <Select>
+            <Select
+              name="category"
+              value={formData.category}
+              onValueChange={(value) => setFormData((prev) => ({ ...prev, category: value }))}>
               <SelectTrigger id="category">
                 <SelectValue placeholder="选择分类" />
               </SelectTrigger>
@@ -64,19 +95,40 @@ export default function LostCreate({ categories }: { categories: Category[] }) {
           </div>
           <div className="space-y-2">
             <Label htmlFor="description">详细描述</Label>
-            <Textarea id="description" placeholder="请详细描述物品特征、丢失情况等" required />
+            <Textarea
+              id="description"
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              placeholder="请详细描述物品特征、丢失情况等"
+              required
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="time">丢失时间</Label>
-            <Input id="time" type="date" required />
+            <Input
+              id="time"
+              name="time"
+              type="date"
+              value={formData.time}
+              onChange={handleChange}
+              required
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="location">可能地点</Label>
-            <Input id="location" placeholder="请输入可能丢失的地点" required />
+            <Input
+              id="location"
+              name="location"
+              value={formData.location}
+              onChange={handleChange}
+              placeholder="请输入可能丢失的地点"
+              required
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="image">图片上传</Label>
-            <Input id="image" type="file" accept="image/*" />
+            <Input id="image" name="image" type="file" accept="image/*" onChange={handleChange} />
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>

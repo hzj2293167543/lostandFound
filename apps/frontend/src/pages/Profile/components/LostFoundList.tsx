@@ -24,7 +24,7 @@ export default memo(function LostFoundList({ counts }: { counts: LostFoundCounts
           </div>
           <div className="flex justify-between items-center">
             <span className="text-gray-600">帮助他人找回</span>
-            <span className="font-semibold">{counts.LostSuccessCount}</span>
+            <span className="font-semibold">{counts.lostSuccessCount}</span>
           </div>
         </div>
       </CardContent>

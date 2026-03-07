@@ -1,4 +1,3 @@
-import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -7,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Announcement, AnnouncementDetail } from '@/types';
+import { Announcement, AnnouncementDetail } from '@lostfound/schema';
 import { Link, useLoaderData } from 'react-router-dom';
 
 export default function AnnouncementDetailPage() {
@@ -31,7 +30,7 @@ export default function AnnouncementDetailPage() {
           <CardDescription>
             <div className="flex flex-wrap gap-4">
               <span>发布时间：{announcementDetail.time}</span>
-              <span>发布者：{announcementDetail.author}</span>
+              <span>发布者：{announcementDetail.author.name}</span>
             </div>
           </CardDescription>
         </CardHeader>
@@ -41,7 +40,7 @@ export default function AnnouncementDetailPage() {
           </div>
 
           {/* 附件 */}
-          {announcementDetail.attachments.length > 0 && (
+          {/* {announcementDetail.attachments.length > 0 && (
             <div className="border-t border-gray-200 pt-4 mt-4">
               <h3 className="font-semibold text-lg mb-4">附件</h3>
               <div className="space-y-2">
@@ -60,7 +59,7 @@ export default function AnnouncementDetailPage() {
                 ))}
               </div>
             </div>
-          )}
+          )} */}
         </CardContent>
         <CardFooter>
           <Link to="/announcements" className="text-blue-600 hover:underline">

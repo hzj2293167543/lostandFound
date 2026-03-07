@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { LostItem } from '@/types';
+import { LostItem } from '@lostfound/schema';
 import { lostApi } from '@/api';
 
 export function useLostData() {

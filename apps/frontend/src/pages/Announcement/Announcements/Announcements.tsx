@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Announcement } from '@/types';
+import { Announcement } from '@lostfound/schema';
 import { type ChangeEvent, useMemo, useState } from 'react';
 import { Link, useLoaderData } from 'react-router-dom';
 
@@ -62,7 +62,7 @@ export default function Announcements() {
                 <CardTitle className="text-xl">{announcement.title}</CardTitle>
               </div>
               <CardDescription>
-                发布时间：{announcement.time} | 发布者：{announcement.author}
+                发布时间：{announcement.time} | 发布者：{announcement.author.name}
               </CardDescription>
             </CardHeader>
             <CardContent>

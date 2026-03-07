@@ -1,4 +1,4 @@
-import { Category, LostDetail } from '@/types';
+import { Category, LostDetail } from '@lostfound/schema';
 import { useState } from 'react';
 import { Link, useLoaderData } from 'react-router-dom';
 import Comments from './components/Comments';

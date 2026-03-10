@@ -8,7 +8,7 @@ import {
   CardFooter,
 } from '@/components/ui/card';
 import { LOST_STATUS_NAME, LOST_STATUS } from '../types';
-import { LostItem } from '@lostfound/schema';
+import { LostItem } from '@lostfound/shared';
 import { memo } from 'react';
 import LostEdit from './LostEdit';
 import { Link } from 'react-router-dom';

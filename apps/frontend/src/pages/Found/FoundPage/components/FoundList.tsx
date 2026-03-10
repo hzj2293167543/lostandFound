@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { FoundItem } from '@lostfound/schema';
+import { FoundItem } from '@lostfound/shared';
 import { FOUND_STATUS_NAME } from '@/pages/Profile/types';
 import { FOUND_FILTER_STATUS } from '../../type';
 

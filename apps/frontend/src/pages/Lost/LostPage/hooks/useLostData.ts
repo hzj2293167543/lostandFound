@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { LostItem } from '@lostfound/schema';
+import { LostItem } from '@lostfound/shared';
 import { lostApi } from '@/api';
 
 export function useLostData() {

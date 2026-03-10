@@ -1,6 +1,6 @@
 import { FOUND_FILTER_STATUS } from '@/pages/Found/type';
 import { FOUND_STATUS_NAME } from '@/pages/Profile/types';
-import { FoundItem } from '@lostfound/schema';
+import { FoundItem } from '@lostfound/shared';
 import { Link } from 'react-router-dom';
 
 export default function FoundList({ foundItems }: { foundItems: FoundItem[] }) {

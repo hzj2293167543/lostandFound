@@ -1,5 +1,5 @@
-import { User } from '@lostfound/schema';
-import { LoginBackDto } from '@lostfound/schema';
+import { User } from '@lostfound/shared';
+import { LoginBackDto } from '@lostfound/shared';
 
 export const userToLoginBackDto = (user: User, token: string): LoginBackDto => ({
   token,

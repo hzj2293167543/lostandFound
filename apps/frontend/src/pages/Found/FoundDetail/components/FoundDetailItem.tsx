@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { FoundDetail } from '@lostfound/schema';
+import { FoundDetail } from '@lostfound/shared';
 import { toast } from 'sonner';
 
 export default function FoundDetailItem({ foundDetail }: { foundDetail: FoundDetail }) {

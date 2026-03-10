@@ -1,4 +1,4 @@
-import { Announcement } from '@lostfound/schema';
+import { Announcement } from '@lostfound/shared';
 import { Link } from 'react-router-dom';
 
 export default function AnnouncementList({ announcements }: { announcements: Announcement[] }) {

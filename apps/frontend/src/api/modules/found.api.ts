@@ -1,6 +1,6 @@
 import { AxiosRequestConfig } from 'axios';
 import { get, post, put, remove } from '../client';
-import { FoundItem, FoundDetail } from '@lostfound/schema';
+import { FoundItem, FoundDetail } from '@lostfound/shared';
 
 export const foundApi = {
   getFoundItems: () => get<FoundItem[]>('/found-items'),

@@ -1,15 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { LostItem } from './entities/lost-item.entity';
-import { LostItem as LostItemVo } from '@lostfound/schema';
+import { LostCreateDto, LostItem as LostItemVo } from '@lostfound/shared';
 import { mapLostItemToVo } from './lost-items.mapper';
+import { Category } from 'src/categories/entities/category.entity';
 
 @Injectable()
 export class LostItemsService {
   constructor(
     @InjectRepository(LostItem)
-    private lostItemsRepository: Repository<LostItem>
+    private lostItemsRepository: Repository<LostItem>,
+    @InjectRepository(Category)
+    private categoriesRepository: Repository<Category>
   ) {}
 
   async findAll(): Promise<LostItem[]> {
@@ -40,17 +43,17 @@ export class LostItemsService {
     return item;
   }
 
-  async create(data: {
-    title: string;
-    categoryId: number;
-    description: string;
-    time: Date;
-    location: string;
-    image?: string;
-    userId: number;
-  }): Promise<LostItem> {
+  async create(data: LostCreateDto & { userId: number }): Promise<LostItem> {
+    const categoryPo = await this.categoriesRepository.findOne({
+      where: { id: data.category },
+    });
+    if (!categoryPo) {
+      throw new NotFoundException('分类不存在');
+    }
+    const category = { id: categoryPo.id, name: categoryPo.name };
     const lostItem = this.lostItemsRepository.create({
       ...data,
+      category,
       commentCount: 0,
       viewCount: 0,
     });

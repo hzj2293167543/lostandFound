@@ -7,7 +7,7 @@ import {
   CardDescription,
   CardFooter,
 } from '@/components/ui/card';
-import { Comment } from '@lostfound/schema';
+import { Comment } from '@lostfound/shared';
 import { memo, useState } from 'react';
 
 export default memo(function PersonalInfoDetailComments({ comments }: { comments: Comment[] }) {

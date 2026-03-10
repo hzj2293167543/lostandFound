@@ -1,5 +1,5 @@
 import { get, post, remove } from '../client';
-import { Comment } from '@lostfound/schema';
+import { Comment } from '@lostfound/shared';
 
 export const commentApi = {
   getCommentsByItem: (itemId: number, itemType: number) =>

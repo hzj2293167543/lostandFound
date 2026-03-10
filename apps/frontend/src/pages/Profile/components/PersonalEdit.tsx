@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { User } from '@lostfound/schema';
+import { User } from '@lostfound/shared';
 import { useState } from 'react';
 import type { ChangeEvent, SyntheticEvent } from 'react';
 import { toast } from 'sonner';

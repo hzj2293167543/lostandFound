@@ -1,4 +1,4 @@
-import { FoundItem, LostItem, User } from '@lostfound/schema';
+import { FoundItem, LostItem, User } from '@lostfound/shared';
 import { useLoaderData } from 'react-router-dom';
 import LostFoundList from './components/LostFoundList';
 import PersonalInformation from './components/PersonalInformation';
@@ -6,7 +6,7 @@ import PersonalInformationDetails from './components/PersonalInformationDetails'
 import { FOUND_FILTER_STATUS } from '../Found/type';
 import { LOST_FILTER_STATUS } from '../Lost/type';
 import { useMemo } from 'react';
-import { Comment } from '@lostfound/schema';
+import { Comment } from '@lostfound/shared';
 
 export default function ProfilePage() {
   const { user, lostItems, foundItems, comments } = useLoaderData() as {

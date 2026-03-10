@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Link } from 'react-router';
 import LostCreate from '../../components/LostCreate';
-import { Category } from '@lostfound/schema';
+import { Category } from '@lostfound/shared';
 
 export default function LostAction({ categories }: { categories: Category[] }) {
   return (

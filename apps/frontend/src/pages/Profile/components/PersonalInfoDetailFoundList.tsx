@@ -8,7 +8,7 @@ import {
   CardFooter,
 } from '@/components/ui/card';
 import { FOUND_FILTER_STATUS } from '@/pages/Found/type';
-import { FoundItem } from '@lostfound/schema';
+import { FoundItem } from '@lostfound/shared';
 import { memo } from 'react';
 import FoundEdit from './FoundEdit';
 import { Link } from 'react-router';

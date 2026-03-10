@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { userApi } from '@/api';
-import type { User, LoginDto, LoginBackDto } from '@lostfound/schema';
+import type { User, LoginDto, LoginBackDto } from '@lostfound/shared';
 import { AuthContextType, ROLE } from './type';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

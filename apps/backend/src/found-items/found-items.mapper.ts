@@ -1,5 +1,5 @@
 import { FoundItem as FoundItemEntity } from './entities/found-item.entity';
-import { FoundItem as FoundItemVo } from '@lostfound/schema';
+import { FoundItem as FoundItemVo } from '@lostfound/shared';
 
 /**
  * 映射 FoundItemEntity 到 FoundItemVo

@@ -14,7 +14,8 @@ import {
 } from '@nestjs/common';
 import { LostItemsService } from './lost-items.service';
 import { AuthGuard } from '@nestjs/passport';
-import { LostItem as LostItemVo } from '@lostfound/schema';
+import { LostCreateDto, LostItem as LostItemVo, User } from '@lostfound/shared';
+import { CurrentUser } from 'src/common/decorators/currentUser.decorators';
 
 @Controller('lost-items')
 export class LostItemsController {
@@ -48,22 +49,25 @@ export class LostItemsController {
 
   @Post()
   @UseGuards(AuthGuard('jwt'))
-  create(@Body() data: any, @Request() req) {
+  create(@Body() data: LostCreateDto, @CurrentUser() user: User) {
     return this.lostItemsService.create({
       ...data,
-      userId: req.user.id,
+      userId: user.id,
     });
   }
 
   @Put(':id')
   @UseGuards(AuthGuard('jwt'))
-  update(@Param('id') id: string, @Body() data: any, @Request() req) {
+  update(@Param('id') id: string, @Body() data: any, @CurrentUser() user: User) {
+    if (user.id !== data.userId) {
+      throw new BadRequestException('你只能更新自己的丢失物品');
+    }
     return this.lostItemsService.update(+id, data);
   }
 
   @Delete(':id')
   @UseGuards(AuthGuard('jwt'))
-  delete(@Param('id') id: string, @Request() req) {
+  delete(@Param('id') id: string, @CurrentUser() user: User) {
     return this.lostItemsService.delete(+id);
   }
 }

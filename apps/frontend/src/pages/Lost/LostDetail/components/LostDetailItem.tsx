@@ -7,7 +7,7 @@ import {
   CardContent,
   CardFooter,
 } from '@/components/ui/card';
-import { LostDetail } from '@lostfound/schema';
+import { LostDetail } from '@lostfound/shared';
 import { LOST_FILTER_STATUS } from '../../type';
 import { toast } from 'sonner';
 import { LOST_STATUS_NAME } from '@/pages/Profile/types';

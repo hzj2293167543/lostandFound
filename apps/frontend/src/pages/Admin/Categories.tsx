@@ -3,16 +3,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
   DialogFooter,
-  DialogTrigger,
+  DialogTrigger 
 } from '@/components/ui/dialog';
 import { categoryApi } from '@/api';
-import { Category } from '@lostfound/schema';
+import { Category } from '@/types';
 import { toast } from 'sonner';
 
 export default function AdminCategories() {
@@ -39,7 +39,7 @@ export default function AdminCategories() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+    
     if (!formData.name.trim()) {
       toast.error('请输入分类名称');
       return;
@@ -70,10 +70,10 @@ export default function AdminCategories() {
 
   const handleDelete = async (id: number) => {
     if (!confirm('确定要删除这个分类吗？')) return;
-
+    
     try {
       // await categoryApi.deleteCategory(id);
-      setCategories(categories.filter((c) => c.id !== id));
+      setCategories(categories.filter(c => c.id !== id));
       toast.success('删除成功');
     } catch (error) {
       toast.error('删除失败');
@@ -98,7 +98,7 @@ export default function AdminCategories() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {categories.map((category) => (
+        {categories.map(category => (
           <Card key={category.id}>
             <CardHeader className="pb-2">
               <div className="flex justify-between items-center">
@@ -144,7 +144,9 @@ export default function AdminCategories() {
               <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                 取消
               </Button>
-              <Button type="submit">{editingCategory ? '保存' : '创建'}</Button>
+              <Button type="submit">
+                {editingCategory ? '保存' : '创建'}
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>

@@ -1,5 +1,5 @@
 {
-  "name": "@lostfound/schema",
+  "name": "@lostfound/shared",
   "version": "1.0.0",
   "description": "Zod schemas and types for LostFound API",
   "main": "./dist/cjs/index.js",
@@ -14,7 +14,7 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json && tsc -p tsconfig.cjs.json",
-    "dev": "tsc -p tsconfig.json --watch"
+    "dev": "tsc -p tsconfig.json && tsc -p tsconfig.cjs.json --watch"
   },
   "keywords": [
     "zod",

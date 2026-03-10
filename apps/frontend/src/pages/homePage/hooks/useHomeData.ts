@@ -1,6 +1,6 @@
 // hooks/useHomeData.ts
 import { useState, useEffect } from 'react';
-import { Announcement, FoundItem, LostItem } from '@lostfound/schema';
+import { Announcement, FoundItem, LostItem } from '@lostfound/shared';
 import { announcementApi, foundApi, lostApi } from '@/api';
 
 export function useHomeData() {

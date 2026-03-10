@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Announcement } from './entities/announcement.entity';
-import { Announcement as AnnouncementVo } from '@lostfound/schema';
+import { Announcement as AnnouncementVo } from '@lostfound/shared';
 import { mapAnnouncementToVo } from './announcements.mapper';
 @Injectable()
 export class AnnouncementsService {

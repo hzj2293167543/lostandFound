@@ -19,7 +19,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Category } from '@lostfound/schema';
+import { Category } from '@lostfound/shared';
 
 interface FoundCreateProps {
   categories: Category[];

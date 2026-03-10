@@ -14,7 +14,7 @@ import {
 } from '@nestjs/common';
 import { AnnouncementsService } from './announcements.service';
 import { AuthGuard } from '@nestjs/passport';
-import { Announcement as AnnouncementVo } from '@lostfound/schema';
+import { Announcement as AnnouncementVo } from '@lostfound/shared';
 
 @Controller('announcements')
 export class AnnouncementsController {

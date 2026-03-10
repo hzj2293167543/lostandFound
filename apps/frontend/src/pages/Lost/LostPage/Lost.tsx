@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useLoaderData } from 'react-router-dom';
-import { Category, LostItem } from '@lostfound/schema';
+import { Category, LostItem } from '@lostfound/shared';
 import LostCreate from '../components/LostCreate';
 import LostFilter from './components/LostFilter';
 import LostList from './components/LostList';

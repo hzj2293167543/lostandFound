@@ -2,7 +2,7 @@ import { Get, Injectable, ParseIntPipe, Query } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FoundItem } from './entities/found-item.entity';
-import { FoundItem as FoundItemVo } from '@lostfound/schema';
+import { FoundItem as FoundItemVo } from '@lostfound/shared';
 import { mapFoundItemToVo } from './found-items.mapper';
 
 @Injectable()

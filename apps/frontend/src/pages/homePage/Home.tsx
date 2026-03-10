@@ -3,7 +3,7 @@ import Header from './components/Header';
 import FoundList from './components/FoundList';
 import LostList from './components/LostList';
 import AnnouncementList from './components/AnnouncementList';
-import { LostItem, FoundItem, Announcement } from '@lostfound/schema';
+import { LostItem, FoundItem, Announcement } from '@lostfound/shared';
 
 export default function Home() {
   const { lostItems, foundItems, announcements } = useLoaderData() as {

@@ -1,6 +1,6 @@
 import { AxiosRequestConfig } from 'axios';
 import { get, post } from '../client';
-import { LoginDto, RegisterDto, User } from '@lostfound/schema';
+import { LoginDto, RegisterDto, User } from '@lostfound/shared';
 
 export const userApi = {
   login: (credentials: LoginDto, config?: AxiosRequestConfig) =>

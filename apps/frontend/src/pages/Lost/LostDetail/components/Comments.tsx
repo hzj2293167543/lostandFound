@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Comment } from '@lostfound/schema';
+import { Comment } from '@lostfound/shared';
 import { type SyntheticEvent, useState } from 'react';
 
 export default function Comments({

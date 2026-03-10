@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useState } from 'react';
 import PersonalEdit from './PersonalEdit';
-import { User } from '@lostfound/schema';
+import { User } from '@lostfound/shared';
 
 export default function PersonalInformation({ userRaw }: { userRaw: User }) {
   const [open, setOpen] = useState(false);

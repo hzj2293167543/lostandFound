@@ -1,13 +1,10 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { ApiResponse } from '@lostfound/schema';
+import { ApiResponse } from '@lostfound/shared';
 
 // 创建 axios 实例
 const client: AxiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
   timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
 });
 
 // 请求取消控制器映射，用于处理重复请求

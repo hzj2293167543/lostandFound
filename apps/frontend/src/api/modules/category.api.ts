@@ -1,6 +1,6 @@
 import { AxiosRequestConfig } from 'axios';
 import { get, post, put, remove } from '../client';
-import { Category } from '@lostfound/schema';
+import { Category } from '@lostfound/shared';
 
 export const categoryApi = {
   getCategories: (config?: AxiosRequestConfig) => get<Category[]>('/categories', config),

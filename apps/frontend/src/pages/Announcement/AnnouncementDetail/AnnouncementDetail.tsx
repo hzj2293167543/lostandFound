@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Announcement, AnnouncementDetail } from '@lostfound/schema';
+import { Announcement, AnnouncementDetail } from '@lostfound/shared';
 import { Link, useLoaderData } from 'react-router-dom';
 
 export default function AnnouncementDetailPage() {

@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { userApi } from '@/api';
 import { toast } from 'sonner';
-import { LoginDto, RegisterDto, RegisterDtoSchema } from '@lostfound/schema';
+import { LoginDto, RegisterDto, RegisterDtoSchema } from '@lostfound/shared';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function Register() {

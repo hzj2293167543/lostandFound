@@ -1,0 +1,19 @@
+app:
+  name: 'LostAndFound'
+  port: 3000
+  env: development
+
+jwt:
+  secret: 'oLN3Jbe5PB4ieTieDPH3pHxUxka5RV+UF8ax2L6OxYk='
+  expiresIn: '7d'
+
+database:
+  type: 'mysql'
+  host: 'localhost'
+  port: 3306
+  username: 'root'
+  password: '123456'
+  database: 'lostfound'
+
+upload:
+  directory: 'D:\work\data\uploads'

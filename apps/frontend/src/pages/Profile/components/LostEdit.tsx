@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Category, LostDetail } from '@lostfound/schema';
+import { Category, LostDetail } from '@lostfound/shared';
 import { formatDateForInput } from '@/utils';
 import { useEffect, useState } from 'react';
 import type { ChangeEvent, SyntheticEvent } from 'react';

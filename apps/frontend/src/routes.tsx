@@ -37,6 +37,7 @@ import { announcementsLoader } from './pages/Announcement/Announcements/announce
 import { announcementDetailLoader } from './pages/Announcement/AnnouncementDetail/announcementDetail.loader';
 import profileLoader from './pages/Profile/profile.loader';
 import { useAuth } from './contexts/AuthContext';
+import { LostCreateAction } from './pages/Lost/LostPage/lost.action';
 
 function Loading() {
   return (
@@ -173,6 +174,7 @@ export const router = createBrowserRouter([
           </Suspense>
         ),
         loader: lostLoader,
+        action: LostCreateAction,
       },
       {
         path: 'lost/:id',

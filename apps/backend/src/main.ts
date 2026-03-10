@@ -1,8 +1,10 @@
-import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { TransformInterceptor } from './common/response.interceptor';
 import { AllExceptionsFilter } from './common/exception.filter';
+import { TransformInterceptor } from './common/response.interceptor';
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
@@ -27,7 +29,7 @@ async function bootstrap() {
   const port = configService.get('app.port');
 
   await app.listen(port);
-  console.log(`Backend API running on http://localhost:${port}`);
+  const baseUrl = configService.get('app.baseUrl') || 'http://localhost:3000';
+  console.log(`Backend API running on ${baseUrl}`);
 }
-import { ConfigService } from '@nestjs/config';
 bootstrap();

@@ -1,6 +1,6 @@
 import { LOST_FILTER_STATUS } from '@/pages/Lost/type';
 import { LOST_STATUS_NAME } from '@/pages/Profile/types';
-import { LostItem } from '@lostfound/schema';
+import { LostItem } from '@lostfound/shared';
 import { Link } from 'react-router-dom';
 
 export default function LostList({ lostItems }: { lostItems: LostItem[] }) {

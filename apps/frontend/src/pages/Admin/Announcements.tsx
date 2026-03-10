@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { announcementApi } from '@/api';
-import { Announcement } from '@lostfound/schema';
+import { Announcement } from '@lostfound/shared';
 import { toast } from 'sonner';
 
 export default function AdminAnnouncements() {

@@ -1,4 +1,4 @@
-import { User, LoginDto } from '@lostfound/schema';
+import { User, LoginDto } from '@lostfound/shared';
 
 export interface AuthContextType {
   user: User | null;

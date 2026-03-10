@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { User } from '@lostfound/schema';
+import { User } from '@lostfound/shared';
 import { memo } from 'react';
 
 export default memo(function PersonalInfoDetailSettingList({ userRaw }: { userRaw: User }) {

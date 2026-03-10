@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
-import { LoginDto, LoginDtoSchema } from '@lostfound/schema';
+import { LoginDto, LoginDtoSchema } from '@lostfound/shared';
 
 export default function Login() {
   const [isLoading, setIsLoading] = useState(false);

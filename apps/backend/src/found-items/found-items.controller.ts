@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { FoundItemsService } from './found-items.service';
 import { AuthGuard } from '@nestjs/passport';
-import { FoundItem as FoundItemVo } from '@lostfound/schema';
+import { FoundItem as FoundItemVo } from '@lostfound/shared';
 
 @Controller('found-items')
 export class FoundItemsController {

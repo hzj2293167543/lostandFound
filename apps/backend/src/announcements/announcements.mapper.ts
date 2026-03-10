@@ -1,4 +1,4 @@
-import { Announcement as AnnouncementVo } from '@lostfound/schema';
+import { Announcement as AnnouncementVo } from '@lostfound/shared';
 import { Announcement } from './entities/announcement.entity';
 
 export function mapAnnouncementToVo(announcement: Announcement): AnnouncementVo {

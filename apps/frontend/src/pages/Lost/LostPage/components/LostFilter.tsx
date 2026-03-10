@@ -7,7 +7,7 @@ import {
   SelectItem,
   Select,
 } from '@/components/ui/select';
-import { Category } from '@lostfound/schema';
+import { Category } from '@lostfound/shared';
 import { ALL_CATEGORY, FilterState, LOST_FILTER_STATUS, SetFilterState } from '../../type';
 
 export default function LostFilter({

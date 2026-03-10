@@ -1,5 +1,5 @@
 import { get, post, put, remove } from '../client';
-import { Announcement, AnnouncementDetail } from '@lostfound/schema';
+import { Announcement, AnnouncementDetail } from '@lostfound/shared';
 
 export const announcementApi = {
   getAnnouncements: () => get<Announcement[]>('/announcements'),

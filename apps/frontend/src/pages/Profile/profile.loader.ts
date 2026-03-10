@@ -1,5 +1,5 @@
 import { lostApi, foundApi, userApi, commentApi } from '@/api';
-import { User } from '@lostfound/schema';
+import { User } from '@lostfound/shared';
 
 export default async function profileLoader() {
   try {

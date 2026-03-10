@@ -1,4 +1,4 @@
-import { LostItem as LostItemVo } from '@lostfound/schema';
+import { LostItem as LostItemVo } from '@lostfound/shared';
 import { LostItem as LostItemEntity } from './entities/lost-item.entity';
 
 export function mapLostItemToVo(item: LostItemEntity): LostItemVo {

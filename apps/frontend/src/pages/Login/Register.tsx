@@ -8,10 +8,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { userApi } from '@/api';
 import { toast } from 'sonner';
 import { LoginDto, RegisterDto, RegisterDtoSchema } from '@lostfound/shared';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthStore } from '@/stores/AuthStore';
 
 export default function Register() {
-  const { login } = useAuth();
+  const login = useAuthStore.use.login();
   const [formData, setFormData] = useState<RegisterDto>({
     name: '',
     email: '',

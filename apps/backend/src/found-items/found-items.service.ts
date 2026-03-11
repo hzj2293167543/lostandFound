@@ -1,16 +1,20 @@
-import { Get, Injectable, ParseIntPipe, Query } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FoundItem } from './entities/found-item.entity';
-import { FoundItem as FoundItemVo } from '@lostfound/shared';
+import { FoundItem as FoundItemVo, FoundCreateDto } from '@lostfound/shared';
 import { mapFoundItemToVo } from './found-items.mapper';
+import { Category } from 'src/categories/entities/category.entity';
+import { UploadService } from '@/common/upload/upload.service';
 
 @Injectable()
 export class FoundItemsService {
-  foundItemsService: any;
   constructor(
     @InjectRepository(FoundItem)
-    private foundItemsRepository: Repository<FoundItem>
+    private foundItemsRepository: Repository<FoundItem>,
+    @InjectRepository(Category)
+    private categoriesRepository: Repository<Category>,
+    private uploadService: UploadService
   ) {}
 
   findAll(): Promise<FoundItem[]> {
@@ -20,10 +24,7 @@ export class FoundItemsService {
     });
   }
 
-  @Get('top')
-  async findTop(
-    @Query('limit', new ParseIntPipe({ optional: true })) limit?: number
-  ): Promise<FoundItemVo[]> {
+  async findTop(limit?: number): Promise<FoundItemVo[]> {
     const items = await this.foundItemsRepository.find({
       relations: ['category', 'user'],
       order: { createdAt: 'DESC' },
@@ -47,23 +48,25 @@ export class FoundItemsService {
     return item;
   }
 
-  create(data: {
-    title: string;
-    categoryId: number;
-    description: string;
-    time: Date;
-    location: string;
-    storageLocation?: string;
-    contactPhone?: string;
-    image?: string;
-    userId: number;
-  }): Promise<FoundItem> {
+  async create(data: FoundCreateDto & { userId: number }): Promise<FoundItem> {
+    const categoryPo = await this.categoriesRepository.findOne({
+      where: { id: data.category },
+    });
+    if (!categoryPo) {
+      throw new NotFoundException('分类不存在');
+    }
+
+    const { category: categoryId, ...restData } = data;
+
     const foundItem = this.foundItemsRepository.create({
-      ...data,
+      ...restData,
+      categoryId,
       commentCount: 0,
       viewCount: 0,
     });
-    return this.foundItemsRepository.save(foundItem);
+
+    const savedItem = await this.foundItemsRepository.save(foundItem);
+    return savedItem;
   }
 
   async update(id: number, data: Partial<FoundItem>): Promise<FoundItem> {

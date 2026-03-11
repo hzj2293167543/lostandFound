@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { ApiResponse } from '@lostfound/shared';
+import { useAuthStore } from '@/stores/AuthStore';
 
 // 创建 axios 实例
 const client: AxiosInstance = axios.create({
@@ -28,7 +29,8 @@ client.interceptors.request.use(
     config.signal = controller.signal;
 
     // 从 localStorage 获取 token
-    const token = localStorage.getItem('token');
+    const token = useAuthStore.getState().token;
+    // const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

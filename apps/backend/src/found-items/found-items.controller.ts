@@ -8,12 +8,13 @@ import {
   Param,
   Query,
   UseGuards,
-  Request,
   ParseIntPipe,
+  BadRequestException,
 } from '@nestjs/common';
 import { FoundItemsService } from './found-items.service';
 import { AuthGuard } from '@nestjs/passport';
-import { FoundItem as FoundItemVo } from '@lostfound/shared';
+import { FoundItem as FoundItemVo, FoundCreateDto, User } from '@lostfound/shared';
+import { CurrentUser } from 'src/common/decorators/currentUser.decorators';
 
 @Controller('found-items')
 export class FoundItemsController {
@@ -46,22 +47,25 @@ export class FoundItemsController {
 
   @Post()
   @UseGuards(AuthGuard('jwt'))
-  create(@Body() data: any, @Request() req) {
+  create(@Body() data: FoundCreateDto, @CurrentUser() user: User) {
     return this.foundItemsService.create({
       ...data,
-      userId: req.user.id,
+      userId: user.id,
     });
   }
 
   @Put(':id')
   @UseGuards(AuthGuard('jwt'))
-  update(@Param('id') id: string, @Body() data: any, @Request() req) {
+  update(@Param('id') id: string, @Body() data: any, @CurrentUser() user: User) {
+    if (user.id !== data.userId) {
+      throw new BadRequestException('你只能更新自己的招领物品');
+    }
     return this.foundItemsService.update(+id, data);
   }
 
   @Delete(':id')
   @UseGuards(AuthGuard('jwt'))
-  delete(@Param('id') id: string, @Request() req) {
+  delete(@Param('id') id: string, @CurrentUser() user: User) {
     return this.foundItemsService.delete(+id);
   }
 }

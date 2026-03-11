@@ -8,11 +8,10 @@ import {
   DialogContent, 
   DialogHeader, 
   DialogTitle, 
-  DialogFooter,
-  DialogTrigger 
+  DialogFooter
 } from '@/components/ui/dialog';
 import { categoryApi } from '@/api';
-import { Category } from '@/types';
+import { Category } from '@lostfound/shared';
 import { toast } from 'sonner';
 
 export default function AdminCategories() {

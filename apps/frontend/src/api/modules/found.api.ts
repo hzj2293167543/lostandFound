@@ -1,6 +1,6 @@
 import { AxiosRequestConfig } from 'axios';
 import { get, post, put, remove } from '../client';
-import { FoundItem, FoundDetail } from '@lostfound/shared';
+import { FoundItem, FoundDetail, FoundCreateDto } from '@lostfound/shared';
 
 export const foundApi = {
   getFoundItems: () => get<FoundItem[]>('/found-items'),
@@ -17,7 +17,8 @@ export const foundApi = {
 
   getFoundItemsByUserId: (userId: number) => get<FoundItem[]>(`/found-items/user/${userId}`),
 
-  createFoundItem: (data: Partial<FoundItem>) => post<FoundItem>('/found-items', data),
+  createFoundItem: (data: FoundCreateDto, config?: AxiosRequestConfig) =>
+    post<FoundCreateDto>('/found-items', data, config),
 
   updateFoundItem: (id: number, data: Partial<FoundItem>) =>
     put<FoundItem>(`/found-items/${id}`, data),

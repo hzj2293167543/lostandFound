@@ -2,11 +2,9 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 
-// 导入布局
 import RootLayout from './layouts/RootLayout';
 import Error from './pages/Error/Error';
 
-// 懒加载页面组件
 const Login = lazy(() => import('./pages/Login/Login'));
 const Register = lazy(() => import('./pages/Login/Register'));
 const HomePage = lazy(() => import('./pages/homePage/Home'));
@@ -27,17 +25,17 @@ const AdminFound = lazy(() => import('./pages/Admin/Found'));
 const AdminCategories = lazy(() => import('./pages/Admin/Categories'));
 const AdminAnnouncements = lazy(() => import('./pages/Admin/Announcements'));
 
-// 导入 loaders
 import { foundDetailLoader } from './pages/Found/FoundDetail/foundDetail.loader';
 import { foundLoader } from './pages/Found/FoundPage/found.loader';
+import { foundAction } from './pages/Found/FoundPage/found.action';
 import { homeLoader } from './pages/homePage/home.loader';
 import { lostDetailLoader } from './pages/Lost/LostDetail/lostDetail.loader';
 import { lostLoader } from './pages/Lost/LostPage/lost.loader';
 import { announcementsLoader } from './pages/Announcement/Announcements/announcements.loader';
 import { announcementDetailLoader } from './pages/Announcement/AnnouncementDetail/announcementDetail.loader';
 import profileLoader from './pages/Profile/profile.loader';
-import { useAuth } from './contexts/AuthContext';
-import { LostCreateAction } from './pages/Lost/LostPage/lost.action';
+import { useAuthStore, useIsAdmin, useIsAuthenticated } from './stores/AuthStore';
+import { lostAction } from './pages/Lost/LostPage/lost.action';
 
 function Loading() {
   return (
@@ -48,7 +46,8 @@ function Loading() {
 }
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isLoading } = useAuth();
+  const isAuthenticated = useIsAuthenticated();
+  const isLoading = useAuthStore.use.isLoading();
 
   if (isLoading) {
     return <Loading />;
@@ -62,7 +61,8 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 }
 
 function AdminRoute({ children }: { children: React.ReactNode }) {
-  const { isAdmin, isLoading } = useAuth();
+  const isAdmin = useIsAdmin();
+  const isLoading = useAuthStore.use.isLoading();
 
   if (isLoading) {
     return <Loading />;
@@ -76,82 +76,6 @@ function AdminRoute({ children }: { children: React.ReactNode }) {
 }
 
 export const router = createBrowserRouter([
-  {
-    path: '/login',
-    element: (
-      <Suspense fallback={<Loading />}>
-        <Login />
-      </Suspense>
-    ),
-  },
-  {
-    path: '/register',
-    element: (
-      <Suspense fallback={<Loading />}>
-        <Register />
-      </Suspense>
-    ),
-  },
-  {
-    path: '/admin',
-    element: (
-      <AdminRoute>
-        <Suspense fallback={<Loading />}>
-          <AdminLayout />
-        </Suspense>
-      </AdminRoute>
-    ),
-    children: [
-      {
-        index: true,
-        element: (
-          <Suspense fallback={<Loading />}>
-            <AdminDashboard />
-          </Suspense>
-        ),
-      },
-      {
-        path: 'users',
-        element: (
-          <Suspense fallback={<Loading />}>
-            <AdminUsers />
-          </Suspense>
-        ),
-      },
-      {
-        path: 'categories',
-        element: (
-          <Suspense fallback={<Loading />}>
-            <AdminCategories />
-          </Suspense>
-        ),
-      },
-      {
-        path: 'lost',
-        element: (
-          <Suspense fallback={<Loading />}>
-            <AdminLost />
-          </Suspense>
-        ),
-      },
-      {
-        path: 'found',
-        element: (
-          <Suspense fallback={<Loading />}>
-            <AdminFound />
-          </Suspense>
-        ),
-      },
-      {
-        path: 'announcements',
-        element: (
-          <Suspense fallback={<Loading />}>
-            <AdminAnnouncements />
-          </Suspense>
-        ),
-      },
-    ],
-  },
   {
     path: '/',
     element: <RootLayout />,
@@ -167,6 +91,22 @@ export const router = createBrowserRouter([
         loader: homeLoader,
       },
       {
+        path: 'login',
+        element: (
+          <Suspense fallback={<Loading />}>
+            <Login />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'register',
+        element: (
+          <Suspense fallback={<Loading />}>
+            <Register />
+          </Suspense>
+        ),
+      },
+      {
         path: 'lost',
         element: (
           <Suspense fallback={<Loading />}>
@@ -174,7 +114,7 @@ export const router = createBrowserRouter([
           </Suspense>
         ),
         loader: lostLoader,
-        action: LostCreateAction,
+        action: lostAction,
       },
       {
         path: 'lost/:id',
@@ -185,6 +125,17 @@ export const router = createBrowserRouter([
         ),
         loader: lostDetailLoader,
       },
+      // {
+      //   path: 'lost/create',
+      //   element: (
+      //     <ProtectedRoute>
+      //       <Suspense fallback={<Loading />}>
+      //         <Lost />
+      //       </Suspense>
+      //     </ProtectedRoute>
+      //   ),
+      //   action: LostCreateAction,
+      // },
       {
         path: 'found',
         element: (
@@ -193,6 +144,7 @@ export const router = createBrowserRouter([
           </Suspense>
         ),
         loader: foundLoader,
+        action: foundAction,
       },
       {
         path: 'found/:id',
@@ -231,6 +183,40 @@ export const router = createBrowserRouter([
           </ProtectedRoute>
         ),
         loader: profileLoader,
+      },
+    ],
+  },
+  {
+    path: '/admin',
+    element: (
+      <AdminRoute>
+        <AdminLayout />
+      </AdminRoute>
+    ),
+    children: [
+      {
+        index: true,
+        element: <AdminDashboard />,
+      },
+      {
+        path: 'users',
+        element: <AdminUsers />,
+      },
+      {
+        path: 'lost',
+        element: <AdminLost />,
+      },
+      {
+        path: 'found',
+        element: <AdminFound />,
+      },
+      {
+        path: 'categories',
+        element: <AdminCategories />,
+      },
+      {
+        path: 'announcements',
+        element: <AdminAnnouncements />,
       },
     ],
   },

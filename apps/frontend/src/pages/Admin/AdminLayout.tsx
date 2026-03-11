@@ -2,12 +2,20 @@ import { useState } from 'react';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { memo } from 'react';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthStore, useIsAdmin } from '@/stores/AuthStore';
 import { toast } from 'sonner';
 import { LayoutDashboard, Users, Package, FileText, LogOut } from 'lucide-react';
+import { useShallow } from 'zustand/react/shallow';
 
 export default memo(function AdminLayout() {
-  const { user, isAdmin, logout } = useAuth();
+  const { user, logout } = useAuthStore(
+    useShallow((state) => ({
+      user: state.user,
+      logout: state.logout,
+    }))
+  );
+  const isAdmin = useIsAdmin();
+
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('dashboard');
 

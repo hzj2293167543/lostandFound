@@ -1,7 +1,7 @@
 import { UploadTypeDto } from '@lostfound/shared';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { createWriteStream } from 'fs';
+import { createWriteStream, unlink } from 'fs';
 import { ensureDir } from 'fs-extra';
 import { join } from 'path';
 import { v4 as uuIdv4 } from 'uuid';
@@ -33,5 +33,19 @@ export class UploadService {
     });
     const baseUrl = this.configService.get('app.baseUrl') || 'http://localhost:3000';
     return `${baseUrl}/uploads/${type}/${fileName}`;
+  }
+
+  deleteFile(rowFilePath: string) {
+    const uploadRoot =
+      this.configService.get('upload.directory') || join(__dirname, '..', '..', 'uploads');
+    const baseUrl = this.configService.get('app.baseUrl') || 'http://localhost:3000';
+
+    const fileBasePath = rowFilePath.split(baseUrl)[1];
+    const filePath = join(uploadRoot, fileBasePath);
+    unlink(filePath, (err) => {
+      if (err) {
+        throw err;
+      }
+    });
   }
 }

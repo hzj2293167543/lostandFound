@@ -1,5 +1,10 @@
-// import { FoundCreateDto } from "@lostfound/shared";
+import { foundApi } from '@/api';
+import { FoundCreateDto, FoundCreateDtoSchema } from '@lostfound/shared';
 
-// export function CreateFound(found: FoundCreateDto) {
-//   return request.post('/found', found);
-// }
+export async function CreateFound(foundCreateDto: FoundCreateDto) {
+  const result = FoundCreateDtoSchema.safeParse(foundCreateDto);
+  if (!result.success) {
+    throw new Error(result.error.errors.map((e) => e.message).join('\n'));
+  }
+  return await foundApi.createFoundItem(result.data);
+}

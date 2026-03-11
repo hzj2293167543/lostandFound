@@ -5,6 +5,7 @@ import { LostItem } from './entities/lost-item.entity';
 import { LostCreateDto, LostItem as LostItemVo } from '@lostfound/shared';
 import { mapLostItemToVo } from './lost-items.mapper';
 import { Category } from 'src/categories/entities/category.entity';
+import { UploadService } from '@/common/upload/upload.service';
 
 @Injectable()
 export class LostItemsService {
@@ -12,7 +13,8 @@ export class LostItemsService {
     @InjectRepository(LostItem)
     private lostItemsRepository: Repository<LostItem>,
     @InjectRepository(Category)
-    private categoriesRepository: Repository<Category>
+    private categoriesRepository: Repository<Category>,
+    private uploadService: UploadService
   ) {}
 
   async findAll(): Promise<LostItem[]> {
@@ -50,14 +52,22 @@ export class LostItemsService {
     if (!categoryPo) {
       throw new NotFoundException('分类不存在');
     }
-    const category = { id: categoryPo.id, name: categoryPo.name };
+
+    const { category: categoryId, ...restData } = data;
+
     const lostItem = this.lostItemsRepository.create({
-      ...data,
-      category,
+      ...restData,
+      categoryId,
       commentCount: 0,
       viewCount: 0,
     });
-    return this.lostItemsRepository.save(lostItem);
+
+    try {
+      return this.lostItemsRepository.save(lostItem);
+    } catch (error) {
+      this.uploadService.deleteFile(lostItem.image);
+      throw error;
+    }
   }
 
   async update(id: number, data: Partial<LostItem>): Promise<LostItem> {

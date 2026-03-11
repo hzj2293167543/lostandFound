@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { lostApi, foundApi, userApi } from '@/api';
-import { LostItem, FoundItem, User } from '@lostfound/schema';
+import { LostItem, FoundItem } from '@lostfound/shared';
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({

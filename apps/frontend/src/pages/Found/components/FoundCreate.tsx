@@ -1,4 +1,4 @@
-import { SyntheticEvent, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -20,6 +20,9 @@ import {
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Category } from '@lostfound/shared';
+import { Form, useActionData } from 'react-router-dom';
+import { toast } from 'sonner';
+import { useAuthAction } from '@/hooks/useAuthAction';
 
 interface FoundCreateProps {
   categories: Category[];
@@ -27,18 +30,28 @@ interface FoundCreateProps {
 
 export default function FoundCreate({ categories }: FoundCreateProps) {
   const [open, setOpen] = useState(false);
+  const actionData = useActionData();
 
-  // 发布招领信息
-  const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    // 这里应该处理表单提交逻辑
-    setOpen(false);
-    // 模拟提交成功后刷新页面
-    alert('招领信息发布成功！');
+  useEffect(() => {
+    if (actionData?.success) {
+      toast.success('招领信息发布成功！');
+      setOpen(false);
+    } else if (actionData?.error) {
+      toast.error(actionData.error);
+    }
+  }, [actionData]);
+
+  const requireAuth = useAuthAction();
+  const handleOpen = (newOpen: boolean) => {
+    if (newOpen) {
+      requireAuth(() => setOpen(true), '请先登录后才能发布招领信息');
+    } else {
+      setOpen(false);
+    }
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpen}>
       <DialogTrigger asChild>
         <Button className="bg-green-600 hover:bg-green-700">发布招领信息</Button>
       </DialogTrigger>
@@ -47,20 +60,20 @@ export default function FoundCreate({ categories }: FoundCreateProps) {
           <DialogTitle>发布招领信息</DialogTitle>
           <DialogDescription>请详细填写招领信息，帮助物品早日回家</DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <Form method="post" encType="multipart/form-data" className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="title">物品名称</Label>
-            <Input id="title" placeholder="请输入物品名称" required />
+            <Input id="title" name="title" placeholder="请输入物品名称" required />
           </div>
           <div className="space-y-2">
             <Label htmlFor="category">物品分类</Label>
-            <Select>
+            <Select name="category">
               <SelectTrigger id="category">
                 <SelectValue placeholder="选择分类" />
               </SelectTrigger>
               <SelectContent>
                 {categories.map((cat) => (
-                  <SelectItem key={cat.id} value={cat.name}>
+                  <SelectItem key={cat.id} value={String(cat.id)}>
                     {cat.name}
                   </SelectItem>
                 ))}
@@ -69,27 +82,37 @@ export default function FoundCreate({ categories }: FoundCreateProps) {
           </div>
           <div className="space-y-2">
             <Label htmlFor="description">详细描述</Label>
-            <Textarea id="description" placeholder="请详细描述物品特征、捡到情况等" required />
+            <Textarea
+              id="description"
+              name="description"
+              placeholder="请详细描述物品特征、捡到情况等"
+              required
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="time">捡到时间</Label>
-            <Input id="time" type="date" required />
+            <Input id="time" name="time" type="date" required />
           </div>
           <div className="space-y-2">
             <Label htmlFor="location">捡到地点</Label>
-            <Input id="location" placeholder="请输入捡到的地点" required />
+            <Input id="location" name="location" placeholder="请输入捡到的地点" required />
           </div>
           <div className="space-y-2">
             <Label htmlFor="storage_location">存储地点</Label>
-            <Input id="storage_location" placeholder="请输入存储地点" required />
+            <Input
+              id="storage_location"
+              name="storage_location"
+              placeholder="请输入存储地点"
+              required
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="contact_phone">联系电话</Label>
-            <Input id="contact_phone" placeholder="请输入联系电话" required />
+            <Input id="contact_phone" name="contact_phone" placeholder="请输入联系电话" required />
           </div>
           <div className="space-y-2">
             <Label htmlFor="image">图片上传</Label>
-            <Input id="image" type="file" accept="image/*" />
+            <Input id="image" name="image" type="file" accept="image/*" />
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
@@ -99,7 +122,7 @@ export default function FoundCreate({ categories }: FoundCreateProps) {
               发布
             </Button>
           </DialogFooter>
-        </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

@@ -21,7 +21,11 @@ export class LostItem {
   title: string;
 
   @ManyToOne(() => Category)
+  @JoinColumn({ name: 'category_id' })
   category: Category;
+
+  @Column({ name: 'category_id' })
+  categoryId: number;
 
   @Column('text')
   description: string;
@@ -39,7 +43,11 @@ export class LostItem {
   image: string;
 
   @ManyToOne(() => User)
+  @JoinColumn({ name: 'user_id' })
   user: User;
+
+  @Column({ name: 'user_id' })
+  userId: number;
 
   @Column({ default: 0 })
   commentCount: number;

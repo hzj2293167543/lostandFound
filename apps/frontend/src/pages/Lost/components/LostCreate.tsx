@@ -22,8 +22,7 @@ import { useEffect, useState } from 'react';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { Form, useActionData } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { useAuthAction } from '../hooks/useAuthAction';
+import { useAuthAction } from '../../../hooks/useAuthAction';
 
 export default function LostCreate({ categories }: { categories: Category[] }) {
   const [open, setOpen] = useState(false);
@@ -38,8 +37,13 @@ export default function LostCreate({ categories }: { categories: Category[] }) {
   }, [actionData]);
   // 验证登录
   const requireAuth = useAuthAction();
-  const handleOpen = () => {
-    requireAuth(() => setOpen(true), '请先登录后才能发布失物信息');
+
+  const handleOpen = (newOpen: boolean) => {
+    if (newOpen) {
+      requireAuth(() => setOpen(true), '请先登录后才能发布失物信息');
+    } else {
+      setOpen(false);
+    }
   };
 
   return (

@@ -4,7 +4,7 @@ import { CreateLost } from '@/services/lost.services';
 import { LostCreateDto, UploadTypeDtoObj } from '@lostfound/shared';
 import { ActionFunction } from 'react-router-dom';
 
-export const LostCreateAction: ActionFunction = async ({ request }) => {
+export const lostAction: ActionFunction = async ({ request }) => {
   try {
     const formData = await request.formData();
     // 上传图片并获取 URL

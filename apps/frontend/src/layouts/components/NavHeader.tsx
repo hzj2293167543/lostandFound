@@ -1,11 +1,17 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { memo } from 'react';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthStore, useIsAdmin, useIsAuthenticated } from '@/stores/AuthStore';
 import { toast } from 'sonner';
+import { useShallow } from 'zustand/react/shallow';
 
 export default memo(function NavHeader() {
-  const { user, isAuthenticated, isAdmin, logout } = useAuth();
+  const { user, logout } = useAuthStore(
+    useShallow((state) => ({ user: state.user, logout: state.logout }))
+  );
+  const isAuthenticated = useIsAuthenticated();
+  const isAdmin = useIsAdmin();
+
   const navigate = useNavigate();
 
   const handleLogout = () => {

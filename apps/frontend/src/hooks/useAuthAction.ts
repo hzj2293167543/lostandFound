@@ -1,8 +1,8 @@
-import { useAuth } from '@/contexts/AuthContext';
+import { useIsAuthenticated } from '@/stores/AuthStore';
 import { toast } from 'sonner';
 
 export function useAuthAction() {
-  const { isAuthenticated } = useAuth();
+  const isAuthenticated = useIsAuthenticated();
 
   return (action: () => void, message = '请先登录') => {
     if (!isAuthenticated) {

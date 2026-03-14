@@ -21,7 +21,6 @@ export class UploadController {
   @Post('file')
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(@UploadedFile() file: Express.Multer.File, @Body('type') type: UploadTypeDto) {
-    console.log(MimeSchemas);
     if (!MimeSchemas[type].safeParse(file.mimetype).success) {
       throw new BadRequestException('文件类型不支持');
     }

@@ -8,26 +8,59 @@ import {
   Query,
   UseGuards,
   Request,
+  ParseIntPipe,
+  BadRequestException,
+  ParseBoolPipe,
 } from '@nestjs/common';
 import { CommentsService } from './comments.service';
 import { AuthGuard } from '@nestjs/passport';
+import { CommentCreateDto, commentCreateDtoSchema, CommentItem, User } from '@lostfound/shared';
+import { CurrentUser } from '@/common/decorators/currentUser.decorators';
 
 @Controller('comments')
+@UseGuards(AuthGuard('jwt'))
 export class CommentsController {
   constructor(private commentsService: CommentsService) {}
 
   @Get()
-  findByItem(@Query('itemId') itemId: string, @Query('itemType') itemType: string) {
-    return this.commentsService.findByItem(+itemId, +itemType);
+  findByItem(
+    @Query('itemId', new ParseIntPipe()) itemId: number,
+    @Query('itemType', new ParseIntPipe()) itemType: number,
+    @CurrentUser() user: User
+  ): Promise<CommentItem[]> {
+    return this.commentsService.findByItem(itemId, itemType, user.id);
+  }
+
+  @Get(':id/likes')
+  like(@Param('id', new ParseIntPipe()) id: number) {
+    return this.commentsService.findLikes(id);
+  }
+
+  @Get(':id/liked')
+  isLiked(@Param('id', new ParseIntPipe()) id: number, @CurrentUser() user: User) {
+    return this.commentsService.findLiked(id, user.id);
   }
 
   @Post()
-  @UseGuards(AuthGuard('jwt'))
-  create(@Body() data: any, @Request() req) {
+  create(@Body() data: CommentCreateDto, @CurrentUser() user: User) {
+    console.log(data);
+    const result = commentCreateDtoSchema.safeParse(data);
+    if (!result.success) {
+      throw new BadRequestException(result.error);
+    }
     return this.commentsService.create({
       ...data,
-      userId: req.user.id,
+      userId: user.id,
     });
+  }
+
+  @Post(':id/like')
+  likeComment(
+    @Param('id', new ParseIntPipe()) id: number,
+    @CurrentUser() user: User,
+    @Query('isLiked', new ParseBoolPipe()) isLike: boolean
+  ) {
+    return this.commentsService.likeComment(id, user.id, isLike);
   }
 
   @Delete(':id')

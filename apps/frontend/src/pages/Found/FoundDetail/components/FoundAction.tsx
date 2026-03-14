@@ -12,9 +12,7 @@ export default function FoundAction({ categories }: { categories: Category[] }) 
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <Button className="w-full bg-green-600 hover:bg-green-700">
-            <FoundCreate categories={categories} />
-          </Button>
+          <FoundCreate categories={categories} className="w-full bg-green-600 hover:bg-green-700" />
           <Button variant="outline" className="w-full">
             <Link to="/lost">查看失物信息</Link>
           </Button>

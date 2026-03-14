@@ -1,82 +1,141 @@
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
 import { Textarea } from '@/components/ui/textarea';
+import { ItemTypeMap } from '@/types/type';
 import { Comment } from '@lostfound/shared';
-import { type SyntheticEvent, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
+import { Form, useActionData } from 'react-router-dom';
+import { LOST_DETAIL_INTENT } from '../../type';
+import CommentItem from './CommentItem';
 
-export default function Comments({
+const PAGE_SIZE = 10;
+
+export default memo(function Comments({
   comments,
-  setComments,
+  itemId,
 }: {
   comments: Comment[];
-  setComments: (comments: Comment[]) => void;
+  itemId: number;
 }) {
-  const [comment, setComment] = useState('');
-  // 提交评论
-  const handleSubmitComment = (e: SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const [content, setContent] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const actionData = useActionData();
+  useEffect(() => {
+    if (actionData?.intent === LOST_DETAIL_INTENT.COMMENT) {
+      setContent('');
+      setCurrentPage(1);
+    }
+  }, [actionData]);
 
-    if (!comment.trim()) return;
-
-    const newComment = {
-      id: comments ? comments.length + 1 : 1,
-      user: {
-        id: 5,
-        name: '当前用户',
-        avatar:
-          'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=user%20avatar%20default&image_size=square',
-      },
-      content: comment,
-      time: new Date().toLocaleString('zh-CN'),
-    };
-    setComments(comments ? [...comments, newComment] : [newComment]);
-    setComment('');
+  const [replyState, setReplyState] = useState<{ replyId: number | undefined }>({
+    replyId: undefined,
+  });
+  const handleReplyStateChange = (id: number | undefined) => {
+    setReplyState((prev) => ({ replyId: prev.replyId === id ? undefined : id }));
   };
+
+  const totalComments = comments?.length || 0;
+  const totalPages = Math.ceil(totalComments / PAGE_SIZE);
+  const displayedComments = comments.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>评论 ({comments?.length || 0})</CardTitle>
+        <CardTitle>评论 ({totalComments})</CardTitle>
         <CardDescription>请文明发言，共同帮助失主找回物品</CardDescription>
       </CardHeader>
       <CardContent>
-        {/* 发表评论 */}
-        <form onSubmit={handleSubmitComment} className="mb-8">
+        <Form method="post" className="mb-8">
+          <input type="hidden" name="intent" value={LOST_DETAIL_INTENT.COMMENT} />
+          <input type="hidden" name="itemId" value={itemId} />
+          <input type="hidden" name="itemType" value={ItemTypeMap.LOST} />
           <div className="space-y-2">
             <Label htmlFor="comment">发表评论</Label>
             <Textarea
-              id="comment"
+              id="content"
+              name="content"
               placeholder="请输入你的评论..."
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
               className="resize-none"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
             />
           </div>
           <Button type="submit" className="mt-4 bg-blue-600 hover:bg-blue-700">
             提交评论
           </Button>
-        </form>
+        </Form>
 
-        {/* 评论列表 */}
-        <div className="space-y-6">
-          {comments?.map((commentItem) => (
-            <div key={commentItem.id} className="flex space-x-4">
-              <img
-                src={commentItem.user.avatar}
-                alt={commentItem.user.name}
-                className="w-10 h-10 rounded-full flex-shrink-0"
-              />
-              <div className="flex-1">
-                <div className="flex justify-between items-start mb-1">
-                  <h4 className="font-medium text-gray-800">{commentItem.user.name}</h4>
-                  <span className="text-xs text-gray-500">{commentItem.time}</span>
-                </div>
-                <p className="text-gray-600">{commentItem.content}</p>
-              </div>
+        {totalComments === 0 ? null : (
+          <>
+            <div className="space-y-6">
+              {displayedComments.map((commentItem) => (
+                <CommentItem
+                  key={commentItem.id}
+                  rootCommentId={commentItem.id}
+                  comment={commentItem}
+                  itemId={itemId}
+                  replyState={{
+                    replyId: replyState.replyId,
+                    setReplyState: handleReplyStateChange,
+                  }}
+                />
+              ))}
             </div>
-          ))}
-        </div>
+            {totalPages > 1 && (
+              <div className="mt-6">
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setCurrentPage((p) => Math.max(1, p - 1));
+                        }}
+                        className={currentPage <= 1 ? 'pointer-events-none opacity-50' : ''}
+                      />
+                    </PaginationItem>
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                      <PaginationItem key={page}>
+                        <PaginationLink
+                          href="#"
+                          isActive={page === currentPage}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setCurrentPage(page);
+                          }}>
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
+                    <PaginationItem>
+                      <PaginationNext
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setCurrentPage((p) => Math.min(totalPages, p + 1));
+                        }}
+                        className={
+                          currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''
+                        }
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </div>
+            )}
+          </>
+        )}
       </CardContent>
     </Card>
   );
-}
+});

@@ -30,7 +30,6 @@ export class FoundItemsService {
       order: { createdAt: 'DESC' },
       take: limit === undefined ? undefined : limit,
     });
-    console.log(items);
     return items.map((item) => mapFoundItemToVo(item));
   }
 

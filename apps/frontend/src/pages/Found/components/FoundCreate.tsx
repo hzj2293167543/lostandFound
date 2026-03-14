@@ -28,7 +28,10 @@ interface FoundCreateProps {
   categories: Category[];
 }
 
-export default function FoundCreate({ categories }: FoundCreateProps) {
+export default function FoundCreate({
+  categories,
+  className,
+}: FoundCreateProps & { className?: string }) {
   const [open, setOpen] = useState(false);
   const actionData = useActionData();
 
@@ -53,7 +56,7 @@ export default function FoundCreate({ categories }: FoundCreateProps) {
   return (
     <Dialog open={open} onOpenChange={handleOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-green-600 hover:bg-green-700">发布招领信息</Button>
+        <Button className={`bg-green-600 hover:bg-green-700 ${className}`}>发布招领信息</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>

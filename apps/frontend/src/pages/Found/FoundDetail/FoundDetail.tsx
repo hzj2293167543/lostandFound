@@ -1,17 +1,16 @@
-import { Category, FoundDetail } from '@lostfound/shared';
-import { useState } from 'react';
+import { Category, FoundDetail, Comment } from '@lostfound/shared';
 import { Link, useLoaderData } from 'react-router-dom';
 import Comments from './components/Comments';
 import FoundAction from './components/FoundAction';
 import FoundDetailItem from './components/FoundDetailItem';
 import FoundTips from './components/FoundTips';
 
-function FoundDetailPage() {
-  const { foundItem, categories } = useLoaderData() as {
-    foundItem: FoundDetail;
+export default function FoundDetailPage() {
+  const { foundDetail, comments, categories } = useLoaderData() as {
+    foundDetail: FoundDetail;
+    comments: Comment[];
     categories: Category[];
   };
-  const [comments, setComments] = useState(foundItem.comments || []);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -23,16 +22,10 @@ function FoundDetailPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* 左侧招领详情 */}
         <div className="lg:col-span-2">
-          {/* 招领基本信息 */}
-          <FoundDetailItem foundDetail={foundItem} />
-
-          {/* 评论区 */}
-          <Comments comments={comments} setComments={setComments} />
+          <FoundDetailItem foundDetail={foundDetail} />
+          <Comments comments={comments} itemId={foundDetail.id} />
         </div>
-
-        {/* 右侧相关信息 */}
         <div className="lg:col-span-1">
           <FoundAction categories={categories} />
           <FoundTips />
@@ -41,5 +34,3 @@ function FoundDetailPage() {
     </div>
   );
 }
-
-export default FoundDetailPage;

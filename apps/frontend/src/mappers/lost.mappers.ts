@@ -1,4 +1,4 @@
-import { LostCreateDto } from '@lostfound/shared';
+import { CommentCreateDto, LostCreateDto } from '@lostfound/shared';
 
 export function mapLostFormToCreateDto(formData: FormData): LostCreateDto {
   return {
@@ -8,5 +8,14 @@ export function mapLostFormToCreateDto(formData: FormData): LostCreateDto {
     time: formData.get('time') as string,
     location: formData.get('location') as string,
     image: formData.get('image') as string,
+  };
+}
+
+export function mapLostDetailFormToCommentDto(formData: FormData): CommentCreateDto {
+  return {
+    parentId: formData.get('parentId') ? Number(formData.get('parentId')) : null,
+    itemId: Number(formData.get('itemId')),
+    itemType: Number(formData.get('itemType')),
+    content: formData.get('content') as string,
   };
 }

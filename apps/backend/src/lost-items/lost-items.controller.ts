@@ -1,28 +1,27 @@
+import { LostCreateDto, LostItem as LostItemVo, User } from '@lostfound/shared';
 import {
+  BadRequestException,
+  Body,
   Controller,
+  Delete,
   Get,
+  Param,
+  ParseIntPipe,
   Post,
   Put,
-  Delete,
-  Body,
-  Param,
   Query,
   UseGuards,
-  Request,
-  ParseIntPipe,
-  BadRequestException,
 } from '@nestjs/common';
-import { LostItemsService } from './lost-items.service';
 import { AuthGuard } from '@nestjs/passport';
-import { LostCreateDto, LostItem as LostItemVo, User } from '@lostfound/shared';
 import { CurrentUser } from 'src/common/decorators/currentUser.decorators';
+import { LostItemsService } from './lost-items.service';
 
 @Controller('lost-items')
 export class LostItemsController {
   constructor(private lostItemsService: LostItemsService) {}
 
   @Get()
-  findAll(@Query('categoryId') categoryId?: string) {
+  findAll() {
     return this.lostItemsService.findAll();
   }
 

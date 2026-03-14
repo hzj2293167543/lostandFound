@@ -1,14 +1,18 @@
+import { AxiosRequestConfig } from 'axios';
 import { get, post, remove } from '../client';
-import { Comment } from '@lostfound/shared';
+import { CommentCreateDto, CommentItem } from '@lostfound/shared';
 
 export const commentApi = {
   getCommentsByItem: (itemId: number, itemType: number) =>
-    get<Comment[]>('/comments', { params: { itemId, itemType } }),
+    get<CommentItem[]>('/comments', { params: { itemId, itemType } }),
 
-  getCommentsByUserId: (userId: number) => get<Comment[]>(`/comments/user/${userId}`),
+  getCommentsByUserId: (userId: number) => get<CommentItem[]>(`/comments/user/${userId}`),
 
-  createComment: (data: { content: string; itemId: number; itemType: number }) =>
-    post<Comment>('/comments', data),
+  likeComment: (id: number, isLiked: boolean) =>
+    post<void>(`/comments/${id}/like`, null, { params: { isLiked } }),
+
+  createComment: (data: CommentCreateDto, config?: AxiosRequestConfig) =>
+    post<CommentItem>('/comments', data, config),
 
   deleteComment: (id: number) => remove<void>(`/comments/${id}`),
 };

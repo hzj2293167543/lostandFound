@@ -12,9 +12,7 @@ export default function LostAction({ categories }: { categories: Category[] }) {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <Button className="w-full bg-blue-600 hover:bg-blue-700">
-            <LostCreate categories={categories} />
-          </Button>
+          <LostCreate categories={categories} className="w-full bg-blue-600 hover:bg-blue-700" />
           <Button variant="outline" className="w-full">
             <Link to="/found">查看招领信息</Link>
           </Button>

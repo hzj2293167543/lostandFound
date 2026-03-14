@@ -24,7 +24,13 @@ import { toast } from 'sonner';
 import { Form, useActionData } from 'react-router-dom';
 import { useAuthAction } from '../../../hooks/useAuthAction';
 
-export default function LostCreate({ categories }: { categories: Category[] }) {
+export default function LostCreate({
+  categories,
+  className,
+}: {
+  categories: Category[];
+  className?: string;
+}) {
   const [open, setOpen] = useState(false);
   const actionData = useActionData();
   useEffect(() => {
@@ -49,7 +55,7 @@ export default function LostCreate({ categories }: { categories: Category[] }) {
   return (
     <Dialog open={open} onOpenChange={handleOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-blue-600 hover:bg-blue-700">发布失物信息</Button>
+        <Button className={`bg-blue-600 hover:bg-blue-700 ${className}`}>发布失物信息</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>

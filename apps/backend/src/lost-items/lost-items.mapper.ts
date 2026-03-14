@@ -1,7 +1,7 @@
 import { LostItem as LostItemVo } from '@lostfound/shared';
 import { LostItem as LostItemEntity } from './entities/lost-item.entity';
 
-export function mapLostItemToVo(item: LostItemEntity): LostItemVo {
+export function mapLostItemToVo(item: LostItemEntity, commentCount: number): LostItemVo {
   return {
     id: item.id,
     title: item.title,
@@ -14,7 +14,7 @@ export function mapLostItemToVo(item: LostItemEntity): LostItemVo {
     location: item.location,
     status: item.status,
     image: item.image,
-    commentCount: item.commentCount,
+    commentCount,
     user: {
       id: item.user.id,
       name: item.user.name,

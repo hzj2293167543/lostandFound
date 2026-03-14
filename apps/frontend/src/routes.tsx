@@ -26,6 +26,7 @@ const AdminCategories = lazy(() => import('./pages/Admin/Categories'));
 const AdminAnnouncements = lazy(() => import('./pages/Admin/Announcements'));
 
 import { foundDetailLoader } from './pages/Found/FoundDetail/foundDetail.loader';
+import { foundDetailAction } from './pages/Found/FoundDetail/foundDetail.action';
 import { foundLoader } from './pages/Found/FoundPage/found.loader';
 import { foundAction } from './pages/Found/FoundPage/found.action';
 import { homeLoader } from './pages/homePage/home.loader';
@@ -36,6 +37,7 @@ import { announcementDetailLoader } from './pages/Announcement/AnnouncementDetai
 import profileLoader from './pages/Profile/profile.loader';
 import { useAuthStore, useIsAdmin, useIsAuthenticated } from './stores/AuthStore';
 import { lostAction } from './pages/Lost/LostPage/lost.action';
+import { lostDetailAction } from './pages/Lost/LostDetail/lostDetail.action';
 
 function Loading() {
   return (
@@ -124,6 +126,7 @@ export const router = createBrowserRouter([
           </Suspense>
         ),
         loader: lostDetailLoader,
+        action: lostDetailAction,
       },
       // {
       //   path: 'lost/create',
@@ -154,6 +157,7 @@ export const router = createBrowserRouter([
           </Suspense>
         ),
         loader: foundDetailLoader,
+        action: foundDetailAction,
       },
       {
         path: 'announcements',

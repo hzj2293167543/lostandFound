@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 
@@ -19,10 +20,20 @@ export class Comment {
   @Column({ type: 'datetime' })
   time: Date;
 
+  @Column({ nullable: true })
+  @JoinColumn({ name: 'parent_id' })
+  parentId: number | null;
+
+  @ManyToOne(() => Comment, { nullable: true })
+  @JoinColumn({ name: 'parent_id' })
+  parent: Comment | null;
+
   @Column()
+  @JoinColumn({ name: 'user_id' })
   userId: number;
 
   @ManyToOne(() => User, (user) => user.comments)
+  @JoinColumn({ name: 'user_id' })
   user: User;
 
   @Column()

@@ -1,16 +1,14 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  UpdateDateColumn,
-  ManyToOne,
-  OneToMany,
-  OneToOne,
+  Entity,
   JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
-import { User } from '../../users/entities/user.entity';
 import { Category } from '../../categories/entities/category.entity';
+import { User } from '../../users/entities/user.entity';
 
 @Entity('lost_items')
 export class LostItem {
@@ -48,9 +46,6 @@ export class LostItem {
 
   @Column({ name: 'user_id' })
   userId: number;
-
-  @Column({ default: 0 })
-  commentCount: number;
 
   @Column({ default: 0 })
   viewCount: number;

@@ -14,7 +14,7 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json && tsc -p tsconfig.cjs.json",
-    "dev": "tsc -p tsconfig.json && tsc -p tsconfig.cjs.json --watch"
+    "dev": "concurrently \"tsc -p tsconfig.json --watch\" \"tsc -p tsconfig.cjs.json --watch\""
   },
   "keywords": [
     "zod",

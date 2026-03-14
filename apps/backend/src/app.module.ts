@@ -55,7 +55,7 @@ const filePath = join(__dirname, '..', 'config', `.env.${env}.yaml`);
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         namingStrategy: new SnakeNamingStrategy(),
         synchronize: false,
-        logging: false,
+        logging: true,
       }),
     }),
     AuthModule,

@@ -1,11 +1,12 @@
+import { CommentsService } from '@/comments/comments.service';
+import { UploadService } from '@/common/upload/upload.service';
+import { LostCreateDto, LostItem as LostItemVo } from '@lostfound/shared';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Category } from 'src/categories/entities/category.entity';
 import { Repository } from 'typeorm';
 import { LostItem } from './entities/lost-item.entity';
-import { LostCreateDto, LostItem as LostItemVo } from '@lostfound/shared';
 import { mapLostItemToVo } from './lost-items.mapper';
-import { Category } from 'src/categories/entities/category.entity';
-import { UploadService } from '@/common/upload/upload.service';
 
 @Injectable()
 export class LostItemsService {
@@ -14,14 +15,20 @@ export class LostItemsService {
     private lostItemsRepository: Repository<LostItem>,
     @InjectRepository(Category)
     private categoriesRepository: Repository<Category>,
-    private uploadService: UploadService
+    private uploadService: UploadService,
+    private commentsService: CommentsService
   ) {}
 
-  async findAll(): Promise<LostItem[]> {
-    return this.lostItemsRepository.find({
+  async findAll(): Promise<LostItemVo[]> {
+    const items = await this.lostItemsRepository.find({
       relations: ['category', 'user'],
       order: { createdAt: 'DESC' },
     });
+
+    const commentCountMap = await this.commentsService.getLostItemCommentCountMap(
+      items.map((item) => item.id)
+    );
+    return items.map((item) => mapLostItemToVo(item, commentCountMap.get(item.id) || 0));
   }
 
   async findTop(limit?: number): Promise<LostItemVo[]> {
@@ -30,19 +37,23 @@ export class LostItemsService {
       order: { createdAt: 'DESC' },
       take: limit === undefined ? undefined : limit,
     });
-    console.log(items);
-    return items.map((item) => mapLostItemToVo(item));
+
+    const commentCountMap = await this.commentsService.getLostItemCommentCountMap(
+      items.map((item) => item.id)
+    );
+    return items.map((item) => mapLostItemToVo(item, commentCountMap.get(item.id) || 0));
   }
 
-  async findOne(id: number): Promise<LostItem> {
+  async findOne(id: number): Promise<LostItemVo> {
     const item = await this.lostItemsRepository.findOne({
       where: { id },
       relations: ['category', 'user'],
     });
+    const commentCountMap = await this.commentsService.getLostItemCommentCountMap([item.id]);
     if (item) {
       await this.lostItemsRepository.increment({ id }, 'viewCount', 1);
     }
-    return item;
+    return mapLostItemToVo(item, commentCountMap.get(item.id) || 0);
   }
 
   async create(data: LostCreateDto & { userId: number }): Promise<LostItem> {
@@ -58,7 +69,6 @@ export class LostItemsService {
     const lostItem = this.lostItemsRepository.create({
       ...restData,
       categoryId,
-      commentCount: 0,
       viewCount: 0,
     });
 
@@ -70,7 +80,7 @@ export class LostItemsService {
     }
   }
 
-  async update(id: number, data: Partial<LostItem>): Promise<LostItem> {
+  async update(id: number, data: Partial<LostItem>): Promise<LostItemVo> {
     await this.lostItemsRepository.update(id, data);
     return this.findOne(id);
   }

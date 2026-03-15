@@ -41,6 +41,11 @@ export class CommentsController {
     return this.commentsService.findLiked(id, user.id);
   }
 
+  @Get('user/:userId')
+  findByUser(@Param('userId', new ParseIntPipe()) userId: number) {
+    return this.commentsService.findByUser(userId);
+  }
+
   @Post()
   create(@Body() data: CommentCreateDto, @CurrentUser() user: User) {
     console.log(data);

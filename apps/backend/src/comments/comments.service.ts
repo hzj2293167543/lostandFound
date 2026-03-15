@@ -106,6 +106,14 @@ export class CommentsService {
     });
   }
 
+  findByUser(userId: number): Promise<Comment[]> {
+    return this.commentsRepository.find({
+      where: { userId },
+      relations: ['user'],
+      order: { createdAt: 'DESC' },
+    });
+  }
+
   create(data: CommentCreateDto & { userId: number }): Promise<Comment> {
     const comment = this.commentsRepository.create({
       ...data,

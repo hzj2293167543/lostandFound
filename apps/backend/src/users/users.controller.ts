@@ -1,6 +1,8 @@
-import { Controller, Get, Put, Param, Body, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Put, Param, Body, UseGuards, Request, Patch } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { AuthGuard } from '@nestjs/passport';
+import { User, UserEditDto, UserEditDtoSchema } from '@lostfound/shared';
+import { CurrentUser } from '@/common/decorators/currentUser.decorators';
 
 @Controller('users')
 export class UsersController {
@@ -23,6 +25,16 @@ export class UsersController {
       throw new Error('无权限操作');
     }
     return this.usersService.update(+id, updateData);
+  }
+
+  @Patch()
+  @UseGuards(AuthGuard('jwt'))
+  updateUser(@Body() updateData: UserEditDto, @CurrentUser() user: User) {
+    const result = UserEditDtoSchema.safeParse(updateData);
+    if (!result.success) {
+      throw new Error(result.error.issues.map((item) => item.message).join(', '));
+    }
+    return this.usersService.update(user.id, result.data);
   }
 
   @Put(':id/password')

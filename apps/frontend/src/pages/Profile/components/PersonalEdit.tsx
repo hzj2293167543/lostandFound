@@ -19,12 +19,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
+import { uploadFile } from '@/services/upload.services';
+import { getFirstError } from '@/utils/form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { User, UserEditDto, UserEditDtoSchema } from '@lostfound/shared';
+import { UploadTypeDtoObj, User, UserEditDto, UserEditDtoSchema } from '@lostfound/shared';
 import { Camera } from 'lucide-react';
 import type { ChangeEvent } from 'react';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { FieldErrors, useForm } from 'react-hook-form';
 import { useSubmit } from 'react-router-dom';
 import { toast } from 'sonner';
 import * as z from 'zod';
@@ -66,6 +68,7 @@ export default function PersonalEdit({
       email: userRaw.email ?? '',
       contact: userRaw.contact ?? '',
       description: userRaw.description ?? '',
+      avatar: userRaw.avatar ?? '',
     },
   });
 
@@ -78,10 +81,12 @@ export default function PersonalEdit({
     },
   });
 
-  const handleAvatarChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const [isUpdateAvatar, setIsUpdateAvatar] = useState(false);
+  const handleAvatarChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // 预览头像
     const reader = new FileReader();
     reader.addEventListener('load', (event) => {
       const result = event.target?.result;
@@ -90,16 +95,25 @@ export default function PersonalEdit({
       }
     });
     reader.readAsDataURL(file);
+
+    try {
+      const imageUrl = await uploadFile(file, UploadTypeDtoObj.AVATAR);
+      profileForm.setValue('avatar', imageUrl);
+    } catch {
+      toast.error('头像上传失败');
+      setAvatarPreview(userRaw.avatar);
+    } finally {
+      setIsUpdateAvatar(false);
+    }
   };
 
-  const onProfileSubmit = (data: UserEditDto) => {
-    console.log('hello');
+  const onProfileSubmit = async (data: UserEditDto) => {
     try {
-      // const isDirty = profileForm.formState.isDirty;
-      // if (!isDirty) {
-      //   toast.error('请至少修改一个字段');
-      //   return;
-      // }
+      const isDirty = profileForm.formState.isDirty;
+      if (!isDirty) {
+        toast.error('请至少修改一个字段');
+        return;
+      }
       const formData = new FormData();
       formData.append('intent', PROFILE_INTENT.USER_EDIT);
       Object.entries(data).forEach(([key, value]) => {
@@ -107,11 +121,17 @@ export default function PersonalEdit({
           formData.append(key, value);
         }
       });
-      submit(formData, { method: 'post' });
+      await submit(formData, { method: 'post' });
       setOpen(false);
       toast.success('个人信息更新成功！');
     } catch {
       toast.error('个人信息更新失败');
+    }
+  };
+  const onProfileSubmitError = (errors: FieldErrors<UserEditDto>) => {
+    const firstError = getFirstError(errors);
+    if (firstError) {
+      toast.error(firstError);
     }
   };
 
@@ -146,9 +166,7 @@ export default function PersonalEdit({
           <TabsContent value="profile">
             <Form {...profileForm}>
               <form
-                onSubmit={profileForm.handleSubmit(onProfileSubmit, (errors) =>
-                  console.log('表单校验失败拦截:', errors)
-                )}
+                onSubmit={profileForm.handleSubmit(onProfileSubmit, onProfileSubmitError)}
                 className="space-y-4">
                 <div className="flex justify-center">
                   <div className="relative">
@@ -235,7 +253,9 @@ export default function PersonalEdit({
                   <Button type="button" variant="outline" onClick={() => setOpen(false)}>
                     取消
                   </Button>
-                  <Button type="submit">保存</Button>
+                  <Button type="submit" disabled={isUpdateAvatar}>
+                    {isUpdateAvatar ? '更新头像中' : '保存'}
+                  </Button>
                 </DialogFooter>
               </form>
             </Form>

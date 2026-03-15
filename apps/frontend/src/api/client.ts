@@ -109,5 +109,9 @@ export const remove = <T>(url: string, config?: AxiosRequestConfig): Promise<T> 
   return client.delete(url, config) as Promise<T>;
 };
 
+export const patch = <T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> => {
+  return client.patch(url, data, config) as Promise<T>;
+};
+
 // 导出 axios 实例
 export default client;

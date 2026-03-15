@@ -1,17 +1,19 @@
-import { lostApi, foundApi, userApi, commentApi } from '@/api';
-import { User } from '@lostfound/shared';
+import { commentApi, foundApi, lostApi } from '@/api';
+import { useAuthStore } from '@/stores/AuthStore';
 
 export default async function profileLoader() {
   try {
-    const user = (await userApi.getCurrentUser()) as User;
-    const id = user.id;
+    const user = useAuthStore.getState().user;
+    const id = user?.id;
+    if (!id) {
+      throw new Response('User not found', { status: 404 });
+    }
     const [lostItems, foundItems, comments] = await Promise.all([
       lostApi.getLostItemsByUserId(id),
       foundApi.getFoundItemsByUserId(id),
       commentApi.getCommentsByUserId(id),
     ]);
     return {
-      user: user,
       lostItems: lostItems,
       foundItems: foundItems,
       comments: comments,

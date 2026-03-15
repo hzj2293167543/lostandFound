@@ -1,20 +1,47 @@
 import { Button } from '@/components/ui/button';
 import {
-  DialogContent,
   Dialog,
-  DialogHeader,
-  DialogTitle,
+  DialogContent,
   DialogDescription,
   DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { User } from '@lostfound/shared';
+import { Textarea } from '@/components/ui/textarea';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { User, UserEditDto, UserEditDtoSchema } from '@lostfound/shared';
+import { Camera } from 'lucide-react';
+import type { ChangeEvent } from 'react';
 import { useState } from 'react';
-import type { ChangeEvent, SyntheticEvent } from 'react';
+import { useForm } from 'react-hook-form';
+import { useSubmit } from 'react-router-dom';
 import { toast } from 'sonner';
+import * as z from 'zod';
+import { PROFILE_INTENT } from '../types';
+
+const passwordSchema = z
+  .object({
+    oldPassword: z.string().min(1, '请输入当前密码'),
+    newPassword: z.string().min(6, '新密码长度至少为6位'),
+    confirmPassword: z.string().min(1, '请确认新密码'),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: '两次输入的密码不一致',
+    path: ['confirmPassword'],
+  });
+
+type PasswordFormValues = z.infer<typeof passwordSchema>;
 
 export default function PersonalEdit({
   userRaw,
@@ -27,59 +54,29 @@ export default function PersonalEdit({
   open: boolean;
   setOpen: (open: boolean) => void;
 }) {
-  const [formData, setFormData] = useState<User>(userRaw);
-  const [passwordData, setPasswordData] = useState({
-    oldPassword: '',
-    newPassword: '',
-    confirmPassword: '',
-  });
+  const [avatarPreview, setAvatarPreview] = useState(userRaw.avatar);
   const [activeTab, setActiveTab] = useState<'profile' | 'password'>('profile');
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  const submit = useSubmit();
 
-  const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setPasswordData((prev) => ({ ...prev, [name]: value }));
-  };
+  const profileForm = useForm<UserEditDto>({
+    resolver: zodResolver(UserEditDtoSchema),
+    defaultValues: {
+      name: userRaw.name ?? '',
+      email: userRaw.email ?? '',
+      contact: userRaw.contact ?? '',
+      description: userRaw.description ?? '',
+    },
+  });
 
-  const handleSaveProfile = (e: SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setUser({ ...formData });
-    setOpen(false);
-    toast.success('个人信息更新成功！');
-  };
-
-  const handleChangePassword = (e: SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (!passwordData.oldPassword) {
-      toast.error('请输入当前密码');
-      return;
-    }
-
-    if (!passwordData.newPassword) {
-      toast.error('请输入新密码');
-      return;
-    }
-
-    if (passwordData.newPassword.length < 6) {
-      toast.error('新密码长度至少为6位');
-      return;
-    }
-
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      toast.error('两次输入的密码不一致');
-      return;
-    }
-
-    // TODO: 调用修改密码 API
-    toast.success('密码修改成功！');
-    setPasswordData({ oldPassword: '', newPassword: '', confirmPassword: '' });
-    setOpen(false);
-  };
+  const passwordForm = useForm<PasswordFormValues>({
+    resolver: zodResolver(passwordSchema),
+    defaultValues: {
+      oldPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+    },
+  });
 
   const handleAvatarChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -89,10 +86,40 @@ export default function PersonalEdit({
     reader.addEventListener('load', (event) => {
       const result = event.target?.result;
       if (result) {
-        setFormData((prev) => ({ ...prev, avatar: result as string }));
+        setAvatarPreview(result as string);
       }
     });
     reader.readAsDataURL(file);
+  };
+
+  const onProfileSubmit = (data: UserEditDto) => {
+    console.log('hello');
+    try {
+      // const isDirty = profileForm.formState.isDirty;
+      // if (!isDirty) {
+      //   toast.error('请至少修改一个字段');
+      //   return;
+      // }
+      const formData = new FormData();
+      formData.append('intent', PROFILE_INTENT.USER_EDIT);
+      Object.entries(data).forEach(([key, value]) => {
+        if (value !== undefined) {
+          formData.append(key, value);
+        }
+      });
+      submit(formData, { method: 'post' });
+      setOpen(false);
+      toast.success('个人信息更新成功！');
+    } catch {
+      toast.error('个人信息更新失败');
+    }
+  };
+
+  const onPasswordSubmit = (data: PasswordFormValues) => {
+    console.log('修改密码:', data);
+    toast.success('密码修改成功！');
+    passwordForm.reset();
+    setOpen(false);
   };
 
   return (
@@ -117,139 +144,157 @@ export default function PersonalEdit({
           </TabsList>
 
           <TabsContent value="profile">
-            <form onSubmit={handleSaveProfile} className="space-y-4">
-              <div className="flex justify-center">
-                <div className="relative">
-                  <img
-                    src={
-                      formData.avatar ||
-                      'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=default%20user%20avatar&image_size=square'
-                    }
-                    alt="头像"
-                    className="w-24 h-24 rounded-full object-cover"
-                  />
-                  <label
-                    htmlFor="avatar-upload"
-                    className="absolute bottom-0 right-0 bg-blue-500 text-white rounded-full p-1 cursor-pointer hover:bg-blue-600">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
-                    </svg>
-                  </label>
-                  <input
-                    id="avatar-upload"
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleAvatarChange}
-                  />
+            <Form {...profileForm}>
+              <form
+                onSubmit={profileForm.handleSubmit(onProfileSubmit, (errors) =>
+                  console.log('表单校验失败拦截:', errors)
+                )}
+                className="space-y-4">
+                <div className="flex justify-center">
+                  <div className="relative">
+                    <img
+                      src={
+                        avatarPreview ||
+                        'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=default%20user%20avatar&image_size=square'
+                      }
+                      alt="头像"
+                      className="w-24 h-24 rounded-full object-cover"
+                    />
+                    <Label
+                      htmlFor="avatar-upload"
+                      className="absolute bottom-0 right-0 bg-blue-500 text-white rounded-full p-1 cursor-pointer hover:bg-blue-600">
+                      <Camera />
+                    </Label>
+                    <Input
+                      id="avatar-upload"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleAvatarChange}
+                    />
+                  </div>
                 </div>
-              </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="name">姓名</Label>
-                <Input
-                  id="name"
+                <FormField
+                  control={profileForm.control}
                   name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  required
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>姓名</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">邮箱</Label>
-                <Input
-                  id="email"
+                <FormField
+                  control={profileForm.control}
                   name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  required
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>邮箱</FormLabel>
+                      <FormControl>
+                        <Input type="email" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="contact">手机号码</Label>
-                <Input
-                  id="contact"
+                <FormField
+                  control={profileForm.control}
                   name="contact"
-                  value={formData.contact}
-                  onChange={handleInputChange}
-                  required
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>手机号码</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="description">个人描述</Label>
-                <Textarea
-                  id="description"
+                <FormField
+                  control={profileForm.control}
                   name="description"
-                  value={formData.description}
-                  onChange={handleInputChange}
-                  rows={3}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>个人描述</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          className="resize-none max-h-12"
+                          {...field}
+                          value={field.value || ''}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-              <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-                  取消
-                </Button>
-                <Button type="submit">保存</Button>
-              </DialogFooter>
-            </form>
+                <DialogFooter>
+                  <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                    取消
+                  </Button>
+                  <Button type="submit">保存</Button>
+                </DialogFooter>
+              </form>
+            </Form>
           </TabsContent>
 
           <TabsContent value="password">
-            <form onSubmit={handleChangePassword} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="oldPassword">当前密码</Label>
-                <Input
-                  id="oldPassword"
+            <Form {...passwordForm}>
+              <form
+                onSubmit={passwordForm.handleSubmit(onPasswordSubmit, (errors) =>
+                  console.log('表单校验失败拦截:', errors)
+                )}
+                className="space-y-4">
+                <FormField
+                  control={passwordForm.control}
                   name="oldPassword"
-                  type="password"
-                  value={passwordData.oldPassword}
-                  onChange={handlePasswordChange}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>当前密码</FormLabel>
+                      <FormControl>
+                        <Input type="password" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="newPassword">新密码</Label>
-                <Input
-                  id="newPassword"
+                <FormField
+                  control={passwordForm.control}
                   name="newPassword"
-                  type="password"
-                  value={passwordData.newPassword}
-                  onChange={handlePasswordChange}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>新密码</FormLabel>
+                      <FormControl>
+                        <Input type="password" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">确认新密码</Label>
-                <Input
-                  id="confirmPassword"
+                <FormField
+                  control={passwordForm.control}
                   name="confirmPassword"
-                  type="password"
-                  value={passwordData.confirmPassword}
-                  onChange={handlePasswordChange}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>确认新密码</FormLabel>
+                      <FormControl>
+                        <Input type="password" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-              <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-                  取消
-                </Button>
-                <Button type="submit">修改密码</Button>
-              </DialogFooter>
-            </form>
+                <DialogFooter>
+                  <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                    取消
+                  </Button>
+                  <Button type="submit">修改密码</Button>
+                </DialogFooter>
+              </form>
+            </Form>
           </TabsContent>
         </Tabs>
       </DialogContent>

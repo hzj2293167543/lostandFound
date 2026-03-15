@@ -1,11 +1,18 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { memo } from 'react';
 import { Button } from '@/components/ui/button';
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from '@/components/ui/navigation-menu';
 import { useAuthStore, useIsAdmin, useIsAuthenticated } from '@/stores/AuthStore';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useShallow } from 'zustand/react/shallow';
 
-export default memo(function NavHeader() {
+export default function NavHeader() {
   const { user, logout } = useAuthStore(
     useShallow((state) => ({ user: state.user, logout: state.logout }))
   );
@@ -26,47 +33,79 @@ export default memo(function NavHeader() {
         <Link to="/" className="text-2xl font-bold text-blue-600">
           校园失物招领
         </Link>
-        <div className="flex space-x-6 items-center">
-          <Link to="/" className="text-gray-700 hover:text-blue-600 font-medium">
-            首页
-          </Link>
-          <Link to="/lost" className="text-gray-700 hover:text-blue-600 font-medium">
-            失物寻回
-          </Link>
-          <Link to="/found" className="text-gray-700 hover:text-blue-600 font-medium">
-            失物招领
-          </Link>
-          <Link to="/announcements" className="text-gray-700 hover:text-blue-600 font-medium">
-            公告中心
-          </Link>
-          {isAuthenticated ? (
-            <div className="flex items-center space-x-3">
-              {isAdmin && (
-                <Link to="/admin" className="text-gray-700 hover:text-blue-600 font-medium">
-                  管理后台
+        <NavigationMenu viewport={false}>
+          <NavigationMenuList>
+            <NavigationMenuItem>
+              <NavigationMenuLink asChild>
+                <Link to="/">首页</Link>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <NavigationMenuLink asChild>
+                <Link to="/lost">失物寻回</Link>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <NavigationMenuLink asChild>
+                <Link to="/found">失物招领</Link>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <NavigationMenuLink asChild>
+                <Link to="/announcements">公告中心</Link>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+            {isAuthenticated && isAdmin && (
+              <NavigationMenuItem>
+                <NavigationMenuLink asChild>
+                  <Link to="/admin">管理后台</Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+            )}
+            {isAuthenticated ? (
+              <NavigationMenuItem>
+                <NavigationMenuTrigger>
+                  <img
+                    src={
+                      user?.avatar ||
+                      'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=default%20user%20avatar&image_size=square'
+                    }
+                    alt={user?.name}
+                    className="w-8 h-8 rounded-full mr-2"
+                  />
+                  {user?.name}
+                </NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <div className="w-32 p-1">
+                    <NavigationMenuLink asChild>
+                      <Link to="/profile">个人中心</Link>
+                    </NavigationMenuLink>
+                    <NavigationMenuLink asChild>
+                      <Link to="/profile/lost">我的失物</Link>
+                    </NavigationMenuLink>
+                    <NavigationMenuLink asChild>
+                      <Link to="/profile/found">我的招领</Link>
+                    </NavigationMenuLink>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full mt-2 bg-red-400 text-white hover:bg-gray-400 hover:text-black"
+                      onClick={handleLogout}>
+                      退出登录
+                    </Button>
+                  </div>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+            ) : (
+              <NavigationMenuItem>
+                <Link to="/login">
+                  <Button>登录</Button>
                 </Link>
-              )}
-              <Link to="/profile">
-                <img
-                  src={
-                    user?.avatar ||
-                    'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=default%20user%20avatar&image_size=square'
-                  }
-                  alt={user?.name}
-                  className="w-8 h-8 rounded-full"
-                />
-              </Link>
-              <Button variant="outline" size="sm" onClick={handleLogout}>
-                退出
-              </Button>
-            </div>
-          ) : (
-            <Link to="/login">
-              <Button>登录</Button>
-            </Link>
-          )}
-        </div>
+              </NavigationMenuItem>
+            )}
+          </NavigationMenuList>
+        </NavigationMenu>
       </div>
     </nav>
   );
-});
+}

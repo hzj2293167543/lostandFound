@@ -23,7 +23,7 @@ export const foundDetailAction: ActionFunction = async ({ request }) => {
       }
       result = await commentApi.createComment(validatedComment.data);
     }
-    return { success: true, result };
+    return { success: true, result, intent };
   } catch (error) {
     let errorMessage;
     if (error instanceof Error) {

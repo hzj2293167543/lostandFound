@@ -1,16 +1,20 @@
-import { FoundItem, LostItem, User } from '@lostfound/shared';
+import { useAuthStore } from '@/stores/AuthStore';
+import { Comment, FoundItem, LostItem } from '@lostfound/shared';
+import { useMemo } from 'react';
 import { useLoaderData } from 'react-router-dom';
+import { FOUND_FILTER_STATUS } from '../Found/type';
+import { LOST_FILTER_STATUS } from '../Lost/type';
 import LostFoundList from './components/LostFoundList';
 import PersonalInformation from './components/PersonalInformation';
 import PersonalInformationDetails from './components/PersonalInformationDetails';
-import { FOUND_FILTER_STATUS } from '../Found/type';
-import { LOST_FILTER_STATUS } from '../Lost/type';
-import { useMemo } from 'react';
-import { Comment } from '@lostfound/shared';
 
 export default function ProfilePage() {
-  const { user, lostItems, foundItems, comments } = useLoaderData() as {
-    user: User;
+  const user = useAuthStore.use.user();
+  console.log(user);
+  if (!user) {
+    return <div>用户未登录</div>;
+  }
+  const { lostItems, foundItems, comments } = useLoaderData() as {
     lostItems: LostItem[];
     foundItems: FoundItem[];
     comments: Comment[];
@@ -20,7 +24,7 @@ export default function ProfilePage() {
     () => ({
       lostCount: lostItems.length,
       foundCount: foundItems.length,
-      foundSuccessCount: foundItems.filter((item) => item.status === FOUND_FILTER_STATUS.已归还)
+      foundSuccessCount: foundItems.filter((item) => item.status === FOUND_FILTER_STATUS.已认领)
         .length,
       lostSuccessCount: lostItems.filter((item) => item.status === LOST_FILTER_STATUS.已找到)
         .length,

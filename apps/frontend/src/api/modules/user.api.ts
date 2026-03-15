@@ -1,6 +1,6 @@
 import { AxiosRequestConfig } from 'axios';
-import { get, post } from '../client';
-import { LoginDto, RegisterDto, User } from '@lostfound/shared';
+import { get, patch, post, put } from '../client';
+import { LoginDto, RegisterDto, User, UserEditDto } from '@lostfound/shared';
 
 export const userApi = {
   login: (credentials: LoginDto, config?: AxiosRequestConfig) =>
@@ -12,7 +12,7 @@ export const userApi = {
 
   getUserById: (id: number) => get<User>(`/users/${id}`),
 
-  updateUser: (data: Partial<User>) => post<User>('/users/update', data),
+  updateUser: (data: UserEditDto) => patch<User>('/users', data),
 
   updatePassword: (oldPassword: string, newPassword: string) =>
     post<void>('/users/password', { oldPassword, newPassword }),

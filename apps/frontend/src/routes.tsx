@@ -38,6 +38,7 @@ import profileLoader from './pages/Profile/profile.loader';
 import { useAuthStore, useIsAdmin, useIsAuthenticated } from './stores/AuthStore';
 import { lostAction } from './pages/Lost/LostPage/lost.action';
 import { lostDetailAction } from './pages/Lost/LostDetail/lostDetail.action';
+import { profileAction } from './pages/Profile/profile.action';
 
 function Loading() {
   return (
@@ -49,11 +50,11 @@ function Loading() {
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useIsAuthenticated();
-  const isLoading = useAuthStore.use.isLoading();
+  // const isLoading = useAuthStore.use.isLoading();
 
-  if (isLoading) {
-    return <Loading />;
-  }
+  // if (isLoading) {
+  //   return <Loading />;
+  // }
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
@@ -128,17 +129,6 @@ export const router = createBrowserRouter([
         loader: lostDetailLoader,
         action: lostDetailAction,
       },
-      // {
-      //   path: 'lost/create',
-      //   element: (
-      //     <ProtectedRoute>
-      //       <Suspense fallback={<Loading />}>
-      //         <Lost />
-      //       </Suspense>
-      //     </ProtectedRoute>
-      //   ),
-      //   action: LostCreateAction,
-      // },
       {
         path: 'found',
         element: (
@@ -187,6 +177,7 @@ export const router = createBrowserRouter([
           </ProtectedRoute>
         ),
         loader: profileLoader,
+        action: profileAction,
       },
     ],
   },

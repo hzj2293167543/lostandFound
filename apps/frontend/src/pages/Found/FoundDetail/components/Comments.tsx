@@ -233,13 +233,8 @@ function CommentItem({
   );
 }
 
-export default memo(function Comments({
-  comments,
-  itemId,
-}: {
-  comments: Comment[];
-  itemId: number;
-}) {
+export default function Comments({ comments, itemId }: { comments: Comment[]; itemId: number }) {
+  'use no memo';
   const [content, setContent] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const actionData = useActionData();
@@ -351,4 +346,4 @@ export default memo(function Comments({
       </CardContent>
     </Card>
   );
-});
+}

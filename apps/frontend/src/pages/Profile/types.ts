@@ -46,3 +46,9 @@ export const LOST_STATUS = {
 export const FOUND_STATUS_NAME = ['招领中', '已归还', '已撤销'];
 
 export const LOST_STATUS_NAME = ['寻找中', '已找到', '已撤销'];
+
+export const PROFILE_INTENT = {
+  USER_EDIT: 'UserEdit',
+  FOUND: 'found',
+  COMMENT: 'comment',
+};

@@ -26,6 +26,7 @@ export default memo(function Comments({
   comments: Comment[];
   itemId: number;
 }) {
+  'use no memo';
   const [content, setContent] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const actionData = useActionData();

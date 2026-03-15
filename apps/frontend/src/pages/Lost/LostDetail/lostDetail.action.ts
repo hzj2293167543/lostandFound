@@ -23,20 +23,8 @@ export const lostDetailAction: ActionFunction = async ({ request }) => {
       }
       result = await commentApi.createComment(validatedComment.data);
     }
-    // const id = formData.get('id') as string;
-    // const comment = [{
-    //   id: Number(id),
-    //   parentId: Number(formData.get('parentId')),
-    //   itemId: Number(formData.get('itemId')),
-    //   itemType: Number(formData.get('itemType')),
-    //   userId: Number(formData.get('userId')),
-    //   description: formData.get('description') as string,
-    //   time: new Date().toISOString(),
-    //   comments: [comment],
-    // }];
 
-    // const result = await lostApi.getLostItemDetailById(Number(id));
-    return { success: true, result };
+    return { success: true, result, intent };
   } catch (error) {
     let errorMessage;
     if (error instanceof Error) {

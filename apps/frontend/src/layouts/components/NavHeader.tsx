@@ -76,20 +76,20 @@ export default function NavHeader() {
                   {user?.name}
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
-                  <div className="w-32 p-1">
+                  <div className="w-32 p-1 cursor-pointer">
                     <NavigationMenuLink asChild>
                       <Link to="/profile">个人中心</Link>
                     </NavigationMenuLink>
-                    <NavigationMenuLink asChild>
+                    {/* <NavigationMenuLink asChild>
                       <Link to="/profile/lost">我的失物</Link>
                     </NavigationMenuLink>
                     <NavigationMenuLink asChild>
                       <Link to="/profile/found">我的招领</Link>
-                    </NavigationMenuLink>
+                    </NavigationMenuLink> */}
                     <Button
                       variant="outline"
                       size="sm"
-                      className="w-full mt-2 bg-red-400 text-white hover:bg-gray-400 hover:text-black"
+                      className="w-full mt-2 bg-red-400 text-white hover:bg-gray-400 hover:text-black cursor-pointer"
                       onClick={handleLogout}>
                       退出登录
                     </Button>

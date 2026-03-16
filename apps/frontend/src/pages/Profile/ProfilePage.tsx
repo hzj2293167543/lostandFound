@@ -39,7 +39,7 @@ export default function ProfilePage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* 左侧个人信息 */}
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1 sticky top-19 self-start">
           <PersonalInformation userRaw={user} />
           <LostFoundList counts={counts} />
         </div>

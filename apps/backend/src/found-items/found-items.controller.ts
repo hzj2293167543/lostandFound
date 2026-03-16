@@ -10,10 +10,11 @@ import {
   UseGuards,
   ParseIntPipe,
   BadRequestException,
+  Patch,
 } from '@nestjs/common';
 import { FoundItemsService } from './found-items.service';
 import { AuthGuard } from '@nestjs/passport';
-import { FoundItem as FoundItemVo, FoundCreateDto, User } from '@lostfound/shared';
+import { FoundItem as FoundItemVo, FoundCreateDto, User, FoundUpdateDto } from '@lostfound/shared';
 import { CurrentUser } from 'src/common/decorators/currentUser.decorators';
 
 @Controller('found-items')
@@ -60,7 +61,17 @@ export class FoundItemsController {
     if (user.id !== data.userId) {
       throw new BadRequestException('你只能更新自己的招领物品');
     }
-    return this.foundItemsService.update(+id, data);
+    return this.foundItemsService.update(data);
+  }
+
+  @Patch()
+  @UseGuards(AuthGuard('jwt'))
+  async patch(@Body() data: FoundUpdateDto, @CurrentUser() user: User) {
+    const foundItem = await this.foundItemsService.findOne(data.id);
+    if (user.id !== foundItem.userId) {
+      throw new BadRequestException('你只能更新自己的招领物品');
+    }
+    return this.foundItemsService.update(data);
   }
 
   @Delete(':id')

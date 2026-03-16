@@ -49,8 +49,7 @@ export default function PersonalEdit({
     () => {
       setOpen(false);
     },
-    (error) => toast.error(error),
-    () => setOpen(false)
+    (error) => toast.error(error)
   );
 
   const {

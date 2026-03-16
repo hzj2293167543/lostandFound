@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Category } from '../../categories/entities/category.entity';
@@ -17,10 +18,11 @@ export class FoundItem {
   @Column({ length: 255 })
   title: string;
 
-  @Column()
+  @Column({ name: 'category_id' })
   categoryId: number;
 
-  @ManyToOne(() => Category)
+  @ManyToOne(() => Category, (category) => category)
+  @JoinColumn({ name: 'category_id' })
   category: Category;
 
   @Column('text')
@@ -47,10 +49,11 @@ export class FoundItem {
   @Column({ default: 0 })
   viewCount: number;
 
-  @Column()
+  @Column({ name: 'user_id' })
   userId: number;
 
   @ManyToOne(() => User, (user) => user.foundItems)
+  @JoinColumn({ name: 'user_id' })
   user: User;
 
   @Column({ default: 0 })

@@ -22,9 +22,9 @@ export default memo(function PersonalInfoDetailSettingList({ userRaw }: { userRa
             </div>
           </div>
         </CardContent>
-        <CardFooter>
+        {/* <CardFooter>
           <Button variant="outline">修改密码</Button>
-        </CardFooter>
+        </CardFooter> */}
       </Card>
     </>
   );

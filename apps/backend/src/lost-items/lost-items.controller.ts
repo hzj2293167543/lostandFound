@@ -1,4 +1,4 @@
-import { LostCreateDto, LostItem as LostItemVo, User } from '@lostfound/shared';
+import { LostCreateDto, LostItem as LostItemVo, LostUpdateDto, User } from '@lostfound/shared';
 import {
   BadRequestException,
   Body,
@@ -7,6 +7,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Put,
   Query,
@@ -55,13 +56,14 @@ export class LostItemsController {
     });
   }
 
-  @Put(':id')
+  @Patch()
   @UseGuards(AuthGuard('jwt'))
-  update(@Param('id') id: string, @Body() data: any, @CurrentUser() user: User) {
-    if (user.id !== data.userId) {
+  async updateById(@Body() data: LostUpdateDto, @CurrentUser() user: User) {
+    const lostItem = await this.lostItemsService.findOne(data.id);
+    if (user.id !== lostItem.user.id) {
       throw new BadRequestException('你只能更新自己的丢失物品');
     }
-    return this.lostItemsService.update(+id, data);
+    return this.lostItemsService.updateById(data);
   }
 
   @Delete(':id')

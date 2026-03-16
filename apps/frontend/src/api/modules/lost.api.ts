@@ -1,6 +1,6 @@
 import { AxiosRequestConfig } from 'axios';
-import { get, post, put, remove } from '../client';
-import { LostItem, LostDetail, LostCreateDto } from '@lostfound/shared';
+import { get, patch, post, put, remove } from '../client';
+import { LostItem, LostDetail, LostCreateDto, LostUpdateDto } from '@lostfound/shared';
 
 export const lostApi = {
   getLostItems: () => get<LostItem[]>('/lost-items'),
@@ -20,7 +20,7 @@ export const lostApi = {
   createLost: (data: LostCreateDto, config?: AxiosRequestConfig) =>
     post<LostCreateDto>('/lost-items', data, config),
 
-  updateLostItem: (id: number, data: LostItem) => put<LostItem>(`/lost-items/${id}`, data),
+  updateLostItem: (data: LostUpdateDto) => patch<LostItem>(`/lost-items/`, data),
   deleteLostItem: (id: number) => remove<void>(`/lost-items/${id}`),
 };
 

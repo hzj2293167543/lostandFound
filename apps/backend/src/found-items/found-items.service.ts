@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FoundItem } from './entities/found-item.entity';
-import { FoundItem as FoundItemVo, FoundCreateDto } from '@lostfound/shared';
+import { FoundItem as FoundItemVo, FoundCreateDto, FoundUpdateDto } from '@lostfound/shared';
 import { mapFoundItemToVo } from './found-items.mapper';
 import { Category } from 'src/categories/entities/category.entity';
 import { UploadService } from '@/common/upload/upload.service';
@@ -68,8 +68,9 @@ export class FoundItemsService {
     return savedItem;
   }
 
-  async update(id: number, data: Partial<FoundItem>): Promise<FoundItem> {
-    await this.foundItemsRepository.update(id, data);
+  async update(data: FoundUpdateDto): Promise<FoundItem> {
+    const { id, category: categoryId, ...restData } = data;
+    await this.foundItemsRepository.update(id, { ...restData, categoryId });
     return this.findOne(id);
   }
 

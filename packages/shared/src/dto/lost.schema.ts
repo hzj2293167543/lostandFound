@@ -8,5 +8,11 @@ export const LostCreateDtoSchema = z.object({
   location: z.string().min(1, '丢失地点不能为空'),
   image: z.string().url('图片链接无效').optional(),
 });
-
 export interface LostCreateDto extends z.infer<typeof LostCreateDtoSchema> {}
+
+export const LostUpdateDtoSchema = LostCreateDtoSchema.extend({
+  id: z.number().min(1, 'ID不能为空'),
+  status: z.number().min(0, '状态不能为空'),
+});
+
+export interface LostUpdateDto extends z.infer<typeof LostUpdateDtoSchema> {}

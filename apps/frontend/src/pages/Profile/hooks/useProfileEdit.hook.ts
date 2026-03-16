@@ -1,21 +1,19 @@
 import { useActionData } from 'react-router-dom';
 // profile/hooks/useProfileEdit.ts
-import { FieldErrors, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useSubmit } from 'react-router-dom';
-import { User, UserEditDto, UserEditDtoSchema } from '@lostfound/shared';
-import { PROFILE_INTENT } from '../types';
-import { ChangeEvent, useEffect, useState } from 'react';
-import { toast } from 'sonner';
 import { uploadFile } from '@/services/upload.services';
-import { UploadTypeDtoObj } from '@lostfound/shared';
 import { getFirstError } from '@/utils';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { UploadTypeDtoObj, User, UserEditDto, UserEditDtoSchema } from '@lostfound/shared';
+import { ChangeEvent, useEffect, useState } from 'react';
+import { FieldErrors, useForm } from 'react-hook-form';
+import { useSubmit } from 'react-router-dom';
+import { toast } from 'sonner';
+import { PROFILE_INTENT } from '../types';
 
 export function useProfileEdit(
   userRaw: User,
   onSuccess?: () => void,
-  onError?: (error: string) => void,
-  onClose?: () => void
+  onError?: (error: string) => void
 ) {
   const submit = useSubmit();
   const [avatarPreview, setAvatarPreview] = useState(userRaw.avatar);
@@ -32,7 +30,7 @@ export function useProfileEdit(
     },
   });
   const {
-    formState: { isSubmitSuccessful, isDirty },
+    formState: { isSubmitSuccessful },
   } = profileForm;
 
   const handleAvatarChange = async (e: ChangeEvent<HTMLInputElement>) => {

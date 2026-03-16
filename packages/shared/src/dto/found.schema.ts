@@ -11,3 +11,10 @@ export const FoundCreateDtoSchema = z.object({
 });
 
 export interface FoundCreateDto extends z.infer<typeof FoundCreateDtoSchema> {}
+
+export const FoundUpdateDtoSchema = FoundCreateDtoSchema.extend({
+  id: z.number().min(1, 'ID不能为空'),
+  status: z.number().min(0, '状态不能为空'),
+});
+
+export interface FoundUpdateDto extends z.infer<typeof FoundUpdateDtoSchema> {}

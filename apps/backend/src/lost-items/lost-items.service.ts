@@ -1,6 +1,6 @@
 import { CommentsService } from '@/comments/comments.service';
 import { UploadService } from '@/common/upload/upload.service';
-import { LostCreateDto, LostItem as LostItemVo } from '@lostfound/shared';
+import { LostCreateDto, LostItem as LostItemVo, LostUpdateDto } from '@lostfound/shared';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from 'src/categories/entities/category.entity';
@@ -80,8 +80,12 @@ export class LostItemsService {
     }
   }
 
-  async update(id: number, data: Partial<LostItem>): Promise<LostItemVo> {
-    await this.lostItemsRepository.update(id, data);
+  async updateById(data: LostUpdateDto): Promise<LostItemVo> {
+    const { category: categoryId, id, ...restData } = data;
+    await this.lostItemsRepository.update(id, {
+      ...restData,
+      categoryId,
+    });
     return this.findOne(id);
   }
 

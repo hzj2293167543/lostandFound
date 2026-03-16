@@ -38,14 +38,16 @@ export default memo(function PersonalInfoDetailComments({ comments }: { comments
                   {comment.content}
                 </CardDescription>
               </CardHeader>
-              <CardFooter className="mt-auto">
-                <Button
-                  variant="outline"
-                  className="ml-auto"
-                  onClick={() => toggleComment(comment.id)}>
-                  {expandedComments[comment.id] ? '收起' : '查看详情'}
-                </Button>
-              </CardFooter>
+              {comment.content.length > 100 && (
+                <CardFooter className="mt-auto">
+                  <Button
+                    variant="outline"
+                    className="ml-auto"
+                    onClick={() => toggleComment(comment.id)}>
+                    {expandedComments[comment.id] ? '收起' : '查看详情'}
+                  </Button>
+                </CardFooter>
+              )}
             </Card>
           );
         })

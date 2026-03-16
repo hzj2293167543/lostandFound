@@ -1,3 +1,6 @@
+import z from 'zod';
+import { UserEditPasswordDtoSchema } from '@lostfound/shared';
+
 export interface LostFoundCounts {
   lostCount: number;
   foundCount: number;
@@ -49,6 +52,19 @@ export const LOST_STATUS_NAME = ['寻找中', '已找到', '已撤销'];
 
 export const PROFILE_INTENT = {
   USER_EDIT: 'UserEdit',
+  USER_EDIT_PASSWORD: 'UserEditPassword',
   FOUND: 'found',
   COMMENT: 'comment',
 };
+
+export const passwordSchema = z
+  .object({
+    ...UserEditPasswordDtoSchema.shape,
+    confirmPassword: UserEditPasswordDtoSchema.shape.newPassword,
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: '两次输入的密码不一致',
+    path: ['confirmPassword'],
+  });
+
+export type PasswordFormValues = z.infer<typeof passwordSchema>;

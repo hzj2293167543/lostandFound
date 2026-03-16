@@ -35,9 +35,6 @@ export default function PersonalInformation({ userRaw }: { userRaw: User }) {
                 alt={userRaw.name}
                 className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-md"
               />
-              <Button className="absolute bottom-0 right-0 bg-blue-600 text-white rounded-full p-2 shadow-md">
-                <span className="text-sm">更换</span>
-              </Button>
             </div>
             <h3 className="text-xl font-semibold mb-2">{userRaw.name}</h3>
             <p className="text-gray-500 mb-4">{userRaw.email}</p>
@@ -56,7 +53,7 @@ export default function PersonalInformation({ userRaw }: { userRaw: User }) {
           </Button>
         </CardFooter>
       </Card>
-      <PersonalEdit userRaw={userRaw} setUser={setUser} open={open} setOpen={setOpen} />
+      <PersonalEdit userRaw={userRaw} open={open} setOpen={setOpen} />
     </>
   );
 }

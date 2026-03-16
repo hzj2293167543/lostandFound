@@ -19,127 +19,62 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
-import { uploadFile } from '@/services/upload.services';
-import { getFirstError } from '@/utils/form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { UploadTypeDtoObj, User, UserEditDto, UserEditDtoSchema } from '@lostfound/shared';
+import { User } from '@lostfound/shared';
 import { Camera } from 'lucide-react';
-import type { ChangeEvent } from 'react';
 import { useState } from 'react';
-import { FieldErrors, useForm } from 'react-hook-form';
-import { useSubmit } from 'react-router-dom';
 import { toast } from 'sonner';
-import * as z from 'zod';
-import { PROFILE_INTENT } from '../types';
-
-const passwordSchema = z
-  .object({
-    oldPassword: z.string().min(1, '请输入当前密码'),
-    newPassword: z.string().min(6, '新密码长度至少为6位'),
-    confirmPassword: z.string().min(1, '请确认新密码'),
-  })
-  .refine((data) => data.newPassword === data.confirmPassword, {
-    message: '两次输入的密码不一致',
-    path: ['confirmPassword'],
-  });
-
-type PasswordFormValues = z.infer<typeof passwordSchema>;
+import { useEditPassword } from '../hooks/useEditPassword.hook';
+import { useProfileEdit } from '../hooks/useProfileEdit.hook';
 
 export default function PersonalEdit({
   userRaw,
-  setUser,
   open,
   setOpen,
 }: {
   userRaw: User;
-  setUser: (user: User) => void;
   open: boolean;
   setOpen: (open: boolean) => void;
 }) {
-  const [avatarPreview, setAvatarPreview] = useState(userRaw.avatar);
   const [activeTab, setActiveTab] = useState<'profile' | 'password'>('profile');
 
-  const submit = useSubmit();
-
-  const profileForm = useForm<UserEditDto>({
-    resolver: zodResolver(UserEditDtoSchema),
-    defaultValues: {
-      name: userRaw.name ?? '',
-      email: userRaw.email ?? '',
-      contact: userRaw.contact ?? '',
-      description: userRaw.description ?? '',
-      avatar: userRaw.avatar ?? '',
-    },
-  });
-
-  const passwordForm = useForm<PasswordFormValues>({
-    resolver: zodResolver(passwordSchema),
-    defaultValues: {
-      oldPassword: '',
-      newPassword: '',
-      confirmPassword: '',
-    },
-  });
-
-  const [isUpdateAvatar, setIsUpdateAvatar] = useState(false);
-  const handleAvatarChange = async (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // 预览头像
-    const reader = new FileReader();
-    reader.addEventListener('load', (event) => {
-      const result = event.target?.result;
-      if (result) {
-        setAvatarPreview(result as string);
-      }
-    });
-    reader.readAsDataURL(file);
-
-    try {
-      const imageUrl = await uploadFile(file, UploadTypeDtoObj.AVATAR);
-      profileForm.setValue('avatar', imageUrl);
-    } catch {
-      toast.error('头像上传失败');
-      setAvatarPreview(userRaw.avatar);
-    } finally {
-      setIsUpdateAvatar(false);
-    }
-  };
-
-  const onProfileSubmit = async (data: UserEditDto) => {
-    try {
-      const isDirty = profileForm.formState.isDirty;
-      if (!isDirty) {
-        toast.error('请至少修改一个字段');
-        return;
-      }
-      const formData = new FormData();
-      formData.append('intent', PROFILE_INTENT.USER_EDIT);
-      Object.entries(data).forEach(([key, value]) => {
-        if (value !== undefined) {
-          formData.append(key, value);
-        }
-      });
-      await submit(formData, { method: 'post' });
+  const {
+    profileForm,
+    avatarPreview,
+    isUpdateAvatar,
+    handleAvatarChange,
+    onSubmit: onProfileSubmit,
+    onSubmitError: onProfileSubmitError,
+  } = useProfileEdit(
+    userRaw,
+    () => {
       setOpen(false);
-      toast.success('个人信息更新成功！');
-    } catch {
-      toast.error('个人信息更新失败');
-    }
-  };
-  const onProfileSubmitError = (errors: FieldErrors<UserEditDto>) => {
-    const firstError = getFirstError(errors);
-    if (firstError) {
-      toast.error(firstError);
-    }
-  };
+    },
+    (error) => toast.error(error),
+    () => setOpen(false)
+  );
 
-  const onPasswordSubmit = (data: PasswordFormValues) => {
-    console.log('修改密码:', data);
-    toast.success('密码修改成功！');
-    passwordForm.reset();
-    setOpen(false);
+  const {
+    passwordForm,
+    onPasswordSubmit,
+    onSubmitError: onPasswordSubmitError,
+  } = useEditPassword(
+    () => {
+      setOpen(false);
+      passwordForm.reset();
+    },
+    (error) => toast.error(error)
+  );
+
+  const handleCancel = () => {
+    if (profileForm.formState.isDirty || passwordForm.formState.isDirty) {
+      if (confirm('确定要取消吗？所有修改将丢失。')) {
+        profileForm.reset(userRaw);
+        passwordForm.reset();
+        setOpen(false);
+      }
+    } else {
+      setOpen(false);
+    }
   };
 
   return (
@@ -192,7 +127,6 @@ export default function PersonalEdit({
                     />
                   </div>
                 </div>
-
                 <FormField
                   control={profileForm.control}
                   name="name"
@@ -250,7 +184,7 @@ export default function PersonalEdit({
                   )}
                 />
                 <DialogFooter>
-                  <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                  <Button type="button" variant="outline" onClick={handleCancel}>
                     取消
                   </Button>
                   <Button type="submit" disabled={isUpdateAvatar}>
@@ -264,9 +198,7 @@ export default function PersonalEdit({
           <TabsContent value="password">
             <Form {...passwordForm}>
               <form
-                onSubmit={passwordForm.handleSubmit(onPasswordSubmit, (errors) =>
-                  console.log('表单校验失败拦截:', errors)
-                )}
+                onSubmit={passwordForm.handleSubmit(onPasswordSubmit, onPasswordSubmitError)}
                 className="space-y-4">
                 <FormField
                   control={passwordForm.control}
@@ -275,7 +207,7 @@ export default function PersonalEdit({
                     <FormItem>
                       <FormLabel>当前密码</FormLabel>
                       <FormControl>
-                        <Input type="password" {...field} />
+                        <Input type="password" {...field} value={(field.value as string) ?? ''} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -288,7 +220,7 @@ export default function PersonalEdit({
                     <FormItem>
                       <FormLabel>新密码</FormLabel>
                       <FormControl>
-                        <Input type="password" {...field} />
+                        <Input type="password" {...field} value={(field.value as string) ?? ''} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -301,14 +233,14 @@ export default function PersonalEdit({
                     <FormItem>
                       <FormLabel>确认新密码</FormLabel>
                       <FormControl>
-                        <Input type="password" {...field} />
+                        <Input type="password" {...field} value={(field.value as string) ?? ''} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
                 <DialogFooter>
-                  <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                  <Button type="button" variant="outline" onClick={handleCancel}>
                     取消
                   </Button>
                   <Button type="submit">修改密码</Button>

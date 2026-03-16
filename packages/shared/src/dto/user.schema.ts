@@ -1,4 +1,5 @@
 import z from 'zod';
+import { PasswordSchema } from '../common.schema';
 
 export const UserEditDtoSchema = z
   .object({
@@ -13,3 +14,10 @@ export const UserEditDtoSchema = z
   });
 
 export type UserEditDto = z.infer<typeof UserEditDtoSchema>;
+
+export const UserEditPasswordDtoSchema = z.object({
+  oldPassword: PasswordSchema,
+  newPassword: PasswordSchema,
+});
+
+export type UserEditPasswordDto = z.infer<typeof UserEditPasswordDtoSchema>;

@@ -1,7 +1,13 @@
 import { Controller, Get, Put, Param, Body, UseGuards, Request, Patch } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { AuthGuard } from '@nestjs/passport';
-import { User, UserEditDto, UserEditDtoSchema } from '@lostfound/shared';
+import {
+  User,
+  UserEditDto,
+  UserEditDtoSchema,
+  UserEditPasswordDto,
+  UserEditPasswordDtoSchema,
+} from '@lostfound/shared';
 import { CurrentUser } from '@/common/decorators/currentUser.decorators';
 
 @Controller('users')
@@ -37,16 +43,17 @@ export class UsersController {
     return this.usersService.update(user.id, result.data);
   }
 
-  @Put(':id/password')
+  @Patch('password')
   @UseGuards(AuthGuard('jwt'))
-  updatePassword(
-    @Param('id') id: string,
-    @Body() body: { oldPassword: string; newPassword: string },
-    @Request() req
-  ) {
-    if (req.user.id !== +id) {
-      throw new Error('无权限操作');
+  updatePassword(@Body() body: UserEditPasswordDto, @CurrentUser() user: User) {
+    const result = UserEditPasswordDtoSchema.safeParse(body);
+    if (!result.success) {
+      throw new Error(result.error.issues.map((item) => item.message).join(', '));
     }
-    return this.usersService.updatePassword(+id, body.oldPassword, body.newPassword);
+    return this.usersService.updatePassword(
+      user.id,
+      result.data.oldPassword,
+      result.data.newPassword
+    );
   }
 }

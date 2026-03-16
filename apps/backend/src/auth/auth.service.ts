@@ -28,6 +28,7 @@ export class AuthService {
       password: hashedPassword,
       avatar:
         'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=default%20user%20avatar&image_size=square',
+      description: '',
     });
 
     await this.usersRepository.save(user);

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { PasswordSchema } from '../common.schema';
 
 export const UserSchema = z.object({
   id: z.number(),
@@ -15,7 +16,7 @@ export type User = z.infer<typeof UserSchema>;
 
 export const LoginSchema = z.object({
   username: z.string().min(1, '用户名不能为空'),
-  password: z.string().min(6, '密码至少6位'),
+  password: PasswordSchema,
 });
 
 export type Login = z.infer<typeof LoginSchema>;
@@ -23,7 +24,7 @@ export type Login = z.infer<typeof LoginSchema>;
 export const RegisterSchema = z.object({
   username: z.string().min(1, '用户名不能为空'),
   email: z.string().email('邮箱格式不正确'),
-  password: z.string().min(6, '密码至少6位'),
+  password: PasswordSchema,
 });
 
 export type Register = z.infer<typeof RegisterSchema>;

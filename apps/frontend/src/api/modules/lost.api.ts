@@ -17,7 +17,7 @@ export const lostApi = {
 
   getLostItemsByUserId: (userId: number) => get<LostItem[]>(`/lost-items/user/${userId}`),
 
-  createLost: (data: LostCreateDto, config?: AxiosRequestConfig) =>
+  createLost: (data: FormData, config?: AxiosRequestConfig) =>
     post<LostCreateDto>('/lost-items', data, config),
 
   updateLostItem: (data: LostUpdateDto) => patch<LostItem>(`/lost-items/`, data),

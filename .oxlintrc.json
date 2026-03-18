@@ -3,7 +3,8 @@
   "plugins": [
     "unicorn",
     "typescript",
-    "oxc"
+    "oxc",
+    "react"
   ],
   "categories": {
     "correctness": "error",
@@ -80,6 +81,7 @@
     "oxc/number-arg-out-of-range": "warn",
     "oxc/only-used-in-recursion": "warn",
     "oxc/uninvoked-array-callback": "warn",
+    // typescript 相关规则
     "typescript/await-thenable": "warn",
     "typescript/no-array-delete": "warn",
     "typescript/no-base-to-string": "warn",
@@ -120,6 +122,10 @@
     "unicorn/prefer-string-starts-ends-with": "warn",
     "unicorn/no-array-sort": "off",
     "no-inline-comments": "off",
+    // react 相关规则
+    "react/exhaustive-deps": "warn",
+    "react/jsx-uses-react": "off",
+    "react/react-in-jsx-scope": "off",
     "typescript/no-extraneous-class": [
       "warn",
       {
@@ -183,7 +189,8 @@
     "react": {
       "formComponents": [],
       "linkComponents": [],
-      "version": null
+      "version": null, // 自动检测 React 版本
+      "jsxRuntime": "automatic" // 使用新的 JSX 运行时
     },
     "jsdoc": {
       "ignorePrivate": false,

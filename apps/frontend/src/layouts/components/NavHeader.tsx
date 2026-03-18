@@ -73,7 +73,7 @@ export default function NavHeader() {
                     alt={user?.name}
                     className="w-8 h-8 rounded-full mr-2"
                   />
-                  {user?.name}
+                  <span className="truncate max-w-[5ch]">{user?.name}</span>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <div className="w-32 p-1 cursor-pointer">

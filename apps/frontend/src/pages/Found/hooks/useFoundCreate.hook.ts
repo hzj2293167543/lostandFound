@@ -74,9 +74,7 @@ export function useFoundCreate(categories: Category[]) {
     try {
       setIsLoading(true);
       data.image = form.getValues('image');
-
-      const parsedData = safeParse<FoundCreateDto>(FoundCreateDtoSchema, data);
-      await submit(JSON.stringify(parsedData), { method: 'POST', encType: 'application/json' });
+      await submit(JSON.stringify(data), { method: 'POST', encType: 'application/json' });
     } catch (error) {
       const message = getErrorMsg(error, '发布招领信息失败');
       toast.error(message);

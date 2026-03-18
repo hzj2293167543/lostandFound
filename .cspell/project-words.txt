@@ -1,26 +1,25 @@
 # 项目与团队词汇
 monorepo
-mycompany
 myawesomeapp
+mycompany
 
 # 技术栈与工具
+eslint
+jsx
+oxlint
 pnpm
+prettier
+Schniz
+tsx
+typescript
 vite
 vuex
-eslint
-oxlint
-prettier
-typescript
-jsx
-tsx
-vite
 winget
-Schniz
 
 # API与业务领域
-userid
-authtoken
 apiendpoint
+authtoken
+userid
 
 # oxlint
 nonconstructor
@@ -30,9 +29,9 @@ uninvoked
 # other
 breakline
 
-
 # Auto-added words
-Vercel
 amondnet
 appleboy
+lostfound
 vercel
+Vercel

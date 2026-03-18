@@ -11,11 +11,13 @@ export default memo(function PersonalInformationDetails({
   lostItems,
   foundItems,
   comments,
+  isSelf,
 }: {
   userRaw: User;
   lostItems: LostItem[];
   foundItems: FoundItem[];
   comments: Comment[];
+  isSelf: boolean;
 }) {
   return (
     <Tabs defaultValue="lost">
@@ -26,10 +28,10 @@ export default memo(function PersonalInformationDetails({
         <TabsTrigger value="settings">账户设置</TabsTrigger>
       </TabsList>
       <TabsContent value="lost" className="mt-6 flex flex-col gap-4">
-        <PersonalInfoDetailLostList lostItems={lostItems} />
+        <PersonalInfoDetailLostList lostItems={lostItems} isSelf={isSelf} />
       </TabsContent>
       <TabsContent value="found" className="mt-6 flex flex-col gap-4">
-        <PersonalInfoDetailFoundList foundItems={foundItems} />
+        <PersonalInfoDetailFoundList foundItems={foundItems} isSelf={isSelf} />
       </TabsContent>
       <TabsContent value="comments" className="mt-6 flex flex-col gap-4">
         <PersonalInfoDetailComments comments={comments} />

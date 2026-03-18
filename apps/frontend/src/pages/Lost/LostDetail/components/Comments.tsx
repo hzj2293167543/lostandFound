@@ -1,21 +1,32 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
 import {
   Pagination,
   PaginationContent,
   PaginationItem,
+  PaginationPrevious,
   PaginationLink,
   PaginationNext,
-  PaginationPrevious,
 } from '@/components/ui/pagination';
 import { Textarea } from '@/components/ui/textarea';
 import { ItemTypeMap } from '@/types/type';
 import { Comment } from '@lostfound/shared';
 import { memo, useEffect, useState } from 'react';
-import { Form, useActionData } from 'react-router-dom';
+import { useActionData, useSubmit } from 'react-router-dom';
 import { LOST_DETAIL_INTENT } from '../../type';
 import CommentItem from './CommentItem';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { FieldErrors, useForm } from 'react-hook-form';
+import * as z from 'zod';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
+import { getErrorMsg } from '@/utils';
+import { toast } from 'sonner';
+
+const commentSchema = z.object({
+  content: z.string().min(1, '评论内容不能为空'),
+});
+
+type CommentFormValues = z.infer<typeof commentSchema>;
 
 const PAGE_SIZE = 10;
 
@@ -27,21 +38,47 @@ export default memo(function Comments({
   itemId: number;
 }) {
   'use no memo';
-  const [content, setContent] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const actionData = useActionData();
+  const actionData = useActionData<{ success: boolean; intent?: number; error?: string }>();
+  const submit = useSubmit();
+
+  const form = useForm<CommentFormValues>({
+    resolver: zodResolver(commentSchema),
+    defaultValues: {
+      content: '',
+    },
+  });
+
   useEffect(() => {
-    if (actionData?.intent === LOST_DETAIL_INTENT.COMMENT) {
-      setContent('');
+    if (actionData?.intent === LOST_DETAIL_INTENT.COMMENT && actionData.success) {
+      form.reset();
       setCurrentPage(1);
     }
-  }, [actionData]);
+  }, [actionData, form]);
 
   const [replyState, setReplyState] = useState<{ replyId: number | undefined }>({
     replyId: undefined,
   });
   const handleReplyStateChange = (id: number | undefined) => {
     setReplyState((prev) => ({ replyId: prev.replyId === id ? undefined : id }));
+  };
+
+  const onSubmit = async (data: CommentFormValues) => {
+    const payload = {
+      intent: LOST_DETAIL_INTENT.COMMENT,
+      parentId: null,
+      itemId,
+      itemType: ItemTypeMap.LOST,
+      content: data.content,
+    };
+    await submit(JSON.stringify(payload), { method: 'POST', encType: 'application/json' });
+  };
+
+  const onError = (errors: FieldErrors<CommentFormValues>) => {
+    const errorMsg = getErrorMsg(errors);
+    if (errorMsg) {
+      toast.error(errorMsg);
+    }
   };
 
   const totalComments = comments?.length || 0;
@@ -55,24 +92,24 @@ export default memo(function Comments({
         <CardDescription>请文明发言，共同帮助失主找回物品</CardDescription>
       </CardHeader>
       <CardContent>
-        <Form method="post" className="mb-8">
-          <input type="hidden" name="intent" value={LOST_DETAIL_INTENT.COMMENT} />
-          <input type="hidden" name="itemId" value={itemId} />
-          <input type="hidden" name="itemType" value={ItemTypeMap.LOST} />
-          <div className="space-y-2">
-            <Label htmlFor="comment">发表评论</Label>
-            <Textarea
-              id="content"
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit, onError)} className="mb-8">
+            <FormField
+              control={form.control}
               name="content"
-              placeholder="请输入你的评论..."
-              className="resize-none"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Textarea placeholder="请输入你的评论..." className="resize-none" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <Button type="submit" className="mt-4 bg-blue-600 hover:bg-blue-700">
-            提交评论
-          </Button>
+            <Button type="submit" className="mt-4 bg-blue-600 hover:bg-blue-700">
+              提交评论
+            </Button>
+          </form>
         </Form>
 
         {totalComments === 0 ? null : (

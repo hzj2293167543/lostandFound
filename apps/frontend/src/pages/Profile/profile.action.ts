@@ -1,32 +1,41 @@
 import { ActionFunctionArgs } from 'react-router';
 
-import { UserEditDtoSchema, UserEditPasswordDtoSchema } from '@lostfound/shared';
+import {
+  User,
+  UserEditDtoSchema,
+  UserEditPasswordDto,
+  UserEditPasswordDtoSchema,
+} from '@lostfound/shared';
 import { PROFILE_INTENT } from './types';
 import { useAuthStore } from '@/stores/AuthStore';
 import { userApi } from '@/api';
+import { getErrorMsg, safeParse } from '@/utils';
+import { ActionResult } from '@/types/type';
 
-export async function profileAction({ request }: ActionFunctionArgs) {
+export async function profileAction({
+  request,
+}: ActionFunctionArgs): Promise<ActionResult<keyof typeof PROFILE_INTENT>> {
   let intent;
   try {
-    const formData = await request.formData();
-    intent = formData.get('intent') as string;
-    if (intent === PROFILE_INTENT.USER_EDIT) {
-      const userEditDto = UserEditDtoSchema.safeParse(Object.fromEntries(formData));
-      if (!userEditDto.success) {
-        throw new Response('Invalid user edit data', { status: 400 });
+    const contentType = request.headers.get('content-type') || '';
+
+    if (contentType.includes('application/json')) {
+      const json = await request.json();
+      intent = json.intent;
+
+      if (intent === PROFILE_INTENT.USER_EDIT) {
+        const parsedData = safeParse<User>(UserEditDtoSchema, json);
+        await useAuthStore.getState().editUser(parsedData);
+      } else if (intent === PROFILE_INTENT.USER_EDIT_PASSWORD) {
+        const parsedData = safeParse<UserEditPasswordDto>(UserEditPasswordDtoSchema, json);
+        await userApi.updatePassword(parsedData);
+      } else {
+        throw new Response('Invalid intent', { status: 400 });
       }
-      await useAuthStore.getState().editUser(userEditDto.data);
-    } else if (intent === PROFILE_INTENT.USER_EDIT_PASSWORD) {
-      const userEditPasswordDto = UserEditPasswordDtoSchema.safeParse(Object.fromEntries(formData));
-      if (!userEditPasswordDto.success) {
-        throw new Response('Invalid user edit password data', { status: 400 });
-      }
-      await userApi.updatePassword(userEditPasswordDto.data);
-    } else {
-      throw new Response('Invalid intent', { status: 400 });
     }
+    return { success: true, intent };
   } catch (error) {
-    console.error('Error updating user:', error);
-    throw new Response('Failed to update user', { status: 500 });
+    const errMsg = getErrorMsg(error, '更新用户信息失败');
+    return { success: false, error: errMsg, intent };
   }
 }

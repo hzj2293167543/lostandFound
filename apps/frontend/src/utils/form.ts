@@ -1,4 +1,5 @@
-import { FieldErrors } from 'react-hook-form';
+import { FoundUpdateDto } from '@lostfound/shared';
+import { FieldErrors, FieldValues, UseFormReturn } from 'react-hook-form';
 import z, { ZodError, ZodSchema, ZodType } from 'zod';
 
 /**
@@ -93,4 +94,13 @@ export function safeParse<T>(schema: unknown, data: unknown): T {
     throw new Error(result.error.issues.map((e) => e.message).join('\n'));
   }
   return result.data as T;
+}
+
+/**
+ * 判断表单是否有脏值,由于isDirty不准确第一次输入有延迟, 所以使用dirtyFields判断
+ * @param form 表单实例
+ * @returns 是否有脏值
+ */
+export function isFormDirty<T extends FieldValues>(form: UseFormReturn<T>) {
+  return Object.keys(form.formState.dirtyFields).length > 0;
 }

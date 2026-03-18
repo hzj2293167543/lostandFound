@@ -25,7 +25,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { useFoundEdit } from '../hooks/foundEdit.hook';
+import { useFoundEdit } from '../hooks/useFoundEdit.hook';
 import { FOUND_STATUS, FOUND_STATUS_NAME } from '../types';
 
 export default function FoundEdit({ foundItemId }: { foundItemId: number }) {
@@ -40,7 +40,6 @@ export default function FoundEdit({ foundItemId }: { foundItemId: number }) {
     open,
     setOpen,
   } = useFoundEdit(foundItemId);
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>

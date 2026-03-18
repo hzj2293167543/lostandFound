@@ -1,9 +1,9 @@
-import { foundApi, categoryApi, uploadApi } from '@/api';
-import { formatDateForInput, getErrorMsg, getFirstError } from '@/utils';
+import { categoryApi, foundApi, uploadApi } from '@/api';
+import { formatDateForInput, getErrorMsg, getFirstError, isFormDirty } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Category, FoundUpdateDto, FoundUpdateDtoSchema, FoundDetail } from '@lostfound/shared';
-import { useState, useEffect, ChangeEvent } from 'react';
-import { useForm, FieldErrors } from 'react-hook-form';
+import { Category, FoundDetail, FoundUpdateDto, FoundUpdateDtoSchema } from '@lostfound/shared';
+import { ChangeEvent, useEffect, useState } from 'react';
+import { FieldErrors, useForm } from 'react-hook-form';
 import { useRevalidator } from 'react-router';
 import { toast } from 'sonner';
 
@@ -105,8 +105,7 @@ export function useFoundEdit(foundItemId: number) {
 
   const onSubmit = async (data: FoundUpdateDto) => {
     try {
-      const isDirty = form.formState.isDirty;
-      if (!isDirty) {
+      if (!isFormDirty(form)) {
         toast.error('请修改招领信息');
         return;
       }

@@ -1,5 +1,5 @@
 import { lostApi, categoryApi, uploadApi } from '@/api';
-import { formatDateForInput, getErrorMsg, getFirstError } from '@/utils';
+import { formatDateForInput, getErrorMsg, getFirstError, isFormDirty } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Category, LostUpdateDto, LostUpdateDtoSchema, LostDetail } from '@lostfound/shared';
 import { useState, useEffect, ChangeEvent } from 'react';
@@ -100,8 +100,7 @@ export function useLostEdit(lostItemId: number) {
 
   const onSubmit = async (data: LostUpdateDto) => {
     try {
-      const isDirectory = form.formState.isDirty;
-      if (!isDirectory) {
+      if (!isFormDirty(form)) {
         toast.error('请修改失物信息');
         return;
       }

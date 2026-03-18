@@ -168,7 +168,7 @@ export const router = createBrowserRouter([
         loader: announcementDetailLoader,
       },
       {
-        path: 'profile',
+        path: 'profile/:id?',
         element: (
           <ProtectedRoute>
             <Suspense fallback={<Loading />}>

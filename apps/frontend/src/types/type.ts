@@ -4,3 +4,9 @@ export const ItemTypeMap = {
 } as const;
 
 export type ItemType = (typeof ItemTypeMap)[keyof typeof ItemTypeMap];
+
+export interface ActionResult<T> {
+  success: boolean;
+  error?: string;
+  intent?: T;
+}

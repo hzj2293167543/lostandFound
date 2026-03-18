@@ -2,22 +2,24 @@ import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
-  CardHeader,
-  CardTitle,
   CardDescription,
   CardFooter,
+  CardHeader,
+  CardTitle,
 } from '@/components/ui/card';
 import { FOUND_FILTER_STATUS } from '@/pages/Found/type';
 import { FoundItem } from '@lostfound/shared';
 import { memo } from 'react';
-import FoundEdit from './FoundEdit';
 import { Link } from 'react-router';
 import { FOUND_STATUS_NAME } from '../types';
+import FoundEdit from './FoundEdit';
 
 export default memo(function PersonalInfoDetailFoundList({
   foundItems,
+  isSelf,
 }: {
   foundItems: FoundItem[];
+  isSelf: boolean;
 }) {
   return (
     <>
@@ -46,8 +48,7 @@ export default memo(function PersonalInfoDetailFoundList({
                 <Link to={`/found/${item.id}`} className="ml-auto mr-2">
                   <Button variant="outline">查看详情</Button>
                 </Link>
-
-                <FoundEdit foundItemId={item.id} />
+                {isSelf && <FoundEdit foundItemId={item.id} />}
               </CardFooter>
             </Card>
           ))

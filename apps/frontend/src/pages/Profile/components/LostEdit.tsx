@@ -25,7 +25,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { useLostEdit } from '../hooks/lostEdit.hoos';
+import { useLostEdit } from '../hooks/useLostEdit.hook';
 import { LOST_STATUS, LOST_STATUS_NAME } from '../types';
 
 export default function LostEdit({ lostItemId }: { lostItemId: number }) {

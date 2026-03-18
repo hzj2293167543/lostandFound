@@ -1,46 +1,42 @@
+import { commentApi } from '@/api';
 import { Button } from '@/components/ui/button';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import {
   Pagination,
   PaginationContent,
   PaginationItem,
-  PaginationPrevious,
   PaginationLink,
   PaginationNext,
+  PaginationPrevious,
 } from '@/components/ui/pagination';
-import { ThumbsUp, ChevronUp, ChevronDown } from 'lucide-react';
-import { RefObject, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react';
-import { Link, useActionData, useSubmit } from 'react-router';
-import { Comment } from '@lostfound/shared';
-import { useAuthStore } from '@/stores/AuthStore';
 import { Textarea } from '@/components/ui/textarea';
+import { useAuthStore } from '@/stores/AuthStore';
 import { ItemTypeMap } from '@/types/type';
-import { LOST_DETAIL_INTENT } from '../../type';
-import { commentApi } from '@/api';
-import { toast } from 'sonner';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { FieldErrors, useForm } from 'react-hook-form';
-import * as z from 'zod';
-import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { getErrorMsg } from '@/utils';
-
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Comment } from '@lostfound/shared';
+import { ChevronDown, ChevronUp, ThumbsUp } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { FieldErrors, useForm } from 'react-hook-form';
+import { Link, useActionData, useSubmit } from 'react-router';
+import { toast } from 'sonner';
+import z from 'zod';
+import { FOUND_DETAIL_INTENT } from '../../type';
 const replySchema = z.object({
   content: z.string().min(1, '回复内容不能为空'),
 });
 
 type ReplyFormValues = z.infer<typeof replySchema>;
 
-export default function CommentItem({
+export function CommentItem({
   comment,
-  rootCommentId,
   replyState,
   itemId,
 }: {
   comment: Comment;
-  rootCommentId: number;
   itemId: number;
   replyState: { replyId: number | undefined; setReplyState: (id: number | undefined) => void };
 }) {
-  'use no memo';
   const [isExpanded, setIsExpanded] = useState(false);
   const [childrenPage, setChildrenPage] = useState(1);
   const children = comment.children || [];
@@ -51,9 +47,6 @@ export default function CommentItem({
     (childrenPage - 1) * childrenPageSize,
     childrenPage * childrenPageSize
   );
-  const handleReplyClick = () => {
-    replyState.setReplyState(comment.id);
-  };
 
   const [isLiked, setIsLiked] = useState(comment.isLiked);
   const [likeCount, setLikeCount] = useState(comment.likeCount || 0);
@@ -69,9 +62,10 @@ export default function CommentItem({
       setLikeCount((prevCount) => (isLiked ? prevCount + 1 : prevCount - 1));
     }
   };
+
   return (
     <div key={comment.id} className="flex flex-col">
-      <div className={`flex gap-x-4 ${comment.parentId && 'scale-80 transform -translate-x-25'}`}>
+      <div className="flex gap-x-4">
         <Link to={`/profile/${comment.user.id}`}>
           <img
             src={comment.user?.avatar}
@@ -86,12 +80,12 @@ export default function CommentItem({
               <Link to={`/profile/${comment.user.id}`}>
                 <h4 className="font-medium text-gray-800">{comment.user.name}</h4>
               </Link>
-              {comment.replyUser && comment.parentId !== rootCommentId && (
+              {comment.replyUser && (
                 <div>
                   <span className="font-medium text-gray-600">回复</span>
                   <Link
                     to={`/profile/${comment.replyUser.id}`}
-                    className="font-medium text-blue-500 hover:text-blue-600">
+                    className="font-medium text-green-500 hover:text-green-600">
                     @{comment.replyUser.name}：
                   </Link>
                 </div>
@@ -104,15 +98,15 @@ export default function CommentItem({
             <span className="text-xs text-gray-500">{comment.time}</span>
             <Button
               size="sm"
-              className="px-0 bg-transparent text-gray-500 hover:text-blue-300 hover:bg-transparent cursor-pointer"
+              className="px-0 bg-transparent text-gray-500 hover:text-green-300 hover:bg-transparent cursor-pointer"
               onClick={handleLikeClick}>
-              <ThumbsUp className={`w-4 h-4  ${isLiked && 'fill-blue-400 text-blue-700'}`} />
+              <ThumbsUp className={`w-4 h-4  ${isLiked && 'fill-green-400 text-green-700'}`} />
               <span className="text-xs text-gray-500">{likeCount > 0 ? likeCount : ''}</span>
             </Button>
             <Button
               size="sm"
-              className="px-0 bg-transparent text-gray-700 hover:text-blue-300 hover:bg-transparent cursor-pointer"
-              onClick={handleReplyClick}>
+              className="px-0 bg-transparent text-gray-700 hover:text-green-300 hover:bg-transparent cursor-pointer"
+              onClick={() => replyState?.setReplyState(comment.id)}>
               回复
             </Button>
           </div>
@@ -123,7 +117,6 @@ export default function CommentItem({
                   {displayedChildren.map((child) => (
                     <CommentItem
                       key={child.id}
-                      rootCommentId={rootCommentId}
                       comment={child}
                       itemId={itemId}
                       replyState={replyState}
@@ -180,7 +173,7 @@ export default function CommentItem({
                     variant="link"
                     size="sm"
                     onClick={() => setIsExpanded(false)}
-                    className="text-blue-500 pl-0 mt-1">
+                    className="text-green-500 pl-0 mt-1">
                     <ChevronUp className="w-4 h-4 mr-1" />
                     收起回复
                   </Button>
@@ -190,7 +183,7 @@ export default function CommentItem({
                   variant="link"
                   size="sm"
                   onClick={() => setIsExpanded(true)}
-                  className="text-blue-500 pl-0">
+                  className="text-green-500 pl-0">
                   <ChevronDown className="w-4 h-4 mr-1" />
                   查看 {totalChildren} 条回复
                 </Button>
@@ -198,11 +191,11 @@ export default function CommentItem({
             </div>
           )}
           {replyState?.replyId === comment.id && (
-            <ReplyComment comment={comment} itemId={itemId} replyId={replyState?.replyId} />
+            <ReplyComment comment={comment} itemId={itemId} replyId={replyState.replyId} />
           )}
         </div>
       </div>
-      {comment.parentId === null && <div className={`my-4 border-t border-gray-200`} />}
+      <div className="my-4 border-t border-gray-200" />
     </div>
   );
 }
@@ -214,7 +207,7 @@ function ReplyComment({
 }: {
   comment: Comment;
   itemId: number;
-  replyId: number | null;
+  replyId: number;
 }) {
   'use no memo';
   const user = useAuthStore.use.user();
@@ -229,7 +222,7 @@ function ReplyComment({
   });
 
   useEffect(() => {
-    if (actionData?.intent === LOST_DETAIL_INTENT.COMMENT && actionData.success) {
+    if (actionData?.intent === FOUND_DETAIL_INTENT.COMMENT && actionData.success) {
       form.reset();
     }
   }, [actionData, form]);
@@ -242,20 +235,18 @@ function ReplyComment({
 
   const onSubmit = async (data: ReplyFormValues) => {
     const payload = {
-      intent: LOST_DETAIL_INTENT.COMMENT,
-      parentId: replyId || null,
+      intent: FOUND_DETAIL_INTENT.COMMENT,
+      parentId: replyId,
       itemId,
-      itemType: ItemTypeMap.LOST,
+      itemType: ItemTypeMap.FOUND,
       content: data.content,
     };
     await submit(JSON.stringify(payload), { method: 'POST', encType: 'application/json' });
   };
 
-  const onError = (errors: FieldErrors<ReplyFormValues>) => {
-    const errorMsg = getErrorMsg(errors);
-    if (errorMsg) {
-      toast.error(errorMsg);
-    }
+  const onError = (error: FieldErrors<ReplyFormValues>) => {
+    const errorMessage = getErrorMsg(error, '创建回复失败');
+    toast.error(errorMessage);
   };
 
   return (
@@ -273,7 +264,7 @@ function ReplyComment({
                 <FormControl>
                   <Textarea
                     rows={3}
-                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none max-h-24"
+                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-400 resize-none max-h-24"
                     placeholder={`回复 @${comment.user.name}：`}
                     {...field}
                   />
@@ -282,9 +273,14 @@ function ReplyComment({
               </FormItem>
             )}
           />
-          <Button size="sm" className="mt-2 px-6 bg-blue-400 text-white hover:bg-blue-500">
-            发布
-          </Button>
+          <div className="flex gap-2 mt-2">
+            <Button
+              type="submit"
+              size="sm"
+              className="px-6 bg-green-400 text-white hover:bg-green-500">
+              发布
+            </Button>
+          </div>
         </form>
       </Form>
     </div>

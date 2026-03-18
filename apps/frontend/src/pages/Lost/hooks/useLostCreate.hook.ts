@@ -73,9 +73,7 @@ export function useLostCreate(categories: Category[]) {
     try {
       setIsLoading(true);
       data.image = form.getValues('image');
-
-      const parsedData = safeParse<LostCreateDto>(LostCreateDtoSchema, data);
-      await submit(JSON.stringify(parsedData), { method: 'POST', encType: 'application/json' });
+      await submit(JSON.stringify(data), { method: 'POST', encType: 'application/json' });
     } catch (error) {
       const message = getErrorMsg(error, '发布失物信息失败');
       toast.error(message);
@@ -101,7 +99,6 @@ export function useLostCreate(categories: Category[]) {
   }, [actionData, form]);
 
   const onError = (errors: FieldErrors<LostCreateDto>) => {
-    console.log(errors);
     const firstError = getFirstError(errors);
     toast.error(firstError || '请检查失物信息');
   };

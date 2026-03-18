@@ -13,7 +13,13 @@ import { memo } from 'react';
 import LostEdit from './LostEdit';
 import { Link } from 'react-router-dom';
 
-export default memo(function PersonalInfoDetailLostList({ lostItems }: { lostItems: LostItem[] }) {
+export default memo(function PersonalInfoDetailLostList({
+  lostItems,
+  isSelf,
+}: {
+  lostItems: LostItem[];
+  isSelf: boolean;
+}) {
   return (
     <>
       <h2 className="text-2xl font-bold mb-6">我的失物信息</h2>
@@ -41,7 +47,7 @@ export default memo(function PersonalInfoDetailLostList({ lostItems }: { lostIte
                 <Link to={`/lost/${item.id}`} className="ml-auto mr-2">
                   <Button variant="outline">查看详情</Button>
                 </Link>
-                <LostEdit lostItemId={item.id} />
+                {isSelf && <LostEdit lostItemId={item.id} />}
               </CardFooter>
             </Card>
           ))

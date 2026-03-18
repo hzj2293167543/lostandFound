@@ -19,6 +19,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
+import { isFormDirty } from '@/utils';
 import { User } from '@lostfound/shared';
 import { Camera } from 'lucide-react';
 import { useState } from 'react';
@@ -65,7 +66,7 @@ export default function PersonalEdit({
   );
 
   const handleCancel = () => {
-    if (profileForm.formState.isDirty || passwordForm.formState.isDirty) {
+    if (!isFormDirty(profileForm) || !isFormDirty(passwordForm)) {
       if (confirm('确定要取消吗？所有修改将丢失。')) {
         profileForm.reset(userRaw);
         passwordForm.reset();

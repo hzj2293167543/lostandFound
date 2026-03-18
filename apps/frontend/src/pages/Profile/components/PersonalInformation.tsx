@@ -6,12 +6,15 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import PersonalEdit from './PersonalEdit';
 
-export default function PersonalInformation({ userRaw }: { userRaw: User }) {
+export default function PersonalInformation({
+  userRaw,
+  isSelf,
+}: {
+  userRaw: User;
+  isSelf: boolean;
+}) {
   'use no memo';
   const [open, setOpen] = useState(false);
-  const [user, setUser] = useState(userRaw);
-  console.log(user, userRaw);
-
   const logout = useAuthStore.use.logout();
   const handleLogout = () => {
     try {
@@ -42,18 +45,22 @@ export default function PersonalInformation({ userRaw }: { userRaw: User }) {
             <p className="text-gray-600 text-center mb-6">
               {userRaw.description || '这个人很懒，什么都没有留下'}
             </p>
-            <Button className="w-full" onClick={() => setOpen(true)}>
-              编辑个人信息
-            </Button>
+            {isSelf && (
+              <Button className="w-full" onClick={() => setOpen(true)}>
+                编辑个人信息
+              </Button>
+            )}
           </div>
         </CardContent>
-        <CardFooter className="flex justify-center">
-          <Button variant="outline" className="w-full" onClick={handleLogout}>
-            退出登录
-          </Button>
-        </CardFooter>
+        {isSelf && (
+          <CardFooter className="flex justify-center">
+            <Button variant="outline" className="w-full" onClick={handleLogout}>
+              退出登录
+            </Button>
+          </CardFooter>
+        )}
       </Card>
-      <PersonalEdit userRaw={userRaw} open={open} setOpen={setOpen} />
+      {isSelf && <PersonalEdit userRaw={userRaw} open={open} setOpen={setOpen} />}
     </>
   );
 }

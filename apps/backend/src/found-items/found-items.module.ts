@@ -5,8 +5,9 @@ import { FoundItemsController } from './found-items.controller';
 import { FoundItem } from './entities/found-item.entity';
 import { Category } from '@/categories/entities/category.entity';
 import { UploadService } from '@/common/upload/upload.service';
+import { CommentsModule } from '@/comments/comments.module';
 @Module({
-  imports: [TypeOrmModule.forFeature([FoundItem, Category])],
+  imports: [TypeOrmModule.forFeature([FoundItem, Category]), CommentsModule],
   controllers: [FoundItemsController],
   providers: [FoundItemsService, UploadService],
   exports: [FoundItemsService],

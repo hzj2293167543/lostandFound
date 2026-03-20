@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { Comment } from './entities/comment.entity';
 import { CommentCreateDto, CommentItem } from '@lostfound/shared';
 import { mapCommentToVo } from './comments.mapper';
-import { CommentItemType } from '@/common/constants/constants';
+import { CommentItemType, CommentItemTypeType } from '@/common/constants/constants';
 import { CommentLike } from './entities/comment_likes.entity';
 
 @Injectable()
@@ -70,14 +70,17 @@ export class CommentsService {
     });
   }
 
-  async getLostItemCommentCountMap(itemIds: number[]): Promise<Map<number, number>> {
+  async getItemCommentCountMapByType(
+    itemIds: number[],
+    itemType: CommentItemTypeType
+  ): Promise<Map<number, number>> {
     if (itemIds.length === 0) return new Map();
 
     const counts = await this.commentsRepository
       .createQueryBuilder('comment')
       .select('comment.itemId', 'itemId')
       .addSelect('COUNT(*)', 'count')
-      .where('comment.itemType = :itemType', { itemType: CommentItemType.LostItem })
+      .where('comment.itemType = :itemType', { itemType })
       .andWhere('comment.itemId IN (:...ids)', { ids: itemIds })
       .groupBy('comment.itemId')
       .getRawMany();

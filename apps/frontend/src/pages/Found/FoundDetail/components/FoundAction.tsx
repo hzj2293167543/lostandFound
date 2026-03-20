@@ -14,7 +14,9 @@ export default function FoundAction() {
             <Button className="w-full bg-green-600 hover:bg-green-700">发布招领信息</Button>
           </Link>
           <Link to="/lost">
-            <Button className="w-full bg-white text-black hover:bg-gray-200">查看失物信息</Button>
+            <Button variant="outline" className="w-full bg-white text-black hover:bg-gray-100">
+              查看失物信息
+            </Button>
           </Link>
           <Button variant="outline" className="w-full">
             举报信息

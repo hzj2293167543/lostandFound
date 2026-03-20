@@ -68,7 +68,7 @@ export class FoundItemsController {
   @UseGuards(AuthGuard('jwt'))
   async patch(@Body() data: FoundUpdateDto, @CurrentUser() user: User) {
     const foundItem = await this.foundItemsService.findOne(data.id);
-    if (user.id !== foundItem.userId) {
+    if (user.id !== foundItem.user.id) {
       throw new BadRequestException('你只能更新自己的招领物品');
     }
     return this.foundItemsService.update(data);

@@ -6,7 +6,7 @@ import { FoundItem as FoundItemVo } from '@lostfound/shared';
  * @param item FoundItemEntity 实体对象
  * @returns FoundItemVo 视图对象
  */
-export function mapFoundItemToVo(item: FoundItemEntity): FoundItemVo {
+export function mapFoundItemToVo(item: FoundItemEntity, commentCount: number): FoundItemVo {
   return {
     id: item.id,
     title: item.title,
@@ -19,6 +19,6 @@ export function mapFoundItemToVo(item: FoundItemEntity): FoundItemVo {
     location: item.location,
     image: item.image,
     user: item.user,
-    commentCount: item.commentCount,
+    commentCount,
   };
 }

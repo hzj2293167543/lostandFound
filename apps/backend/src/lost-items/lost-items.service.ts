@@ -7,6 +7,7 @@ import { Category } from 'src/categories/entities/category.entity';
 import { Repository } from 'typeorm';
 import { LostItem } from './entities/lost-item.entity';
 import { mapLostItemToVo } from './lost-items.mapper';
+import { CommentItemType } from '@/common/constants/constants';
 
 @Injectable()
 export class LostItemsService {
@@ -25,8 +26,9 @@ export class LostItemsService {
       order: { createdAt: 'DESC' },
     });
 
-    const commentCountMap = await this.commentsService.getLostItemCommentCountMap(
-      items.map((item) => item.id)
+    const commentCountMap = await this.commentsService.getItemCommentCountMapByType(
+      items.map((item) => item.id),
+      CommentItemType.LostItem
     );
     return items.map((item) => mapLostItemToVo(item, commentCountMap.get(item.id) || 0));
   }
@@ -38,8 +40,9 @@ export class LostItemsService {
       take: limit === undefined ? undefined : limit,
     });
 
-    const commentCountMap = await this.commentsService.getLostItemCommentCountMap(
-      items.map((item) => item.id)
+    const commentCountMap = await this.commentsService.getItemCommentCountMapByType(
+      items.map((item) => item.id),
+      CommentItemType.LostItem
     );
     return items.map((item) => mapLostItemToVo(item, commentCountMap.get(item.id) || 0));
   }
@@ -49,7 +52,10 @@ export class LostItemsService {
       where: { id },
       relations: ['category', 'user'],
     });
-    const commentCountMap = await this.commentsService.getLostItemCommentCountMap([item.id]);
+    const commentCountMap = await this.commentsService.getItemCommentCountMapByType(
+      [item.id],
+      CommentItemType.LostItem
+    );
     if (item) {
       await this.lostItemsRepository.increment({ id }, 'viewCount', 1);
     }

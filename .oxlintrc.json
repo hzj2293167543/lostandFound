@@ -1,11 +1,6 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": [
-    "unicorn",
-    "typescript",
-    "oxc",
-    "react"
-  ],
+  "plugins": ["unicorn", "typescript", "oxc", "react"],
   "categories": {
     "correctness": "error",
     "suspicious": "warn",
@@ -136,9 +131,7 @@
   "overrides": [
     {
       // 针对普通 .ts 文件（不包括 hooks）
-      "files": [
-        "**/*.ts"
-      ],
+      "files": ["**/*.ts"],
       "rules": {
         "max-lines-per-function": [
           "warn",
@@ -150,10 +143,7 @@
     },
     {
       // 针对 hooks 文件，允许更多行
-      "files": [
-        "**/*.hook.ts",
-        "**/hooks/**/*.ts"
-      ],
+      "files": ["**/*.hook.ts", "**/hooks/**/*.ts"],
       "rules": {
         "max-lines-per-function": [
           "warn",
@@ -164,9 +154,7 @@
       }
     },
     {
-      "files": [
-        "**/*.tsx"
-      ],
+      "files": ["**/*.tsx"],
       "rules": {
         "max-lines-per-function": [
           "warn",

@@ -1,6 +1,11 @@
 import { CommentsService } from '@/comments/comments.service';
 import { UploadService } from '@/common/upload/upload.service';
-import { LostCreateDto, LostItem as LostItemVo, LostUpdateDto } from '@lostfound/shared';
+import {
+  LostCreateDto,
+  LostItem as LostItemVo,
+  LostUpdateDto,
+  PageResponse,
+} from '@lostfound/shared';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from 'src/categories/entities/category.entity';
@@ -8,6 +13,14 @@ import { Repository } from 'typeorm';
 import { LostItem } from './entities/lost-item.entity';
 import { mapLostItemToVo } from './lost-items.mapper';
 import { CommentItemType } from '@/common/constants/constants';
+
+export interface FindAllParams {
+  page: number;
+  limit: number;
+  categoryId?: number;
+  status?: number;
+  search?: string;
+}
 
 @Injectable()
 export class LostItemsService {
@@ -19,6 +32,50 @@ export class LostItemsService {
     private uploadService: UploadService,
     private commentsService: CommentsService
   ) {}
+
+  async findAllPaginated(params: FindAllParams): Promise<PageResponse<LostItemVo>> {
+    const { page, limit, categoryId, status, search } = params;
+    const skip = (page - 1) * limit;
+
+    const queryBuilder = this.lostItemsRepository
+      .createQueryBuilder('lostItem')
+      .leftJoinAndSelect('lostItem.category', 'category')
+      .leftJoinAndSelect('lostItem.user', 'user')
+      .orderBy('lostItem.createdAt', 'DESC')
+      .skip(skip)
+      .take(limit);
+
+    if (categoryId) {
+      queryBuilder.andWhere('lostItem.categoryId = :categoryId', { categoryId });
+    }
+    if (status) {
+      queryBuilder.andWhere('lostItem.status = :status', { status });
+    }
+    if (search) {
+      queryBuilder.andWhere('(lostItem.title LIKE :search OR lostItem.description LIKE :search)', {
+        search: `%${search}%`,
+      });
+    }
+
+    const [items, total] = await queryBuilder.getManyAndCount();
+
+    const commentCountMap = await this.commentsService.getItemCommentCountMapByType(
+      items.map((item) => item.id),
+      CommentItemType.LostItem
+    );
+
+    const mappedItems = items.map((item) =>
+      mapLostItemToVo(item, commentCountMap.get(item.id) || 0)
+    );
+
+    return {
+      items: mappedItems,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
+  }
 
   async findAll(): Promise<LostItemVo[]> {
     const items = await this.lostItemsRepository.find({

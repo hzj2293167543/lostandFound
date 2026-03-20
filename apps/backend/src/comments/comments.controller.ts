@@ -1,21 +1,20 @@
+import { CurrentUser } from '@/common/decorators/currentUser.decorators';
+import { CommentCreateDto, commentCreateDtoSchema, CommentItem, User } from '@lostfound/shared';
 import {
-  Controller,
-  Get,
-  Post,
-  Delete,
+  BadRequestException,
   Body,
+  Controller,
+  Delete,
+  Get,
   Param,
+  ParseBoolPipe,
+  ParseIntPipe,
+  Post,
   Query,
   UseGuards,
-  Request,
-  ParseIntPipe,
-  BadRequestException,
-  ParseBoolPipe,
 } from '@nestjs/common';
-import { CommentsService } from './comments.service';
 import { AuthGuard } from '@nestjs/passport';
-import { CommentCreateDto, commentCreateDtoSchema, CommentItem, User } from '@lostfound/shared';
-import { CurrentUser } from '@/common/decorators/currentUser.decorators';
+import { CommentsService } from './comments.service';
 
 @Controller('comments')
 @UseGuards(AuthGuard('jwt'))

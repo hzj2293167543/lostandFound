@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useLoaderData } from 'react-router-dom';
-import { Category, LostItem } from '@lostfound/shared';
+import { Category, GetLostItemsParams } from '@lostfound/shared';
 import LostCreate from '../components/LostCreate';
 import LostFilter from './components/LostFilter';
 import LostList from './components/LostList';
@@ -12,8 +12,7 @@ export default function LostPage() {
     searchTerm: '',
     category: ALL_CATEGORY,
   });
-  const { lostItems, categories } = useLoaderData() as {
-    lostItems: LostItem[];
+  const { categories } = useLoaderData() as {
     categories: Category[];
   };
 
@@ -24,25 +23,20 @@ export default function LostPage() {
     }));
   };
 
-  // 筛选失物
-  const filteredItems = useMemo(
-    () =>
-      lostItems.filter((item) => {
-        const { searchTerm, category, status } = filterState;
-        const matchesSearch =
-          item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          item.description.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesCategory =
-          !category || item.category.id === category || category === ALL_CATEGORY;
-        const matchesStatus =
-          !status || item.status === status || status === LOST_FILTER_STATUS.全部状态;
-        return matchesSearch && matchesCategory && matchesStatus;
-      }),
-    [filterState, lostItems]
-  );
+  const filters: GetLostItemsParams = {
+    categoryId:
+      filterState.category && filterState.category !== ALL_CATEGORY
+        ? filterState.category
+        : undefined,
+    status:
+      filterState.status && filterState.status !== LOST_FILTER_STATUS.全部状态
+        ? filterState.status
+        : undefined,
+    search: filterState.searchTerm || undefined,
+  };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 h-[calc(100vh-64px)] flex flex-col">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-800">失物寻回</h1>
         <LostCreate categories={categories} />
@@ -52,7 +46,7 @@ export default function LostPage() {
       <LostFilter categories={categories} filterState={filterState} setFilterState={setFilter} />
 
       {/* 失物列表 */}
-      <LostList filteredItems={filteredItems} />
+      <LostList filters={filters} />
     </div>
   );
 }

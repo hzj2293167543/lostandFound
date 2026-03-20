@@ -5,19 +5,11 @@ import { categoryKeys } from '@/queryKeys';
 
 export async function lostLoader() {
   try {
-    // 并行获取数据
-    const [lostItems, categories] = await Promise.all([
-      queryClient.ensureQueryData({
-        queryKey: lostKeys.lists(),
-        queryFn: () => lostApi.getLostItems(),
-      }),
-      queryClient.ensureQueryData({
-        queryKey: categoryKeys.list(),
-        queryFn: () => categoryApi.getCategories(),
-      }),
-    ]);
+    const categories = await queryClient.ensureQueryData({
+      queryKey: categoryKeys.list(),
+      queryFn: () => categoryApi.getCategories(),
+    });
     return {
-      lostItems,
       categories,
     };
   } catch (error) {

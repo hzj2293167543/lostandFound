@@ -1,4 +1,13 @@
-import { LostCreateDto, LostItem as LostItemVo, LostUpdateDto, User } from '@lostfound/shared';
+import {
+  GetLostItemsParams,
+  GetLostItemsParamsSchema,
+  LostCreateDto,
+  LostCreateDtoSchema,
+  LostItem as LostItemVo,
+  LostUpdateDto,
+  LostUpdateDtoSchema,
+  User,
+} from '@lostfound/shared';
 import {
   BadRequestException,
   Body,
@@ -9,19 +18,35 @@ import {
   ParseIntPipe,
   Patch,
   Post,
-  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { CurrentUser } from 'src/common/decorators/currentUser.decorators';
 import { LostItemsService } from './lost-items.service';
+import { ZodValidationPipe } from '@/common/pipe';
 
 @Controller('lost-items')
 export class LostItemsController {
   constructor(private lostItemsService: LostItemsService) {}
 
   @Get()
+  findAllPaginated(
+    @Query(new ZodValidationPipe(GetLostItemsParamsSchema)) params: GetLostItemsParams
+  ) {
+    const { page, limit, categoryId, status, search } = params;
+    const validPage = page ?? 1;
+    const validLimit = limit ?? 12;
+    return this.lostItemsService.findAllPaginated({
+      page: validPage,
+      limit: validLimit,
+      categoryId,
+      status,
+      search,
+    });
+  }
+
+  @Get('all')
   findAll() {
     return this.lostItemsService.findAll();
   }
@@ -49,7 +74,10 @@ export class LostItemsController {
 
   @Post()
   @UseGuards(AuthGuard('jwt'))
-  create(@Body() data: LostCreateDto, @CurrentUser() user: User) {
+  create(
+    @Body(new ZodValidationPipe(LostCreateDtoSchema)) data: LostCreateDto,
+    @CurrentUser() user: User
+  ) {
     return this.lostItemsService.create({
       ...data,
       userId: user.id,
@@ -58,7 +86,13 @@ export class LostItemsController {
 
   @Patch()
   @UseGuards(AuthGuard('jwt'))
-  async updateById(@Body() data: LostUpdateDto, @CurrentUser() user: User) {
+  async updateById(
+    @Body(new ZodValidationPipe(LostUpdateDtoSchema)) data: LostUpdateDto,
+    @CurrentUser() user: User
+  ) {
+    if (!data) {
+      throw new BadRequestException('Invalid update data');
+    }
     const lostItem = await this.lostItemsService.findOne(data.id);
     if (user.id !== lostItem.user.id) {
       throw new BadRequestException('你只能更新自己的丢失物品');

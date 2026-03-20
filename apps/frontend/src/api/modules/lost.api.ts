@@ -1,9 +1,19 @@
-import { LostCreateDto, LostDetail, LostItem, LostUpdateDto } from '@lostfound/shared';
+import {
+  GetLostItemsParams,
+  LostCreateDto,
+  LostDetail,
+  LostItem,
+  LostUpdateDto,
+  PageResponse,
+} from '@lostfound/shared';
 import { AxiosRequestConfig } from 'axios';
 import { get, patch, post, remove } from '../client';
 
 export const lostApi = {
-  getLostItems: () => get<LostItem[]>('/lost-items'),
+  getLostItems: (params?: GetLostItemsParams) =>
+    get<PageResponse<LostItem>>('/lost-items', { params }),
+
+  getLostItemsAll: () => get<LostItem[]>('/lost-items/all'),
 
   getLostItemsTop: (count?: number) =>
     get<LostItem[]>('/lost-items/top', {

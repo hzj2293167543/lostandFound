@@ -6,8 +6,15 @@ import { useSubmit, useActionData } from 'react-router';
 import { getFirstError, isFormDirty } from '@/utils';
 import { useEffect, useEffectEvent } from 'react';
 import { ActionResult } from '@/types/type';
+import { queryClient } from '@/lib/queryClient';
+import { userKeys } from '@/queryKeys';
+import { User } from '@lostfound/shared';
 
-export function useEditPassword(onSuccess?: () => void, onError?: (error: string) => void) {
+export function useEditPassword(
+  userRaw: User,
+  onSuccess?: () => void,
+  onError?: (error: string) => void
+) {
   const submit = useSubmit();
   const passwordForm = useForm<PasswordFormValues>({
     resolver: zodResolver(passwordSchema),
@@ -36,6 +43,7 @@ export function useEditPassword(onSuccess?: () => void, onError?: (error: string
     if (actionData?.intent !== PROFILE_INTENT.USER_EDIT_PASSWORD) return;
     if (actionData?.success) {
       toast.success('密码修改成功！');
+      queryClient.refetchQueries({ queryKey: userKeys.detail(userRaw.id) });
       onSuccess?.();
     } else if (actionData?.error) {
       toast.error(actionData.error);

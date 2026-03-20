@@ -27,7 +27,7 @@ export default function FoundDetailPage() {
           <Comments comments={comments} itemId={foundDetail.id} />
         </div>
         <div className="lg:col-span-1">
-          <FoundAction categories={categories} />
+          <FoundAction />
           <FoundTips />
         </div>
       </div>

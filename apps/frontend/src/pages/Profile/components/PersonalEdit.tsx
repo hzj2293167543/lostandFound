@@ -58,6 +58,7 @@ export default function PersonalEdit({
     onPasswordSubmit,
     onSubmitError: onPasswordSubmitError,
   } = useEditPassword(
+    userRaw,
     () => {
       setOpen(false);
       passwordForm.reset();

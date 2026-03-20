@@ -1,3 +1,4 @@
+import { useAuthStore } from '@/stores/AuthStore';
 import { Comment, FoundItem, LostItem, User } from '@lostfound/shared';
 import { useMemo } from 'react';
 import { useLoaderData } from 'react-router-dom';
@@ -6,7 +7,6 @@ import { LOST_FILTER_STATUS } from '../Lost/type';
 import LostFoundList from './components/LostFoundList';
 import PersonalInformation from './components/PersonalInformation';
 import PersonalInformationDetails from './components/PersonalInformationDetails';
-import { useAuthStore } from '@/stores/AuthStore';
 
 export default function ProfilePage() {
   const { user, lostItems, foundItems, comments } = useLoaderData() as {

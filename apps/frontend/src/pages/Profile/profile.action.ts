@@ -17,21 +17,17 @@ export async function profileAction({
 }: ActionFunctionArgs): Promise<ActionResult<keyof typeof PROFILE_INTENT>> {
   let intent;
   try {
-    const contentType = request.headers.get('content-type') || '';
+    const json = await request.json();
+    intent = json.intent;
 
-    if (contentType.includes('application/json')) {
-      const json = await request.json();
-      intent = json.intent;
-
-      if (intent === PROFILE_INTENT.USER_EDIT) {
-        const parsedData = safeParse<User>(UserEditDtoSchema, json);
-        await useAuthStore.getState().editUser(parsedData);
-      } else if (intent === PROFILE_INTENT.USER_EDIT_PASSWORD) {
-        const parsedData = safeParse<UserEditPasswordDto>(UserEditPasswordDtoSchema, json);
-        await userApi.updatePassword(parsedData);
-      } else {
-        throw new Response('Invalid intent', { status: 400 });
-      }
+    if (intent === PROFILE_INTENT.USER_EDIT) {
+      const parsedData = safeParse<User>(UserEditDtoSchema, json);
+      await useAuthStore.getState().editUser(parsedData);
+    } else if (intent === PROFILE_INTENT.USER_EDIT_PASSWORD) {
+      const parsedData = safeParse<UserEditPasswordDto>(UserEditPasswordDtoSchema, json);
+      await userApi.updatePassword(parsedData);
+    } else {
+      throw new Response('Invalid intent', { status: 400 });
     }
     return { success: true, intent };
   } catch (error) {

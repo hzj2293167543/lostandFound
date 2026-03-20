@@ -9,6 +9,8 @@ import { useSubmit } from 'react-router-dom';
 import { toast } from 'sonner';
 import { PROFILE_INTENT } from '../types';
 import { ActionResult } from '@/types/type';
+import { queryClient } from '@/lib/queryClient';
+import { userKeys } from '@/queryKeys';
 
 export function useProfileEdit(
   userRaw: User,
@@ -59,6 +61,7 @@ export function useProfileEdit(
       }
       const payload = { ...data, intent: PROFILE_INTENT.USER_EDIT };
       await submit(JSON.stringify(payload), { method: 'post', encType: 'application/json' });
+      queryClient.refetchQueries({ queryKey: userKeys.detail(userRaw.id) });
     } catch {
       onError?.('个人信息更新失败');
     }

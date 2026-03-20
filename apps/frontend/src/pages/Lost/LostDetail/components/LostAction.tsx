@@ -1,21 +1,27 @@
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Link } from 'react-router';
-import LostCreate from '../../components/LostCreate';
-import { Category } from '@lostfound/shared';
 
-export default function LostAction({ categories }: { categories: Category[] }) {
+export default function LostAction() {
   return (
     <Card className="mb-6">
       <CardHeader>
         <CardTitle>相关操作</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          <LostCreate categories={categories} className="w-full bg-blue-600 hover:bg-blue-700" />
-          <Button variant="outline" className="w-full">
-            <Link to="/found">查看招领信息</Link>
-          </Button>
+        <div className="space-y-4 flex flex-col gap-1">
+          <Link to="/lost" className="w-full">
+            <Button
+              variant="outline"
+              className="w-full hover:bg-blue-600 text-white hover:text-white bg-blue-500">
+              创建失物信息
+            </Button>
+          </Link>
+          <Link to="/found">
+            <Button variant="outline" className="w-full">
+              查看招领信息
+            </Button>
+          </Link>
           <Button variant="outline" className="w-full">
             举报信息
           </Button>

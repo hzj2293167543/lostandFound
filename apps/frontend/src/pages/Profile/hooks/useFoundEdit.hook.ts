@@ -1,19 +1,22 @@
 import { categoryApi, foundApi, uploadApi } from '@/api';
+import { queryClient } from '@/lib/queryClient';
+import { foundKeys } from '@/queryKeys';
+import { categoryKeys } from '@/queryKeys/category.key';
 import { formatDateForInput, getErrorMsg, getFirstError, isFormDirty } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Category, FoundDetail, FoundUpdateDto, FoundUpdateDtoSchema } from '@lostfound/shared';
+import { FoundUpdateDto, FoundUpdateDtoSchema } from '@lostfound/shared';
+import { useMutation, useQueries } from '@tanstack/react-query';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { FieldErrors, useForm } from 'react-hook-form';
-import { useRevalidator } from 'react-router';
+import { useLoaderData, useRevalidator } from 'react-router';
 import { toast } from 'sonner';
 
 export function useFoundEdit(foundItemId: number) {
   const [open, setOpen] = useState(false);
-  const [categories, setCategories] = useState<Category[]>([]);
   const [imagePreview, setImagePreview] = useState<string>('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const { user } = useLoaderData();
   const revalidator = useRevalidator();
-
   const form = useForm<FoundUpdateDto>({
     resolver: zodResolver(FoundUpdateDtoSchema),
     defaultValues: {
@@ -30,49 +33,56 @@ export function useFoundEdit(foundItemId: number) {
     },
   });
 
-  useEffect(() => {
-    const abortController = new AbortController();
-    const fetchFoundDetail = async () => {
-      if (!open) return;
-      setIsLoading(true);
+  const [foundDetailQuery, categoryQuery] = useQueries({
+    queries: [
+      {
+        queryKey: foundKeys.detail(foundItemId),
+        queryFn: () => foundApi.getFoundItemDetailById(foundItemId),
+        enabled: open,
+      },
+      {
+        queryKey: categoryKeys.list(),
+        queryFn: () => categoryApi.getCategories(),
+        enabled: open,
+      },
+    ],
+  });
 
-      try {
-        const [foundDetail, categoriesData]: [FoundDetail, Category[]] = await Promise.all([
-          foundApi.getFoundItemDetailById(foundItemId, { signal: abortController.signal }),
-          categoryApi.getCategories({ signal: abortController.signal }),
-        ]);
-        setCategories(categoriesData);
-        setImagePreview(foundDetail.image || '');
-        form.reset({
-          id: foundDetail.id,
-          title: foundDetail.title,
-          category: foundDetail.category.id,
-          description: foundDetail.description,
-          status: foundDetail.status,
-          time: formatDateForInput(foundDetail.time) || new Date().toISOString(),
-          location: foundDetail.location,
-          storageLocation: foundDetail.storageLocation,
-          contactPhone: foundDetail.contactPhone,
-        });
-      } catch (error) {
-        if (error instanceof Error && error.name === 'CanceledError') {
-          return;
-        }
-        const errorMessage = error instanceof Error ? error.message : '获取招领信息失败';
-        toast.error(errorMessage);
-      } finally {
-        setIsLoading(false);
-      }
+  useEffect(() => {
+    const fetchFoundDetail = () => {
+      if (!categoryQuery.data || !foundDetailQuery.data) return;
+      const foundDetail = foundDetailQuery.data;
+      setImagePreview(foundDetail.image || '');
+      form.reset({
+        id: foundDetail.id,
+        title: foundDetail.title,
+        category: foundDetail.category.id,
+        description: foundDetail.description,
+        status: foundDetail.status,
+        time: formatDateForInput(foundDetail.time) || new Date().toISOString(),
+        location: foundDetail.location,
+        storageLocation: foundDetail.storageLocation,
+        contactPhone: foundDetail.contactPhone,
+      });
     };
     fetchFoundDetail();
-    return () => {
-      abortController.abort();
-    };
-  }, [foundItemId, open, form]);
+  }, [foundDetailQuery.data, categoryQuery.data, form]);
+
+  // 处理错误提示
+  useEffect(() => {
+    if (foundDetailQuery.error) {
+      toast.error(getErrorMsg(foundDetailQuery.error, '获取招领信息失败'));
+    }
+  }, [foundDetailQuery.error]);
+
+  useEffect(() => {
+    if (categoryQuery.error) {
+      toast.error(getErrorMsg(categoryQuery.error, '获取分类失败'));
+    }
+  }, [categoryQuery.error]);
 
   const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     try {
-      setIsLoading(true);
       const file = e.target.files?.[0];
       if (!file) return;
 
@@ -87,10 +97,10 @@ export function useFoundEdit(foundItemId: number) {
         toast.error('图片读取失败');
       });
       reader.readAsDataURL(file);
-
       const formData = new FormData();
       formData.append('file', file);
       formData.append('type', 'found');
+      setIsUploading(true);
       const imageUrl = await uploadApi.upload(formData);
       if (imageUrl) {
         form.setValue('image', imageUrl, { shouldDirty: true });
@@ -99,24 +109,37 @@ export function useFoundEdit(foundItemId: number) {
       const message = getErrorMsg(error, '图片上传失败');
       toast.error(message);
     } finally {
-      setIsLoading(false);
+      setIsUploading(false);
     }
   };
 
-  const onSubmit = async (data: FoundUpdateDto) => {
-    try {
-      if (!isFormDirty(form)) {
-        toast.error('请修改招领信息');
-        return;
-      }
-      await foundApi.updateFoundItem(data);
+  const updateMutation = useMutation({
+    mutationFn: (data: FoundUpdateDto) => foundApi.updateFoundItem(data),
+    onMutate: () => {
+      setIsUploading(true);
+    },
+    onSuccess: async () => {
+      queryClient.invalidateQueries({ queryKey: foundKeys.detail(foundItemId) });
+      await queryClient.refetchQueries({ queryKey: foundKeys.list(user.id) });
       revalidator.revalidate();
       setOpen(false);
       toast.success('招领信息修改成功！');
-    } catch (error) {
+    },
+    onError: (error) => {
       const message = getErrorMsg(error, '修改招领信息失败');
       toast.error(message);
+    },
+    onSettled: () => {
+      setIsUploading(false);
+    },
+  });
+
+  const onSubmit = (data: FoundUpdateDto) => {
+    if (!isFormDirty(form)) {
+      toast.error('请修改招领信息');
+      return;
     }
+    updateMutation.mutate(data);
   };
 
   const onError = (errors: FieldErrors<FoundUpdateDto>) => {
@@ -125,8 +148,14 @@ export function useFoundEdit(foundItemId: number) {
     toast.error(firstError || '请检查招领信息');
   };
 
+  // 计算加载状态
+  const isLoading =
+    foundDetailQuery.isLoading ||
+    categoryQuery.isLoading ||
+    isUploading ||
+    updateMutation.isPending;
   return {
-    categories,
+    categories: categoryQuery.data || [],
     imagePreview,
     isLoading,
     form,

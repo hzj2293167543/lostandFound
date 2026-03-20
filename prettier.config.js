@@ -66,5 +66,4 @@ const config = {
   ],
 };
 
-// 关键改动：将 CommonJS 的 module.exports 改为 ES Module 的 export default
 export default config;

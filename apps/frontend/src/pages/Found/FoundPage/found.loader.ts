@@ -1,17 +1,23 @@
 import { categoryApi, foundApi } from '@/api';
+import { queryClient } from '@/lib/queryClient';
+import { foundKeys } from '@/queryKeys';
+import { categoryKeys } from '@/queryKeys';
 
 export async function foundLoader() {
   try {
-    // 并行获取数据
-    const [foundData, categoryData] = await Promise.all([
-      foundApi.getFoundItems(),
-      categoryApi.getCategories(),
+    const [foundItems, categories] = await Promise.all([
+      queryClient.ensureQueryData({
+        queryKey: foundKeys.lists(),
+        queryFn: () => foundApi.getFoundItems(),
+      }),
+      queryClient.ensureQueryData({
+        queryKey: categoryKeys.list(),
+        queryFn: () => categoryApi.getCategories(),
+      }),
     ]);
-    console.log(foundData, categoryData);
-
     return {
-      foundItems: foundData,
-      categories: categoryData,
+      foundItems,
+      categories,
     };
   } catch (error) {
     console.error('Error loading found items:', error);

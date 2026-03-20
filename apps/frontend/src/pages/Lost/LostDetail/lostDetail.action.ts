@@ -3,6 +3,9 @@ import { commentCreateDtoSchema } from '@lostfound/shared';
 import { ActionFunction } from 'react-router-dom';
 import { LOST_DETAIL_INTENT } from '../type';
 import { getErrorMsg } from '@/utils';
+import { queryClient } from '@/lib/queryClient';
+import { commentKeys } from '@/queryKeys';
+import { ItemTypeMap } from '@/types/type';
 
 export const lostDetailAction: ActionFunction = async ({ request }) => {
   let intent;
@@ -17,6 +20,9 @@ export const lostDetailAction: ActionFunction = async ({ request }) => {
         throw new Response('评论内容无效', { status: 400 });
       }
       result = await commentApi.createComment(validatedComment.data);
+      await queryClient.refetchQueries({
+        queryKey: commentKeys.list(validatedComment.data.itemId, { type: ItemTypeMap.LOST }),
+      });
     } else {
       throw new Response('无效的操作', { status: 400 });
     }

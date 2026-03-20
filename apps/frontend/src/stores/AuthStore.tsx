@@ -4,7 +4,7 @@ import type { LoginBackDto, LoginDto, User, UserEditDto } from '@lostfound/share
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { ROLE } from '../contexts/type';
+import { ROLE } from './type';
 
 interface AuthState {
   user: User | null;

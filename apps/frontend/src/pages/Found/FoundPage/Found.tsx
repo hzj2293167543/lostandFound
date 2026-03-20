@@ -1,15 +1,11 @@
 import { useState } from 'react';
 import { useLoaderData } from 'react-router-dom';
-import {
-  ALL_CATEGORY,
-  FilterState,
-  FOUND_FILTER_STATUS,
-  FoundLoaderData,
-  SetFilterState,
-} from '../type';
+import { ALL_CATEGORY, FilterState, FOUND_FILTER_STATUS, SetFilterState } from '../type';
 import FoundCreate from '../components/FoundCreate';
 import FoundFilter from './components/FoundFilter';
 import FoundList from './components/FoundList';
+import { FoundItem } from '@lostfound/shared';
+import { Category } from '@lostfound/shared';
 
 export default function FoundPage() {
   const [filterState, setFilterState] = useState<FilterState>({
@@ -17,7 +13,10 @@ export default function FoundPage() {
     searchTerm: '',
     category: ALL_CATEGORY,
   });
-  const { foundItems, categories } = useLoaderData() as FoundLoaderData;
+  const { foundItems, categories } = useLoaderData() as {
+    foundItems: FoundItem[];
+    categories: Category[];
+  };
 
   const setFilter: SetFilterState = (key, value) => {
     setFilterState((prev) => ({

@@ -2,14 +2,13 @@
 import js from '@eslint/js';
 import tsPlugin from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
-import vuePlugin from 'eslint-plugin-vue';
-import vueParser from 'vue-eslint-parser';
+import prettierConfig from 'eslint-config-prettier';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
-import prettierPlugin from 'eslint-plugin-prettier';
-import prettierConfig from 'eslint-config-prettier';
+import vuePlugin from 'eslint-plugin-vue';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
+import vueParser from 'vue-eslint-parser';
 
 export default [
   // 1. 忽略文件
@@ -119,20 +118,20 @@ export default [
       'react/prop-types': 'off', // 关闭 prop-types（如果用 TS）
     },
   },
-  // 7. Prettier 集成
-  {
-    plugins: {
-      prettier: prettierPlugin,
-    },
-    rules: {
-      'prettier/prettier': 'warn',
-    },
-  },
+  // // 7. Prettier 集成
+  // {
+  //   plugins: {
+  //     prettier: prettierPlugin,
+  //   },
+  //   rules: {
+  //     'prettier/prettier': 'warn',
+  //   },
+  // },
   // 8. 忽略 TypeScript 类型检查配置
   {
     files: ['vitest.config.ts', 'vite.config.ts', 'playwright.config.ts'],
     ...tseslint.configs.disableTypeChecked,
   },
-  // 必须放在最后！
+  // 必须放在最后！让prettier接管prettier
   prettierConfig,
 ];

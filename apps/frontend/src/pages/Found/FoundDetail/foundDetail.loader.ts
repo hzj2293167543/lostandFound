@@ -1,8 +1,10 @@
-import { categoryApi, commentApi, foundApi } from '@/api';
+import { commentApi, foundApi } from '@/api';
+import { queryClient } from '@/lib/queryClient';
+import { commentKeys, foundKeys } from '@/queryKeys';
 import { ItemTypeMap } from '@/types/type';
-import { LoaderFunctionArgs } from 'react-router-dom';
-import { Comment } from '@lostfound/shared';
 import { buildTree } from '@/utils';
+import { Comment } from '@lostfound/shared';
+import { LoaderFunctionArgs } from 'react-router-dom';
 
 export async function foundDetailLoader({ params }: LoaderFunctionArgs) {
   try {
@@ -10,10 +12,15 @@ export async function foundDetailLoader({ params }: LoaderFunctionArgs) {
     if (!id) {
       throw new Response('Missing ID', { status: 400 });
     }
-    const [foundDetail, commentsDto, categories] = await Promise.all([
-      foundApi.getFoundItemDetailById(id),
-      commentApi.getCommentsByItem(id, ItemTypeMap.FOUND),
-      categoryApi.getCategories(),
+    const [foundDetail, commentsDto] = await Promise.all([
+      queryClient.ensureQueryData({
+        queryKey: foundKeys.detail(id),
+        queryFn: () => foundApi.getFoundItemDetailById(id),
+      }),
+      queryClient.ensureQueryData({
+        queryKey: commentKeys.list(id, { type: ItemTypeMap.FOUND }),
+        queryFn: () => commentApi.getCommentsByItem(id, ItemTypeMap.FOUND),
+      }),
     ]);
 
     const comments: Comment[] = buildTree(commentsDto);
@@ -21,7 +28,6 @@ export async function foundDetailLoader({ params }: LoaderFunctionArgs) {
     return {
       foundDetail,
       comments,
-      categories,
     };
   } catch (error) {
     console.error('Error fetching found item detail:', error);

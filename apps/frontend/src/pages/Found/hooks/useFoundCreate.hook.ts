@@ -1,6 +1,8 @@
 import { uploadApi } from '@/api';
 import { useAuthAction } from '@/hooks/useAuthAction';
-import { getErrorMsg, getFirstError, safeParse } from '@/utils';
+import { queryClient } from '@/lib/queryClient';
+import { foundKeys } from '@/queryKeys';
+import { getErrorMsg, getFirstError } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Category, FoundCreateDto, FoundCreateDtoSchema } from '@lostfound/shared';
 import { useEffect, useEffectEvent, useState } from 'react';
@@ -13,7 +15,6 @@ export function useFoundCreate(categories: Category[]) {
   const [isLoading, setIsLoading] = useState(false);
   const requireAuth = useAuthAction();
   const submit = useSubmit();
-
   const form = useForm<FoundCreateDto>({
     resolver: zodResolver(FoundCreateDtoSchema),
     defaultValues: {
@@ -91,6 +92,7 @@ export function useFoundCreate(categories: Category[]) {
     if (!shouldClose()) return;
 
     if (actionData?.success) {
+      queryClient.refetchQueries({ queryKey: foundKeys.lists() });
       setOpen(false);
       form.reset();
       toast.success('招领信息发布成功！');

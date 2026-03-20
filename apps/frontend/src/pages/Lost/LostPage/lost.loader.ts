@@ -1,16 +1,24 @@
 import { categoryApi, lostApi } from '@/api';
+import { queryClient } from '@/lib/queryClient';
+import { lostKeys } from '@/queryKeys';
+import { categoryKeys } from '@/queryKeys';
 
 export async function lostLoader() {
   try {
     // 并行获取数据
-    const [lostData, categoryData] = await Promise.all([
-      lostApi.getLostItems(),
-      categoryApi.getCategories(),
+    const [lostItems, categories] = await Promise.all([
+      queryClient.ensureQueryData({
+        queryKey: lostKeys.lists(),
+        queryFn: () => lostApi.getLostItems(),
+      }),
+      queryClient.ensureQueryData({
+        queryKey: categoryKeys.list(),
+        queryFn: () => categoryApi.getCategories(),
+      }),
     ]);
-
     return {
-      lostItems: lostData,
-      categories: categoryData,
+      lostItems,
+      categories,
     };
   } catch (error) {
     console.error('Error loading lost items:', error);

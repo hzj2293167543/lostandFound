@@ -29,4 +29,5 @@ export const LOST_FILTER_STATUS_TO_NAME = ['全部状态', '寻找中', '已找�
 export const LOST_DETAIL_INTENT = {
   COMMENT: 0,
   THUMBS_UP: 1,
+  LOST: 2,
 };

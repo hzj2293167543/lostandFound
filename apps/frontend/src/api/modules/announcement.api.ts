@@ -5,7 +5,7 @@ export const announcementApi = {
   getAnnouncements: () => get<Announcement[]>('/announcements'),
 
   getAnnouncementsTop: (count?: number) =>
-    get<Announcement[]>('/announcements', {
+    get<Announcement[]>('/announcements/top', {
       params: count === undefined ? undefined : { limit: count },
     }),
 

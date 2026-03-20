@@ -1,19 +1,21 @@
 import { foundApi } from '@/api';
-import { safeParse } from '@/utils';
-import { FoundCreateDto } from '@lostfound/shared';
-import { FoundCreateDtoSchema } from '@lostfound/shared';
+import { queryClient } from '@/lib/queryClient';
+import { foundKeys } from '@/queryKeys';
+import { getErrorMsg, safeParse } from '@/utils';
+import { FoundCreateDto, FoundCreateDtoSchema } from '@lostfound/shared';
 import { ActionFunction } from 'react-router-dom';
 
 export const foundAction: ActionFunction = async ({ request }) => {
   try {
     const json = await request.json();
     const parsedData = safeParse<FoundCreateDto>(FoundCreateDtoSchema, json);
+
     const found = await foundApi.createFoundItem(parsedData);
+    await queryClient.refetchQueries({ queryKey: foundKeys.lists() });
+
     return { success: true, result: found };
   } catch (error) {
-    if (error instanceof Error) {
-      return { success: false, error: error.message };
-    }
-    return { success: false, error: '创建招领信息失败' };
+    const message = getErrorMsg(error, '创建招领信息失败');
+    return { success: false, error: message };
   }
 };

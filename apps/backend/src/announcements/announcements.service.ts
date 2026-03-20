@@ -28,8 +28,10 @@ export class AnnouncementsService {
   async findTop(limit: number): Promise<AnnouncementVo[]> {
     const announcements = await this.announcementsRepository.find({
       order: { createdAt: 'DESC' },
+      relations: ['author'],
       take: limit === undefined ? undefined : limit,
     });
+    console.log('announcements', announcements);
     return announcements.map((announcement) => mapAnnouncementToVo(announcement));
   }
 

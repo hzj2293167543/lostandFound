@@ -2,7 +2,13 @@ import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FoundItem } from './entities/found-item.entity';
-import { FoundItem as FoundItemVo, FoundCreateDto, FoundUpdateDto } from '@lostfound/shared';
+import {
+  FoundItem as FoundItemVo,
+  FoundCreateDto,
+  FoundUpdateDto,
+  GetFoundItemsParams,
+  PageResponse,
+} from '@lostfound/shared';
 import { mapFoundItemToVo } from './found-items.mapper';
 import { Category } from 'src/categories/entities/category.entity';
 import { UploadService } from '@/common/upload/upload.service';
@@ -20,14 +26,58 @@ export class FoundItemsService {
     private uploadService: UploadService
   ) {}
 
+  async findAllPaginated(params: GetFoundItemsParams): Promise<PageResponse<FoundItemVo>> {
+    const { page, limit, categoryId, status, search } = params;
+    const skip = (page - 1) * limit;
+
+    const queryBuilder = this.foundItemsRepository
+      .createQueryBuilder('item')
+      .leftJoinAndSelect('item.category', 'category')
+      .leftJoinAndSelect('item.user', 'user')
+      .orderBy('item.createdAt', 'DESC')
+      .skip(skip)
+      .take(limit);
+
+    if (categoryId) {
+      queryBuilder.andWhere('item.categoryId = :categoryId', { categoryId });
+    }
+    if (status) {
+      queryBuilder.andWhere('item.status = :status', { status });
+    }
+
+    if (search) {
+      queryBuilder.andWhere('item.title LIKE :search OR item.content LIKE :search', {
+        search: `%${search}%`,
+      });
+    }
+
+    const [items, total] = await queryBuilder.getManyAndCount();
+
+    const commentCountMap = await this.commentsService.getItemCommentCountMapByType(
+      items.map((item) => item.id),
+      CommentItemType.FoundItem
+    );
+    const mappedItems = items.map((item) =>
+      mapFoundItemToVo(item, commentCountMap.get(item.id) || 0)
+    );
+    return {
+      items: mappedItems,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
+  }
+
   async findAll(): Promise<FoundItemVo[]> {
     const items = await this.foundItemsRepository.find({
       relations: ['category', 'user'],
       order: { createdAt: 'DESC' },
     });
+
     const commentCountMap = await this.commentsService.getItemCommentCountMapByType(
       items.map((item) => item.id),
-      CommentItemType.FoundItem
+      CommentItemType.LostItem
     );
     return items.map((item) => mapFoundItemToVo(item, commentCountMap.get(item.id) || 0));
   }

@@ -19,13 +19,3 @@ export type PageResponse<T> = {
   limit: number;
   totalPages: number;
 };
-
-export const GetLostItemsParamsSchema = z.object({
-  page: z.coerce.number().nonnegative().optional(),
-  limit: z.coerce.number().nonnegative().optional(),
-  categoryId: z.coerce.number().optional(),
-  status: z.coerce.number().optional(),
-  search: z.string().optional(),
-});
-
-export type GetLostItemsParams = z.infer<typeof GetLostItemsParamsSchema>;

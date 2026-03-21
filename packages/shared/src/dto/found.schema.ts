@@ -18,3 +18,12 @@ export const FoundUpdateDtoSchema = FoundCreateDtoSchema.extend({
 });
 
 export interface FoundUpdateDto extends z.infer<typeof FoundUpdateDtoSchema> {}
+
+export const GetFoundItemsParamsSchema = z.object({
+  page: z.coerce.number().nonnegative().optional(),
+  limit: z.coerce.number().nonnegative().optional(),
+  categoryId: z.coerce.number().optional(),
+  status: z.coerce.number().optional(),
+  search: z.string().optional(),
+});
+export type GetFoundItemsParams = z.infer<typeof GetFoundItemsParamsSchema>;

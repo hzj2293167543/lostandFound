@@ -5,8 +5,8 @@ import { useLoaderData } from 'react-router-dom';
 import { FOUND_FILTER_STATUS } from '../Found/type';
 import { LOST_FILTER_STATUS } from '../Lost/type';
 import LostFoundList from './components/LostFoundList';
-import PersonalInformation from './components/PersonalInformation';
-import PersonalInformationDetails from './components/PersonalInformationDetails';
+import PersonalInformation from './components/personalInformation/PersonalInformation';
+import PersonalInformationDetails from './components/personalInformationDetails/PersonalInformationDetails';
 
 export default function ProfilePage() {
   const { user, lostItems, foundItems, comments } = useLoaderData() as {

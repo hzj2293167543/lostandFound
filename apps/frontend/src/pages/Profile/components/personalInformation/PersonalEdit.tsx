@@ -24,8 +24,8 @@ import { User } from '@lostfound/shared';
 import { Camera } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { useEditPassword } from '../hooks/useEditPassword.hook';
-import { useProfileEdit } from '../hooks/useProfileEdit.hook';
+import { useEditPassword } from '../../hooks/useEditPassword.hook';
+import { useProfileEdit } from '../../hooks/useProfileEdit.hook';
 
 export default function PersonalEdit({
   userRaw,

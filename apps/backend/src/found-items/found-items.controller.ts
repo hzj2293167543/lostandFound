@@ -14,12 +14,36 @@ import {
 } from '@nestjs/common';
 import { FoundItemsService } from './found-items.service';
 import { AuthGuard } from '@nestjs/passport';
-import { FoundItem as FoundItemVo, FoundCreateDto, User, FoundUpdateDto } from '@lostfound/shared';
+import {
+  FoundItem as FoundItemVo,
+  FoundCreateDto,
+  User,
+  FoundUpdateDto,
+  GetFoundItemsParams,
+  GetFoundItemsParamsSchema,
+} from '@lostfound/shared';
 import { CurrentUser } from 'src/common/decorators/currentUser.decorators';
+import { ZodValidationPipe } from '@/common/pipe';
 
 @Controller('found-items')
 export class FoundItemsController {
   constructor(private foundItemsService: FoundItemsService) {}
+
+  @Get()
+  findAllPaginated(
+    @Query(new ZodValidationPipe(GetFoundItemsParamsSchema)) params: GetFoundItemsParams
+  ) {
+    const { page, limit, categoryId, status, search } = params;
+    const validPage = page ?? 1;
+    const validLimit = limit ?? 12;
+    return this.foundItemsService.findAllPaginated({
+      page: validPage,
+      limit: validLimit,
+      categoryId,
+      status,
+      search,
+    });
+  }
 
   @Get()
   findAll() {

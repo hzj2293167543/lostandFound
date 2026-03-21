@@ -1,19 +1,18 @@
-import { announcementApi } from '@/api';
+import { categoryApi } from '@/api';
 import { queryClient } from '@/lib/queryClient';
-import { announcementKeys } from '@/queryKeys';
+import { categoryKeys } from '@/queryKeys';
 
 export async function announcementsLoader() {
   try {
-    // 并行获取数据
-    const annData = await queryClient.ensureQueryData({
-      queryKey: announcementKeys.list(),
-      queryFn: () => announcementApi.getAnnouncements(),
+    const categories = await queryClient.ensureQueryData({
+      queryKey: categoryKeys.list(),
+      queryFn: () => categoryApi.getCategories(),
     });
     return {
-      announcements: annData,
+      categories,
     };
   } catch (error) {
-    console.error('Error fetching home data:', error);
+    console.error('Error fetching announcements data:', error);
     throw error;
   }
 }

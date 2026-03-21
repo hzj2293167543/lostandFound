@@ -3,7 +3,7 @@ import { useLoaderData } from 'react-router-dom';
 import { Category, GetLostItemsParams } from '@lostfound/shared';
 import LostCreate from '../components/LostCreate';
 import LostFilter from './components/LostFilter';
-import LostList from './components/LostList';
+import LostList from './components/lostList/LostList';
 import { ALL_CATEGORY, FilterState, LOST_FILTER_STATUS, SetFilterState } from '../type';
 
 export default function LostPage() {

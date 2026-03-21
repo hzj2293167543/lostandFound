@@ -25,8 +25,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { useFoundEdit } from '../hooks/useFoundEdit.hook';
-import { FOUND_STATUS, FOUND_STATUS_NAME } from '../types';
+import { useFoundEdit } from '../../hooks/useFoundEdit.hook';
+import { FOUND_STATUS, FOUND_STATUS_NAME } from '../../types';
 
 export default function FoundEdit({ foundItemId }: { foundItemId: number }) {
   const {

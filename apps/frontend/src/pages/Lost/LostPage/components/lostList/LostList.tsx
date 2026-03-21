@@ -7,30 +7,18 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { LOST_STATUS_NAME } from '@/pages/Profile/types';
+import { CellProps, CellPropsExplicit, COLUMN_COUNT, ITEM_HEIGHT } from '@/types/type';
 import { GetLostItemsParams, LostItem } from '@lostfound/shared';
 import { Link } from 'react-router';
 import { Grid } from 'react-window';
-import { LOST_FILTER_STATUS } from '../../type';
-import { useLostInfiniteQuery } from '../hooks/useLostInfiniteQuery';
+import { LOST_FILTER_STATUS } from '../../../type';
+import { useLostInfiniteQuery } from '../../hooks/useLostInfiniteQuery';
+
+type Status = 'pending' | 'error' | 'empty' | 'success';
+
 interface LostListProps {
   filters?: GetLostItemsParams;
 }
-
-interface CellProps {
-  columnIndex: number;
-  rowIndex: number;
-  style: React.CSSProperties;
-  data: {
-    items: LostItem[];
-    hasNextPage: boolean;
-    fetchNextPage: () => Promise<unknown>;
-    isFetchingNextPage: boolean;
-  };
-}
-// 布局常量
-const COLUMN_COUNT = 3; // 最大列数（lg 屏）
-const ITEM_HEIGHT = 430; // 每行高度（px）
-
 export default function LostList({ filters }: LostListProps) {
   const {
     containerRef,
@@ -44,7 +32,34 @@ export default function LostList({ filters }: LostListProps) {
     allItems,
   } = useLostInfiniteQuery(filters);
 
-  // 渲染状态
+  return (
+    <div ref={containerRef} className="h-full w-full" style={{ scrollbarWidth: 'none' }}>
+      {containerWidth === null ? (
+        <div className="flex justify-center items-center h-64">加载中...</div>
+      ) : (
+        <>
+          {status === 'pending' && <LostError status="pending" />}
+          {status === 'error' && <LostError status="error" />}
+          {status === 'success' && allItems.length === 0 && <LostError status="empty" />}
+          {status === 'success' && allItems.length > 0 && (
+            <Grid
+              style={{ scrollbarWidth: 'none' }}
+              columnCount={columnCount!}
+              columnWidth={columnWidth!}
+              rowCount={rowCount!}
+              rowHeight={ITEM_HEIGHT}
+              onScroll={handleScroll}
+              cellProps={{ data: itemData }}
+              cellComponent={Cell}
+            />
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+function LostError({ status }: { status: Status }) {
   if (status === 'pending') {
     return (
       <div className="flex justify-center items-center h-64">
@@ -61,57 +76,58 @@ export default function LostList({ filters }: LostListProps) {
     );
   }
 
-  if (allItems.length === 0) {
+  if (status === 'empty') {
     return (
       <div className="flex justify-center items-center h-64">
         <p className="text-gray-600 text-lg">没有找到匹配的失物信息</p>
       </div>
     );
   }
+  return null;
+}
 
-  return (
-    <div ref={containerRef} className="h-full w-full">
-      <Grid
-        columnCount={columnCount}
-        columnWidth={columnWidth}
-        defaultHeight={600}
-        rowCount={rowCount}
-        rowHeight={ITEM_HEIGHT}
-        defaultWidth={containerWidth}
-        onScroll={handleScroll}
-        className=""
-        cellProps={{}}
-        cellComponent={({ columnIndex, rowIndex, style }) => (
-          <Cell
-            columnIndex={columnIndex}
-            rowIndex={rowIndex}
-            style={style}
-            data={itemData} // 直接读取外部变量
-          />
-        )}
-      />
-    </div>
-  );
+function LoaderMoreItem({
+  columnIndex,
+  rowIndex,
+  hasNextPage,
+  style,
+}: {
+  columnIndex: number;
+  rowIndex: number;
+  hasNextPage: boolean;
+  style: React.CSSProperties;
+}) {
+  if (rowIndex > 0 && columnIndex === 0) {
+    return (
+      <div style={style} className="p-3">
+        <div className="flex justify-center items-center py-8">
+          {hasNextPage ? (
+            <p className="text-gray-500">加载中...</p>
+          ) : (
+            <p className="text-gray-400">没有更多失物信息</p>
+          )}
+        </div>
+      </div>
+    );
+  }
+  return null;
 }
 
 // 单元格组件，独立渲染每个卡片
-function Cell({ columnIndex, rowIndex, style, data }: CellProps) {
+function Cell(props: CellProps<LostItem>) {
+  const { columnIndex, rowIndex, style, data } = props as CellPropsExplicit<LostItem>;
   const { items, hasNextPage } = data;
   const index = rowIndex * COLUMN_COUNT + columnIndex;
 
-  // 渲染“加载更多”提示（仅在第一列显示，避免重复）
   if (index >= items.length) {
     if (rowIndex > 0 && columnIndex === 0) {
       return (
-        <div style={style} className="p-3">
-          <div className="flex justify-center items-center py-8">
-            {hasNextPage ? (
-              <p className="text-gray-500">加载中...</p>
-            ) : (
-              <p className="text-gray-400">没有更多了</p>
-            )}
-          </div>
-        </div>
+        <LoaderMoreItem
+          columnIndex={columnIndex}
+          rowIndex={rowIndex}
+          hasNextPage={hasNextPage}
+          style={style}
+        />
       );
     }
     return null;

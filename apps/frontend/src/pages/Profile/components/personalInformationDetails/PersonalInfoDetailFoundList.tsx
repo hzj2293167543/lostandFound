@@ -11,7 +11,7 @@ import { FOUND_FILTER_STATUS } from '@/pages/Found/type';
 import { FoundItem } from '@lostfound/shared';
 import { memo } from 'react';
 import { Link } from 'react-router';
-import { FOUND_STATUS_NAME } from '../types';
+import { FOUND_STATUS_NAME } from '../../types';
 import FoundEdit from './FoundEdit';
 
 export default memo(function PersonalInfoDetailFoundList({

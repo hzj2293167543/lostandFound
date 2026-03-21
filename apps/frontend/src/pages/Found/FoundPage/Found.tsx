@@ -1,11 +1,10 @@
+import { Category, GetFoundItemsParams } from '@lostfound/shared';
 import { useState } from 'react';
 import { useLoaderData } from 'react-router-dom';
-import { ALL_CATEGORY, FilterState, FOUND_FILTER_STATUS, SetFilterState } from '../type';
 import FoundCreate from '../components/FoundCreate';
+import { ALL_CATEGORY, FilterState, FOUND_FILTER_STATUS, SetFilterState } from '../type';
 import FoundFilter from './components/FoundFilter';
 import FoundList from './components/FoundList';
-import { FoundItem } from '@lostfound/shared';
-import { Category } from '@lostfound/shared';
 
 export default function FoundPage() {
   const [filterState, setFilterState] = useState<FilterState>({
@@ -13,8 +12,7 @@ export default function FoundPage() {
     searchTerm: '',
     category: ALL_CATEGORY,
   });
-  const { foundItems, categories } = useLoaderData() as {
-    foundItems: FoundItem[];
+  const { categories } = useLoaderData() as {
     categories: Category[];
   };
 
@@ -24,19 +22,20 @@ export default function FoundPage() {
       [key]: value,
     }));
   };
-
-  // 筛选招领
-  const filteredItems = foundItems.filter((item) => {
-    const { searchTerm, category, status } = filterState;
-    const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = !category || item.category.id === category || category === ALL_CATEGORY;
-    const matchesStatus =
-      !status || item.status === status || status === FOUND_FILTER_STATUS.全部状态;
-    return matchesSearch && matchesCategory && matchesStatus;
-  });
+  const filters: GetFoundItemsParams = {
+    categoryId:
+      filterState.category && filterState.category !== ALL_CATEGORY
+        ? filterState.category
+        : undefined,
+    status:
+      filterState.status && filterState.status !== FOUND_FILTER_STATUS.全部状态
+        ? filterState.status
+        : undefined,
+    search: filterState.searchTerm || undefined,
+  };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 h-[calc(100vh-64px)] flex flex-col">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-800">失物招领</h1>
         <FoundCreate categories={categories} />
@@ -46,7 +45,7 @@ export default function FoundPage() {
       <FoundFilter categories={categories} filterState={filterState} setFilterState={setFilter} />
 
       {/* 招领列表 */}
-      <FoundList filteredItems={filteredItems} />
+      <FoundList filters={filters} />
     </div>
   );
 }

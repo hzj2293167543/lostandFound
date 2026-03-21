@@ -1,8 +1,16 @@
 import { get, post, put, remove } from '../client';
-import { Announcement, AnnouncementDetail } from '@lostfound/shared';
+import {
+  Announcement,
+  AnnouncementDetail,
+  GetAnnouncementsParams,
+  PageResponse,
+} from '@lostfound/shared';
 
 export const announcementApi = {
-  getAnnouncements: () => get<Announcement[]>('/announcements'),
+  getAnnouncements: (params?: GetAnnouncementsParams) =>
+    get<PageResponse<Announcement>>('/announcements', { params }),
+
+  getAnnouncementsAll: () => get<Announcement[]>('/announcements/all'),
 
   getAnnouncementsTop: (count?: number) =>
     get<Announcement[]>('/announcements/top', {

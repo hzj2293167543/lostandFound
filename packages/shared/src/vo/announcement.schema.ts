@@ -8,6 +8,7 @@ export const AnnouncementSchema = z.object({
   author: z.object({
     id: z.number(),
     name: z.string(),
+    avatar: z.string().optional(),
   }),
 });
 
@@ -35,3 +36,10 @@ export type CreateAnnouncement = z.infer<typeof CreateAnnouncementSchema>;
 export const UpdateAnnouncementSchema = CreateAnnouncementSchema.partial();
 
 export type UpdateAnnouncement = z.infer<typeof UpdateAnnouncementSchema>;
+
+export const GetAnnouncementsParamsSchema = z.object({
+  page: z.coerce.number().optional(),
+  limit: z.coerce.number().optional(),
+  search: z.string().optional(),
+});
+export type GetAnnouncementsParams = z.infer<typeof GetAnnouncementsParamsSchema>;

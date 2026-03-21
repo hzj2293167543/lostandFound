@@ -14,13 +14,32 @@ import {
 } from '@nestjs/common';
 import { AnnouncementsService } from './announcements.service';
 import { AuthGuard } from '@nestjs/passport';
-import { Announcement as AnnouncementVo } from '@lostfound/shared';
+import {
+  Announcement as AnnouncementVo,
+  GetAnnouncementsParams,
+  GetAnnouncementsParamsSchema,
+} from '@lostfound/shared';
+import { ZodValidationPipe } from '@/common/pipe';
 
 @Controller('announcements')
 export class AnnouncementsController {
   constructor(private announcementsService: AnnouncementsService) {}
 
   @Get()
+  findAllPaginated(
+    @Query(new ZodValidationPipe(GetAnnouncementsParamsSchema)) params: GetAnnouncementsParams
+  ) {
+    const { page, limit, search } = params;
+    const validPage = page ?? 1;
+    const validLimit = limit ?? 12;
+    return this.announcementsService.findAllPaginated({
+      page: validPage,
+      limit: validLimit,
+      search,
+    });
+  }
+
+  @Get('all')
   findAll() {
     return this.announcementsService.findAll();
   }

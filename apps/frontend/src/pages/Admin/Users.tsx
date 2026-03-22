@@ -112,7 +112,7 @@ export default function AdminUsers() {
           variant={activeTab === 'reports' ? 'default' : 'outline'}
           onClick={() => setActiveTab('reports')}>
           举报列表
-          {reports.filter((r) => r.status === 'pending').length > 0 && (
+          {reports.some((r) => r.status === 'pending').length > 0 && (
             <Badge variant="destructive" className="ml-2">
               {reports.filter((r) => r.status === 'pending').length}
             </Badge>

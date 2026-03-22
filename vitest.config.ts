@@ -1,6 +1,6 @@
-import { defineConfig } from 'vitest/config';
 import vue from '@vitejs/plugin-vue';
 import path from 'path';
+import { defineConfig } from 'vitest/config';
 // 1. 导入 browser mode 所需的 provider 函数
 import { playwright } from '@vitest/browser-playwright';
 

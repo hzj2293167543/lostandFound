@@ -171,8 +171,13 @@ export class LostItemsService {
       take: limit,
     });
 
+    const commentCountMap = await this.commentsService.getItemCommentCountMapByType(
+      items.map((item) => item.id),
+      CommentItemType.LostItem
+    );
+
     return {
-      items: items.map(mapLostItemToVo),
+      items: items.map((item) => mapLostItemToVo(item, commentCountMap.get(item.id) || 0)),
       total,
       page,
       limit,

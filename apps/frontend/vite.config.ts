@@ -2,9 +2,8 @@ import path from 'path';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import { mockDevServerPlugin } from 'vite-plugin-mock-dev-server';
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react({
@@ -25,13 +24,19 @@ export default defineConfig({
     },
   },
   server: {
-    port: 5173, // 你可以自定义端口
-    open: true, // 自动打开浏览器
+    port: 5173,
+    open: true,
     proxy: {
       '^/api': {
         target: 'http://localhost:3000',
         changeOrigin: true,
       },
     },
+  },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    include: ['src/__test__/**/*.test.{ts,tsx}'],
+    setupFiles: ['./src/test/setup.ts'],
   },
 });

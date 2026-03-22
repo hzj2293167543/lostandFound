@@ -1,6 +1,5 @@
-import { FoundUpdateDto } from '@lostfound/shared';
 import { FieldErrors, FieldValues, UseFormReturn } from 'react-hook-form';
-import z, { ZodError, ZodSchema, ZodType } from 'zod';
+import z, { ZodError } from 'zod';
 
 /**
  * 获取表单第一个错误信息

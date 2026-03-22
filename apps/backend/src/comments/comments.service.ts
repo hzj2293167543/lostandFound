@@ -1,10 +1,10 @@
+import { CommentItemTypeType } from '@/common/constants/constants';
+import { CommentCreateDto, CommentItem, PageResponse } from '@lostfound/shared';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Comment } from './entities/comment.entity';
-import { CommentCreateDto, CommentItem, PageResponse } from '@lostfound/shared';
 import { mapCommentToVo } from './comments.mapper';
-import { CommentItemType, CommentItemTypeType } from '@/common/constants/constants';
+import { Comment } from './entities/comment.entity';
 import { CommentLike } from './entities/comment_likes.entity';
 
 @Injectable()

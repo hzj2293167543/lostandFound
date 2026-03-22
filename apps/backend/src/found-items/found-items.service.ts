@@ -8,6 +8,8 @@ import {
   FoundUpdateDto,
   GetFoundItemsParams,
   PageResponse,
+  Count,
+  FoundItemStatus,
 } from '@lostfound/shared';
 import { mapFoundItemToVo } from './found-items.mapper';
 import { Category } from 'src/categories/entities/category.entity';
@@ -27,7 +29,7 @@ export class FoundItemsService {
   ) {}
 
   async findAllPaginated(params: GetFoundItemsParams): Promise<PageResponse<FoundItemVo>> {
-    const { page, limit, categoryId, status, search } = params;
+    const { page, limit, categoryId, status, search, userId } = params;
     const skip = (page - 1) * limit;
 
     const queryBuilder = this.foundItemsRepository
@@ -44,9 +46,11 @@ export class FoundItemsService {
     if (status) {
       queryBuilder.andWhere('item.status = :status', { status });
     }
-
+    if (userId) {
+      queryBuilder.andWhere('item.userId = :userId', { userId });
+    }
     if (search) {
-      queryBuilder.andWhere('item.title LIKE :search OR item.content LIKE :search', {
+      queryBuilder.andWhere('item.title LIKE :search OR item.description LIKE :search', {
         search: `%${search}%`,
       });
     }
@@ -110,6 +114,20 @@ export class FoundItemsService {
     return mapFoundItemToVo(item, commentCountMap.get(item.id) || 0);
   }
 
+  async findUserCount(userId: number): Promise<Count> {
+    const result = await this.foundItemsRepository
+      .createQueryBuilder('item')
+      .select('COUNT(*)', 'total')
+      .addSelect(`SUM(CASE WHEN item.status = :status THEN 1 ELSE 0 END)`, 'successCount')
+      .setParameter('status', FoundItemStatus.已归还)
+      .where('item.userId = :userId', { userId })
+      .getRawOne();
+    return {
+      totalCount: parseInt(result.total, 10),
+      successCount: parseInt(result.successCount, 10),
+    };
+  }
+
   async create(data: FoundCreateDto & { userId: number }): Promise<FoundItem> {
     const categoryPo = await this.categoriesRepository.findOne({
       where: { id: data.category },
@@ -145,11 +163,12 @@ export class FoundItemsService {
     await this.foundItemsRepository.delete(id);
   }
 
-  findByUser(userId: number): Promise<FoundItem[]> {
-    return this.foundItemsRepository.find({
-      where: { userId },
-      relations: ['category'],
-      order: { createdAt: 'DESC' },
-    });
+  findByUser(
+    userId: number,
+    page: number = 1,
+    limit: number = 10
+  ): Promise<PageResponse<FoundItemVo>> {
+    const skip = (page - 1) * limit;
+    return this.findAllPaginated({ page, limit, userId });
   }
 }

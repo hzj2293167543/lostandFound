@@ -33,3 +33,11 @@ export const AuthResponseSchema = z.object({
 });
 
 export type AuthResponse = z.infer<typeof AuthResponseSchema>;
+
+export const CountSchema = z.object({
+  totalCount: z.number(),
+  successCount: z.number().optional(),
+  failedCount: z.number().optional(),
+});
+
+export type Count = z.infer<typeof CountSchema>;

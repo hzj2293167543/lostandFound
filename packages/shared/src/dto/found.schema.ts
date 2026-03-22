@@ -25,5 +25,6 @@ export const GetFoundItemsParamsSchema = z.object({
   categoryId: z.coerce.number().optional(),
   status: z.coerce.number().optional(),
   search: z.string().optional(),
+  userId: z.coerce.number().optional(),
 });
 export type GetFoundItemsParams = z.infer<typeof GetFoundItemsParamsSchema>;

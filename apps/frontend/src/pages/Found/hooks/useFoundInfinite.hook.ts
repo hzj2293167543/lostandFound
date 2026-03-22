@@ -2,14 +2,14 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 
 import { foundApi } from '@/api';
 import { foundKeys } from '@/queryKeys';
-import { LG, LOAD_MORE_THRESHOLD, MD } from '@/types/type';
 import { debounce, FoundItem, GetFoundItemsParams, PageResponse } from '@lostfound/shared';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { MD, LG, LOAD_MORE_THRESHOLD } from '@/constants';
 
 export function useFoundInfinite(filters?: GetFoundItemsParams) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState<number | null>(null);
-  // 监听窗口宽度变化，更新容器宽度状态
+
   useEffect(() => {
     const updateWidth = debounce(() => {
       if (containerRef.current) {
@@ -36,25 +36,24 @@ export function useFoundInfinite(filters?: GetFoundItemsParams) {
     return containerWidth / columnCount;
   }, [containerWidth, columnCount]);
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } = useInfiniteQuery<
-    PageResponse<FoundItem>
-  >({
-    queryKey: foundKeys.infinite(filters as Record<string, unknown>),
-    queryFn: ({ pageParam = 1 }) =>
-      foundApi.getFoundItems({
-        page: pageParam as number,
-        ...filters,
-      }),
-    getNextPageParam: (lastPage) => {
-      if (lastPage.page < lastPage.totalPages) {
-        return lastPage.page + 1;
-      }
-      return null;
-    },
-    initialPageParam: 1,
-  });
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetching, status } =
+    useInfiniteQuery<PageResponse<FoundItem>>({
+      queryKey: foundKeys.infinite(filters as Record<string, unknown>),
+      queryFn: ({ pageParam = 1 }) =>
+        foundApi.getFoundItems({
+          page: pageParam as number,
+          ...filters,
+        }),
+      getNextPageParam: (lastPage) => {
+        if (lastPage.page < lastPage.totalPages) {
+          return lastPage.page + 1;
+        }
+        return null;
+      },
+      initialPageParam: 1,
+      placeholderData: (previousData) => previousData,
+    });
 
-  // 所有已加载的数据（平铺）
   const allItems = useMemo(() => {
     return data?.pages.flatMap((page) => page.items) || [];
   }, [data]);
@@ -97,5 +96,6 @@ export function useFoundInfinite(filters?: GetFoundItemsParams) {
     containerWidth,
     containerRef,
     allItems,
+    isFetching,
   };
 }

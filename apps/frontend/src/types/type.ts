@@ -1,3 +1,5 @@
+import { ExtendProp } from './utils';
+
 export const ItemTypeMap = {
   LOST: 0,
   FOUND: 1,
@@ -11,15 +13,6 @@ export interface ActionResult<T> {
   intent?: T;
 }
 
-// 布局常量 虚拟列表相关
-export const MD = 768;
-export const LG = 1024;
-export const COLUMN_COUNT = 3; // 最大列数（lg 屏）
-export const ITEM_HEIGHT = 430; // 每行高度（px）
-export const LOAD_MORE_THRESHOLD = 300; // 滚动到底部提前加载的阈值（px）
-export const DEFAULT_HEIGHT = 600; // 默认高度（px）
-export const DEFAULT_WIDTH = 1450; // 默认宽度（px）
-
 /**
  * cell grid组件 props 类型
  */
@@ -28,7 +21,9 @@ export interface CellProps<T> {
     items: T[];
     hasNextPage: boolean;
     fetchNextPage: () => Promise<unknown>;
-    isFetchingNextPage: boolean;
+    isFetchingNextPage?: boolean;
+    isFetching?: boolean;
+    isFilterChanged?: boolean;
   };
 }
 
@@ -52,6 +47,8 @@ export interface CellRowProps<T> {
     hasNextPage: boolean;
     fetchNextPage: () => Promise<unknown>;
     isFetchingNextPage: boolean;
+    isFetching?: boolean;
+    isSelf?: boolean;
   };
 }
 
@@ -59,6 +56,26 @@ export interface CellRowProps<T> {
  * cell list组件 props 类型 显式指定索引、样式等
  */
 export interface CellRowPropsExplicit<T> extends CellRowProps<T> {
+  index: number;
+  style: React.CSSProperties;
+}
+
+/**
+ * comment cell list组件 props 类型 评论项
+ */
+export type CellRowCommentProps<T> = ExtendProp<
+  CellRowProps<T>,
+  'data',
+  {
+    expandedComments: Record<number, boolean>;
+    toggleComment: (commentId: number) => void;
+  }
+>;
+
+/**
+ * comment cell list组件 props 类型 评论项 显式指定索引、样式等
+ */
+export interface CellRowCommentPropsExplicit<T> extends CellRowCommentProps<T> {
   index: number;
   style: React.CSSProperties;
 }

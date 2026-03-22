@@ -7,16 +7,18 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { FOUND_STATUS_NAME } from '@/pages/Profile/types';
-import { CellProps, CellPropsExplicit, COLUMN_COUNT, ITEM_HEIGHT } from '@/types/type';
+import { CellProps, CellPropsExplicit } from '@/types/type';
 import { FoundItem, GetFoundItemsParams } from '@lostfound/shared';
 import { Link } from 'react-router-dom';
 import { Grid } from 'react-window';
 import { useFoundInfinite } from '../../hooks/useFoundInfinite.hook';
 import { FOUND_FILTER_STATUS } from '../../type';
+import { ITEM_HEIGHT, COLUMN_COUNT } from '@/constants';
 
 interface FoundListProps {
   filters?: GetFoundItemsParams;
 }
+
 export default function FoundList({ filters }: FoundListProps) {
   const {
     itemData,
@@ -28,20 +30,20 @@ export default function FoundList({ filters }: FoundListProps) {
     containerWidth,
     containerRef,
     allItems,
+    isFetching,
   } = useFoundInfinite(filters);
 
   return (
-    <div ref={containerRef} className="h-full w-full">
+    <div ref={containerRef} className="h-full w-full relative">
       {containerWidth === null ? (
         <div className="flex justify-center items-center h-64">
           <p className="text-gray-500">加载中...</p>
         </div>
       ) : (
         <>
-          {status === 'pending' && <FoundError status="pending" />}
           {status === 'error' && <FoundError status="error" />}
           {status === 'success' && allItems.length === 0 && <FoundError status="empty" />}
-          {status === 'success' && allItems.length > 0 && (
+          {status === 'success' && (
             <Grid
               style={{ scrollbarWidth: 'none' }}
               columnCount={columnCount!}
@@ -52,6 +54,11 @@ export default function FoundList({ filters }: FoundListProps) {
               cellProps={{ data: itemData }}
               cellComponent={Cell}
             />
+          )}
+          {isFetching && status !== 'success' && (
+            <div className="absolute top-0 left-0 right-0 bg-green-50 text-green-600 text-center py-1 text-sm">
+              加载中...
+            </div>
           )}
         </>
       )}
@@ -67,12 +74,15 @@ function Cell(props: CellProps<FoundItem>) {
   if (index >= items.length) {
     if (rowIndex > 0 && columnIndex === 0) {
       return (
-        <LoaderMoreItem
-          columnIndex={columnIndex}
-          rowIndex={rowIndex}
-          hasNextPage={hasNextPage}
-          style={style}
-        />
+        <div style={style} className="p-3">
+          <div className="flex justify-center items-center py-8">
+            {hasNextPage ? (
+              <p className="text-gray-500">加载中...</p>
+            ) : (
+              <p className="text-gray-400">没有更多招领信息</p>
+            )}
+          </div>
+        </div>
       );
     }
     return null;
@@ -130,44 +140,7 @@ function Cell(props: CellProps<FoundItem>) {
   );
 }
 
-function LoaderMoreItem({
-  columnIndex,
-  rowIndex,
-  hasNextPage,
-  style,
-}: {
-  columnIndex: number;
-  rowIndex: number;
-  hasNextPage: boolean;
-  style: React.CSSProperties;
-}) {
-  if (rowIndex > 0 && columnIndex === 0) {
-    return (
-      <div style={style} className="p-3">
-        <div className="flex justify-center items-center py-8">
-          {hasNextPage ? (
-            <p className="text-gray-500">加载中...</p>
-          ) : (
-            <p className="text-gray-400">没有更多招领信息</p>
-          )}
-        </div>
-      </div>
-    );
-  }
-  return null;
-}
-
-type Status = 'pending' | 'error' | 'empty' | 'success';
-function FoundError({ status }: { status: Status }) {
-  // 渲染状态
-  if (status === 'pending') {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <p className="text-gray-500">加载中...</p>
-      </div>
-    );
-  }
-
+function FoundError({ status }: { status: 'error' | 'empty' }) {
   if (status === 'error') {
     return (
       <div className="flex justify-center items-center h-64">
@@ -175,13 +148,9 @@ function FoundError({ status }: { status: Status }) {
       </div>
     );
   }
-
-  if (status === 'empty') {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <p className="text-gray-600 text-lg">没有找到匹配的失物信息</p>
-      </div>
-    );
-  }
-  return null;
+  return (
+    <div className="flex justify-center items-center h-64">
+      <p className="text-gray-600 text-lg">没有找到匹配的失物信息</p>
+    </div>
+  );
 }

@@ -7,6 +7,7 @@ import {
   FoundUpdateDto,
   GetFoundItemsParams,
   PageResponse,
+  Count,
 } from '@lostfound/shared';
 
 export const foundApi = {
@@ -23,7 +24,12 @@ export const foundApi = {
   getFoundItemDetailById: (id: number, config?: AxiosRequestConfig) =>
     get<FoundDetail>(`/found-items/${id}`, config),
 
-  getFoundItemsByUserId: (userId: number) => get<FoundItem[]>(`/found-items/user/${userId}`),
+  getFoundItemsByUserId: (userId: number, page?: number, limit?: number) =>
+    get<PageResponse<FoundItem>>(`/found-items/user/${userId}`, {
+      params: { page, limit },
+    }),
+
+  getFoundItemsByUserIdCount: (userId: number) => get<Count>(`/found-items/user/${userId}/count`),
 
   createFoundItem: (data: FoundCreateDto, config?: AxiosRequestConfig) =>
     post<FoundCreateDto>('/found-items', data, config),

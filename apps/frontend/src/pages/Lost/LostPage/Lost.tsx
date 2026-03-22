@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useLoaderData } from 'react-router-dom';
 import { Category, GetLostItemsParams } from '@lostfound/shared';
 import LostCreate from '../components/LostCreate';
@@ -12,16 +12,14 @@ export default function LostPage() {
     searchTerm: '',
     category: ALL_CATEGORY,
   });
-  const { categories } = useLoaderData() as {
-    categories: Category[];
-  };
+  const { categories } = useLoaderData() as { categories: Category[] };
 
-  const setFilter: SetFilterState = (key, value) => {
+  const setFilter: SetFilterState = useCallback((key, value) => {
     setFilterState((prev) => ({
       ...prev,
       [key]: value,
     }));
-  };
+  }, []);
 
   const filters: GetLostItemsParams = {
     categoryId:

@@ -1,12 +1,17 @@
 import { CommentItem, Comment } from '@lostfound/shared';
 
+/**
+ * 格式化日期字符串YYYY/MM/DD -> YYYY-MM-DD 格式
+ * @param dateStr 日期字符串
+ * @returns 格式化后的日期字符串
+ */
 export const formatDateForInput = (dateStr: string | undefined) => {
   if (!dateStr) return '';
   // 如果已经是 YYYY-MM-DD，直接返回；否则尝试转换
   if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
   const date = new Date(dateStr);
   if (isNaN(date.getTime())) return '';
-  return date.toISOString().split('T')[0];
+  return date.toLocaleDateString().replaceAll('/', '-');
 };
 
 /**

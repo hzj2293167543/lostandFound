@@ -18,14 +18,18 @@ export default memo(function LostFoundList({ counts }: { counts: LostFoundCounts
             <span className="text-gray-600">发布招领信息</span>
             <span className="font-semibold">{counts.foundCount}</span>
           </div>
-          <div className="flex justify-between items-center">
-            <span className="text-gray-600">已找到物品</span>
-            <span className="font-semibold">{counts.foundSuccessCount}</span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="text-gray-600">帮助他人找回</span>
-            <span className="font-semibold">{counts.lostSuccessCount}</span>
-          </div>
+          {counts.foundSuccessCount && (
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600">已找到物品</span>
+              <span className="font-semibold">{counts.foundSuccessCount}</span>
+            </div>
+          )}
+          {counts.lostSuccessCount && (
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600">帮助他人找回</span>
+              <span className="font-semibold">{counts.lostSuccessCount}</span>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

@@ -9,6 +9,8 @@ import {
 } from '@/components/ui/select';
 import { Category } from '@lostfound/shared';
 import { ALL_CATEGORY, FilterState, FOUND_FILTER_STATUS, SetFilterState } from '../../type';
+import { SearchInput } from '@/components/searchInput/searchInput';
+import { SEARCH_DEBOUNCE_DELAY } from '@/constants';
 
 export default function FoundFilter({
   categories,
@@ -26,12 +28,11 @@ export default function FoundFilter({
     <div className="bg-white rounded-lg shadow-md p-4 mb-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="search">搜索</Label>
-          <Input
-            id="search"
-            placeholder="搜索物品名称或描述"
+          <SearchInput
+            delay={SEARCH_DEBOUNCE_DELAY}
             value={searchTerm}
-            onChange={(e) => setFilterState('searchTerm', e.target.value)}
+            onSearch={(value) => setFilterState('searchTerm', value)}
+            placeholder="搜索物品名称或描述"
           />
         </div>
         <div className="space-y-2">

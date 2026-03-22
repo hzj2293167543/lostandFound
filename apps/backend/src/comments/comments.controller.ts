@@ -41,8 +41,14 @@ export class CommentsController {
   }
 
   @Get('user/:userId')
-  findByUser(@Param('userId', new ParseIntPipe()) userId: number) {
-    return this.commentsService.findByUser(userId);
+  findByUser(
+    @Param('userId', new ParseIntPipe()) userId: number,
+    @Query('page', new ParseIntPipe({ optional: true })) page?: number,
+    @Query('limit', new ParseIntPipe({ optional: true })) limit?: number
+  ) {
+    const validPage = (page ?? 1) > 0 ? page : 1;
+    const validLimit = (limit ?? 10) > 0 ? limit : 10;
+    return this.commentsService.findByUser(userId, validPage, validLimit);
   }
 
   @Post()

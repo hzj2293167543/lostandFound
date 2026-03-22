@@ -7,4 +7,5 @@ export const foundKeys = {
   listTop3: () => [...foundKeys.lists(), 'top3'] as const,
   infinite: (filters?: Record<string, unknown>) =>
     [...foundKeys.lists(), 'infinite', filters] as const,
+  userFoundList: (userId: number) => [...foundKeys.all, 'user', userId] as const,
 };

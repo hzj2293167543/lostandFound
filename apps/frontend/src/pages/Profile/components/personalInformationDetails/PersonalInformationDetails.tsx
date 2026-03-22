@@ -1,5 +1,5 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Comment, FoundItem, LostItem, User } from '@lostfound/shared';
+import { User } from '@lostfound/shared';
 import { memo } from 'react';
 import PersonalInfoDetailComments from './PersonalInfoDetailComments';
 import PersonalInfoDetailFoundList from './PersonalInfoDetailFoundList';
@@ -8,15 +8,9 @@ import PersonalInfoDetailSettingList from './PersonalInfoDetailSettingList';
 
 export default memo(function PersonalInformationDetails({
   userRaw,
-  lostItems,
-  foundItems,
-  comments,
   isSelf,
 }: {
   userRaw: User;
-  lostItems: LostItem[];
-  foundItems: FoundItem[];
-  comments: Comment[];
   isSelf: boolean;
 }) {
   return (
@@ -28,13 +22,13 @@ export default memo(function PersonalInformationDetails({
         <TabsTrigger value="settings">账户设置</TabsTrigger>
       </TabsList>
       <TabsContent value="lost" className="mt-6 flex flex-col gap-4">
-        <PersonalInfoDetailLostList lostItems={lostItems} isSelf={isSelf} />
+        <PersonalInfoDetailLostList userId={userRaw.id} isSelf={isSelf} />
       </TabsContent>
       <TabsContent value="found" className="mt-6 flex flex-col gap-4">
-        <PersonalInfoDetailFoundList foundItems={foundItems} isSelf={isSelf} />
+        <PersonalInfoDetailFoundList userId={userRaw.id} isSelf={isSelf} />
       </TabsContent>
       <TabsContent value="comments" className="mt-6 flex flex-col gap-4">
-        <PersonalInfoDetailComments comments={comments} />
+        <PersonalInfoDetailComments userId={userRaw.id} />
       </TabsContent>
       <TabsContent value="settings" className="mt-6">
         <PersonalInfoDetailSettingList userRaw={userRaw} />

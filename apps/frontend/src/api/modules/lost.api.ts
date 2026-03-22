@@ -1,4 +1,5 @@
 import {
+  Count,
   GetLostItemsParams,
   LostCreateDto,
   LostDetail,
@@ -25,7 +26,12 @@ export const lostApi = {
   getLostItemDetailById: (id: number, config?: AxiosRequestConfig) =>
     get<LostDetail>(`/lost-items/${id}`, config),
 
-  getLostItemsByUserId: (userId: number) => get<LostItem[]>(`/lost-items/user/${userId}`),
+  getLostItemsByUserId: (userId: number, page?: number, limit?: number) =>
+    get<PageResponse<LostItem>>(`/lost-items/user/${userId}`, {
+      params: { page, limit },
+    }),
+
+  getLostItemsByUserIdCount: (userId: number) => get<Count>(`/lost-items/user/${userId}/count`),
 
   createLost: (data: LostCreateDto, config?: AxiosRequestConfig) =>
     post<LostCreateDto>('/lost-items', data, config),

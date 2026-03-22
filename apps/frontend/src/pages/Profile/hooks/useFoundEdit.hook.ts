@@ -8,7 +8,7 @@ import { FoundUpdateDto, FoundUpdateDtoSchema } from '@lostfound/shared';
 import { useMutation, useQueries } from '@tanstack/react-query';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { FieldErrors, useForm } from 'react-hook-form';
-import { useLoaderData, useRevalidator } from 'react-router';
+import { useLoaderData } from 'react-router';
 import { toast } from 'sonner';
 
 export function useFoundEdit(foundItemId: number) {
@@ -16,7 +16,6 @@ export function useFoundEdit(foundItemId: number) {
   const [imagePreview, setImagePreview] = useState<string>('');
   const [isUploading, setIsUploading] = useState(false);
   const { user } = useLoaderData();
-  const revalidator = useRevalidator();
   const form = useForm<FoundUpdateDto>({
     resolver: zodResolver(FoundUpdateDtoSchema),
     defaultValues: {
@@ -118,10 +117,9 @@ export function useFoundEdit(foundItemId: number) {
     onMutate: () => {
       setIsUploading(true);
     },
-    onSuccess: async () => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: foundKeys.detail(foundItemId) });
-      await queryClient.refetchQueries({ queryKey: foundKeys.list(user.id) });
-      revalidator.revalidate();
+      queryClient.invalidateQueries({ queryKey: foundKeys.userFoundList(user.id) });
       setOpen(false);
       toast.success('招领信息修改成功！');
     },

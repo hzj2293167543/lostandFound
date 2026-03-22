@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Comment } from './entities/comment.entity';
-import { CommentCreateDto, CommentItem } from '@lostfound/shared';
+import { CommentCreateDto, CommentItem, PageResponse } from '@lostfound/shared';
 import { mapCommentToVo } from './comments.mapper';
 import { CommentItemType, CommentItemTypeType } from '@/common/constants/constants';
 import { CommentLike } from './entities/comment_likes.entity';
@@ -109,12 +109,36 @@ export class CommentsService {
     });
   }
 
-  findByUser(userId: number): Promise<Comment[]> {
-    return this.commentsRepository.find({
+  async findByUser(
+    userId: number,
+    page: number = 1,
+    limit: number = 10
+  ): Promise<PageResponse<CommentItem>> {
+    const skip = (page - 1) * limit;
+    const [items, total] = await this.commentsRepository.findAndCount({
       where: { userId },
       relations: ['user'],
       order: { createdAt: 'DESC' },
+      skip,
+      take: limit,
     });
+
+    const likeCountSet = await this.getLikedCommentIds(
+      items.map((item) => item.id),
+      userId
+    );
+
+    const likeCountMap = await this.getCommentLikeCounts(items.map((item) => item.id));
+
+    return {
+      items: items.map((item) =>
+        mapCommentToVo(item, likeCountSet.has(item.id), likeCountMap.get(item.id) || 0)
+      ),
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
   create(data: CommentCreateDto & { userId: number }): Promise<Comment> {

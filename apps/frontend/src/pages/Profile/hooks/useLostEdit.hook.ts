@@ -106,10 +106,9 @@ export function useLostEdit(lostItemId: number) {
 
   const updateMutation = useMutation({
     mutationFn: (data: LostUpdateDto) => lostApi.updateLostItem(data),
-    onSuccess: async () => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: lostKeys.detail(lostItemId) });
-      await queryClient.refetchQueries({ queryKey: lostKeys.list(user.id) });
-      revalidator.revalidate();
+      queryClient.invalidateQueries({ queryKey: lostKeys.userLostList(user.id) });
       setOpen(false);
       toast.success('失物信息修改成功！');
     },

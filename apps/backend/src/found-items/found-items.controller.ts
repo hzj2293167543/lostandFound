@@ -61,13 +61,24 @@ export class FoundItemsController {
   }
 
   @Get('user/:userId')
-  findByUser(@Param('userId') userId: string) {
-    return this.foundItemsService.findByUser(+userId);
+  findByUser(
+    @Param('userId') userId: string,
+    @Query('page', new ParseIntPipe({ optional: true })) page?: number,
+    @Query('limit', new ParseIntPipe({ optional: true })) limit?: number
+  ) {
+    const validPage = (page ?? 1) > 0 ? page : 1;
+    const validLimit = (limit ?? 10) > 0 ? limit : 10;
+    return this.foundItemsService.findByUser(+userId, validPage, validLimit);
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.foundItemsService.findOne(+id);
+  }
+
+  @Get('user/:userId/count')
+  findUserCount(@Param('userId') userId: string) {
+    return this.foundItemsService.findUserCount(Number(userId));
   }
 
   @Post()

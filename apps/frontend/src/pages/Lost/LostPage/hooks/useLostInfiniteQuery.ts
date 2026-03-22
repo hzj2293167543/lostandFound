@@ -1,22 +1,14 @@
 import { lostApi } from '@/api';
 import { lostKeys } from '@/queryKeys';
-import { DEFAULT_WIDTH, LG, LOAD_MORE_THRESHOLD, MD } from '@/types/type';
+import { LG, LOAD_MORE_THRESHOLD, MD } from '@/constants/layout';
 import { debounce, GetLostItemsParams, LostItem, PageResponse } from '@lostfound/shared';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 export function useLostInfiniteQuery(filters?: GetLostItemsParams) {
   const containerRef = useRef<HTMLDivElement>(null);
-  // 容器宽度改为 state，以便响应窗口 resize 时重新渲染
   const [containerWidth, setContainerWidth] = useState<number | null>(null);
-  console.log(
-    'containerRef.current.clientWidth',
-    containerRef?.current?.clientWidth,
-    containerRef?.current?.offsetWidth,
-    containerRef?.current?.scrollWidth
-  );
 
-  // 监听容器宽度变化
   useLayoutEffect(() => {
     if (containerRef.current) {
       setContainerWidth(containerRef.current.clientWidth);
@@ -32,7 +24,6 @@ export function useLostInfiniteQuery(filters?: GetLostItemsParams) {
     return () => window.removeEventListener('resize', updateWidth);
   }, []);
 
-  // 根据容器宽度动态计算列数（响应式布局）
   const columnCount = useMemo(() => {
     if (containerWidth === null) return;
     const width = containerWidth;
@@ -46,27 +37,25 @@ export function useLostInfiniteQuery(filters?: GetLostItemsParams) {
     return containerWidth / columnCount;
   }, [containerWidth, columnCount]);
 
-  // 无限滚动查询
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } = useInfiniteQuery<
-    PageResponse<LostItem>
-  >({
-    queryKey: lostKeys.infinite(filters as Record<string, unknown>),
-    queryFn: ({ pageParam = 1 }) => lostApi.getLostItems({ page: pageParam as number, ...filters }),
-    getNextPageParam: (lastPage) => {
-      if (lastPage.page < lastPage.totalPages) {
-        return lastPage.page + 1;
-      }
-      return null;
-    },
-    initialPageParam: 1,
-  });
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetching, status } =
+    useInfiniteQuery<PageResponse<LostItem>>({
+      queryKey: lostKeys.infinite(filters as Record<string, unknown>),
+      queryFn: ({ pageParam = 1 }) =>
+        lostApi.getLostItems({ page: pageParam as number, ...filters }),
+      getNextPageParam: (lastPage) => {
+        if (lastPage.page < lastPage.totalPages) {
+          return lastPage.page + 1;
+        }
+        return null;
+      },
+      initialPageParam: 1,
+      placeholderData: (previousData) => previousData,
+    });
 
-  // 所有已加载的数据（平铺）
   const allItems = useMemo(() => {
     return data?.pages.flatMap((page) => page.items) ?? [];
   }, [data]);
 
-  // 总行数：实际数据行数 + 可能存在的加载更多提示行
   const rowCount = useMemo(() => {
     if (!columnCount) return null;
     const dataRows = Math.ceil(allItems.length / columnCount);
@@ -74,7 +63,6 @@ export function useLostInfiniteQuery(filters?: GetLostItemsParams) {
     return dataRows + loaderRow;
   }, [allItems.length, columnCount, hasNextPage, isFetchingNextPage]);
 
-  // 滚动事件处理，判断是否需要加载更多
   const handleScroll = useCallback(
     (event: React.UIEvent<HTMLDivElement>) => {
       const { scrollTop, scrollHeight, clientHeight } = event.currentTarget;
@@ -86,7 +74,6 @@ export function useLostInfiniteQuery(filters?: GetLostItemsParams) {
     [fetchNextPage, hasNextPage, isFetchingNextPage]
   );
 
-  // 传递给 Grid 的额外数据，方便 Cell 使用
   const itemData = useMemo(
     () => ({
       items: allItems,
@@ -107,5 +94,6 @@ export function useLostInfiniteQuery(filters?: GetLostItemsParams) {
     itemData,
     rowCount,
     status,
+    isFetching,
   };
 }

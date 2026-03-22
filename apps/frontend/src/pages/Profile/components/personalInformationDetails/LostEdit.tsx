@@ -27,6 +27,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { useLostEdit } from '../../hooks/useLostEdit.hook';
 import { LOST_STATUS, LOST_STATUS_NAME } from '../../types';
+import { isEmpty } from '@lostfound/shared';
 
 export default function LostEdit({ lostItemId }: { lostItemId: number }) {
   const {
@@ -78,7 +79,7 @@ export default function LostEdit({ lostItemId }: { lostItemId: number }) {
                   <Select
                     key={categories.length}
                     value={String(field.value)}
-                    onValueChange={(value) => field.onChange(Number(value))}>
+                    onValueChange={(value) => !isEmpty(value) && field.onChange(Number(value))}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="选择分类" />

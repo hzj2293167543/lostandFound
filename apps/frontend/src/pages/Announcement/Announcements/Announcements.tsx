@@ -8,12 +8,14 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { CellRowProps, CellRowPropsExplicit, DEFAULT_HEIGHT, DEFAULT_WIDTH } from '@/types/type';
+import { CellRowProps, CellRowPropsExplicit } from '@/types/type';
 import { Announcement, GetAnnouncementsParams } from '@lostfound/shared';
 import { type ChangeEvent, useState } from 'react';
 import { Link } from 'react-router';
 import { List } from 'react-window';
 import { useAnnouncementInfinite } from '../hooks/useAnnouncementInfinite.hook';
+import { SearchInput } from '@/components/searchInput/searchInput';
+import { SEARCH_DEBOUNCE_DELAY } from '@/constants';
 
 const ITEM_HEIGHT = 220;
 
@@ -63,15 +65,8 @@ function Row(props: CellRowProps<Announcement>) {
     </div>
   );
 }
-type Status = 'pending' | 'error' | 'empty' | 'success';
-function AnnouncementError({ status }: { status: Status }) {
-  if (status === 'pending') {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <p className="text-gray-500">加载中...</p>
-      </div>
-    );
-  }
+
+function AnnouncementError({ status }: { status: 'error' | 'empty' }) {
   if (status === 'error') {
     return (
       <div className="flex justify-center items-center h-64">
@@ -79,14 +74,11 @@ function AnnouncementError({ status }: { status: Status }) {
       </div>
     );
   }
-  if (status === 'empty') {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <p className="text-gray-600 text-lg">没有找到匹配的公告</p>
-      </div>
-    );
-  }
-  return null;
+  return (
+    <div className="flex justify-center items-center h-64">
+      <p className="text-gray-600 text-lg">没有找到匹配的公告</p>
+    </div>
+  );
 }
 
 export default function Announcements() {
@@ -96,12 +88,8 @@ export default function Announcements() {
     search: searchTerm || undefined,
   };
 
-  const { itemData, handleScroll, status, rowCount, containerWidth, containerRef, allItems } =
+  const { itemData, handleScroll, status, rowCount, containerRef, allItems, isFetching } =
     useAnnouncementInfinite(filters);
-
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-  };
 
   return (
     <div className="container mx-auto px-4 py-8 h-[calc(100vh-64px)] flex flex-col">
@@ -111,37 +99,31 @@ export default function Announcements() {
 
       <div className="bg-white rounded-lg shadow-md p-4 mb-6">
         <div className="space-y-2">
-          <Label htmlFor="search">搜索公告</Label>
-          <Input
-            id="search"
+          <SearchInput
             placeholder="搜索公告标题或内容"
-            value={searchTerm}
-            onChange={handleChange}
+            onSearch={(value) => setSearchTerm(value)}
+            delay={SEARCH_DEBOUNCE_DELAY}
           />
         </div>
       </div>
 
-      <div ref={containerRef} className="flex-1  h-[calc(100vh-64px)]">
-        {containerWidth === null ? (
-          <div className="flex justify-center items-center h-64">
-            <p className="text-gray-500">加载中...</p>
+      <div ref={containerRef} className="flex-1 h-[calc(100vh-64px)] relative">
+        {status === 'error' && <AnnouncementError status="error" />}
+        {status === 'success' && allItems.length === 0 && <AnnouncementError status="empty" />}
+        {status === 'success' && (
+          <List
+            style={{ scrollbarWidth: 'none' }}
+            rowCount={rowCount!}
+            rowHeight={ITEM_HEIGHT}
+            onScroll={handleScroll}
+            rowProps={{ data: itemData }}
+            rowComponent={Row}
+          />
+        )}
+        {isFetching && status !== 'success' && (
+          <div className="absolute top-0 left-0 right-0 bg-blue-50 text-blue-600 text-center py-1 text-sm">
+            加载中...
           </div>
-        ) : (
-          <>
-            {status === 'pending' && <AnnouncementError status="pending" />}
-            {status === 'error' && <AnnouncementError status="error" />}
-            {status === 'success' && allItems.length === 0 && <AnnouncementError status="empty" />}
-            {status === 'success' && allItems.length > 0 && (
-              <List
-                style={{ scrollbarWidth: 'none' }}
-                rowCount={rowCount!}
-                rowHeight={ITEM_HEIGHT}
-                onScroll={handleScroll}
-                rowProps={{ data: itemData }}
-                rowComponent={Row}
-              />
-            )}
-          </>
         )}
       </div>
     </div>

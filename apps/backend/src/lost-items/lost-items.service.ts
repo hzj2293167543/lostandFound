@@ -1,7 +1,10 @@
 import { CommentsService } from '@/comments/comments.service';
+import { CommentItemType } from '@/common/constants/constants';
 import { UploadService } from '@/common/upload/upload.service';
 import {
+  Count,
   LostCreateDto,
+  LostItemStatus,
   LostItem as LostItemVo,
   LostUpdateDto,
   PageResponse,
@@ -12,8 +15,6 @@ import { Category } from 'src/categories/entities/category.entity';
 import { Repository } from 'typeorm';
 import { LostItem } from './entities/lost-item.entity';
 import { mapLostItemToVo } from './lost-items.mapper';
-import { CommentItemType } from '@/common/constants/constants';
-
 export interface FindAllParams {
   page: number;
   limit: number;
@@ -156,11 +157,42 @@ export class LostItemsService {
     await this.lostItemsRepository.delete(id);
   }
 
-  async findByUser(userId: number): Promise<LostItem[]> {
-    return this.lostItemsRepository.find({
+  async findByUser(
+    userId: number,
+    page: number = 1,
+    limit: number = 10
+  ): Promise<PageResponse<LostItemVo>> {
+    const skip = (page - 1) * limit;
+    const [items, total] = await this.lostItemsRepository.findAndCount({
       where: { user: { id: userId } },
-      relations: ['category'],
+      relations: ['category', 'user'],
       order: { createdAt: 'DESC' },
+      skip,
+      take: limit,
     });
+
+    return {
+      items: items.map(mapLostItemToVo),
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
+  }
+
+  async findUserCount(userId: number): Promise<Count> {
+    console.log(LostItemStatus.已找到);
+
+    const result = await this.lostItemsRepository
+      .createQueryBuilder('item')
+      .select('COUNT(*)', 'total')
+      .addSelect(`SUM(CASE WHEN item.status = :status THEN 1 ELSE 0 END)`, 'successCount')
+      .setParameter('status', LostItemStatus.已找到)
+      .where('item.userId = :userId', { userId })
+      .getRawOne();
+    return {
+      totalCount: parseInt(result.total, 10),
+      successCount: parseInt(result.successCount, 10),
+    };
   }
 }

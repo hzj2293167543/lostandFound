@@ -1,14 +1,16 @@
-import { Input } from '@/components/ui/input';
+import { SearchInput } from '@/components/searchInput/searchInput';
 import { Label } from '@/components/ui/label';
 import {
-  SelectTrigger,
-  SelectValue,
+  Select,
   SelectContent,
   SelectItem,
-  Select,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select';
-import { Category } from '@lostfound/shared';
+import { Category, debounce } from '@lostfound/shared';
+import { useMemo, useTransition } from 'react';
 import { ALL_CATEGORY, FilterState, LOST_FILTER_STATUS, SetFilterState } from '../../type';
+import { SEARCH_DEBOUNCE_DELAY } from '@/constants';
 
 export default function LostFilter({
   categories,
@@ -19,21 +21,21 @@ export default function LostFilter({
   filterState: FilterState;
   setFilterState: SetFilterState;
 }) {
-  const { status, searchTerm, category } = filterState;
+  const { status, category, searchTerm } = filterState;
   const categoryOptions = [
     { value: ALL_CATEGORY, label: '全部分类' },
     ...categories.map((cat) => ({ value: cat.id, label: cat.name })),
   ];
+
   return (
     <div className="bg-white rounded-lg shadow-md p-4 mb-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="search">搜索</Label>
-          <Input
-            id="search"
+          <SearchInput
             placeholder="搜索物品名称或描述"
+            onSearch={(value) => setFilterState('searchTerm', value)}
+            delay={SEARCH_DEBOUNCE_DELAY}
             value={searchTerm}
-            onChange={(e) => setFilterState('searchTerm', e.target.value)}
           />
         </div>
         <div className="space-y-2">

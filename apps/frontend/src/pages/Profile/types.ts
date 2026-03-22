@@ -4,8 +4,8 @@ import { UserEditPasswordDtoSchema } from '@lostfound/shared';
 export interface LostFoundCounts {
   lostCount: number;
   foundCount: number;
-  foundSuccessCount: number;
-  lostSuccessCount: number;
+  foundSuccessCount: number | undefined;
+  lostSuccessCount: number | undefined;
 }
 
 export interface LostEditFormData {

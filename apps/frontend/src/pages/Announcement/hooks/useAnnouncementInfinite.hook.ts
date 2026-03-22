@@ -1,46 +1,31 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
 import { announcementApi } from '@/api';
 import { announcementKeys } from '@/queryKeys';
-import { debounce, Announcement, PageResponse, GetAnnouncementsParams } from '@lostfound/shared';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Announcement, GetAnnouncementsParams, PageResponse } from '@lostfound/shared';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { useCallback, useMemo, useRef } from 'react';
 
+const PAGE_NUM = 6;
 export function useAnnouncementInfinite(filters?: GetAnnouncementsParams) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [containerWidth, setContainerWidth] = useState<number | null>(null);
-  const [containerHeight, setContainerHeight] = useState<number | null>(null);
 
-  useEffect(() => {
-    const updateSize = debounce(() => {
-      if (containerRef.current) {
-        setContainerWidth(containerRef.current.offsetWidth);
-        setContainerHeight(containerRef.current.offsetHeight);
-      }
-    }, 200);
-    updateSize();
-    window.addEventListener('resize', updateSize);
-    return () => {
-      window.removeEventListener('resize', updateSize);
-    };
-  }, []);
-
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } = useInfiniteQuery<
-    PageResponse<Announcement>
-  >({
-    queryKey: announcementKeys.infinite(filters as Record<string, unknown>),
-    queryFn: ({ pageParam = 1 }) =>
-      announcementApi.getAnnouncements({
-        page: pageParam as number,
-        limit: 6,
-        ...filters,
-      }),
-    getNextPageParam: (lastPage) => {
-      if (lastPage.page < lastPage.totalPages) {
-        return lastPage.page + 1;
-      }
-      return null;
-    },
-    initialPageParam: 1,
-  });
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetching, status } =
+    useInfiniteQuery<PageResponse<Announcement>>({
+      queryKey: announcementKeys.infinite(filters as Record<string, unknown>),
+      queryFn: ({ pageParam = 1 }) =>
+        announcementApi.getAnnouncements({
+          page: pageParam as number,
+          limit: PAGE_NUM,
+          ...filters,
+        }),
+      getNextPageParam: (lastPage) => {
+        if (lastPage.page < lastPage.totalPages) {
+          return lastPage.page + 1;
+        }
+        return null;
+      },
+      initialPageParam: 1,
+      placeholderData: (previousData) => previousData,
+    });
 
   const allItems = useMemo(() => {
     return data?.pages.flatMap((page) => page.items) || [];
@@ -54,16 +39,13 @@ export function useAnnouncementInfinite(filters?: GetAnnouncementsParams) {
 
   const handleScroll = useCallback(
     (event: React.UIEvent<HTMLDivElement>) => {
-      if (containerHeight === null) return;
-      const { scrollTop } = event.target as HTMLDivElement;
-      const scrollHeight = allItems.length * 220;
-      const clientHeight = containerHeight;
+      const { scrollTop, clientHeight, scrollHeight } = event.target as HTMLDivElement;
       const bottom = scrollHeight - scrollTop - clientHeight;
       if (bottom < 300 && hasNextPage && !isFetchingNextPage) {
         fetchNextPage();
       }
     },
-    [isFetchingNextPage, hasNextPage, fetchNextPage, containerHeight, allItems.length]
+    [isFetchingNextPage, hasNextPage, fetchNextPage]
   );
 
   const itemData = useMemo(
@@ -81,9 +63,8 @@ export function useAnnouncementInfinite(filters?: GetAnnouncementsParams) {
     handleScroll,
     status,
     rowCount,
-    containerHeight,
-    containerWidth,
     containerRef,
     allItems,
+    isFetching,
   };
 }

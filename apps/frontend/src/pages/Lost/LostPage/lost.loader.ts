@@ -1,6 +1,5 @@
-import { categoryApi, lostApi } from '@/api';
+import { categoryApi } from '@/api';
 import { queryClient } from '@/lib/queryClient';
-import { lostKeys } from '@/queryKeys';
 import { categoryKeys } from '@/queryKeys';
 
 export async function lostLoader() {

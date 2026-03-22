@@ -1,6 +1,6 @@
-import { commentApi, foundApi, lostApi, userApi } from '@/api';
+import { foundApi, lostApi, userApi } from '@/api';
 import { queryClient } from '@/lib/queryClient';
-import { commentKeys, foundKeys, lostKeys, userKeys } from '@/queryKeys';
+import { foundKeys, lostKeys, userKeys } from '@/queryKeys';
 import { useAuthStore } from '@/stores/AuthStore';
 
 export default async function profileLoader({ params }: { params: { id?: number } }) {
@@ -11,8 +11,7 @@ export default async function profileLoader({ params }: { params: { id?: number 
       throw new Response('User not found', { status: 404 });
     }
     // 并行确保所有数据都在缓存中
-    console.log(params.id && params.id !== user?.id);
-    const [userResult, lostItems, foundItems, comments] = await Promise.all([
+    const [userResult, lostItemsCount, foundItemsCount] = await Promise.all([
       params.id && Number(params.id) !== user?.id
         ? queryClient.ensureQueryData({
             queryKey: userKeys.detail(id),
@@ -21,22 +20,17 @@ export default async function profileLoader({ params }: { params: { id?: number 
         : Promise.resolve(user),
       queryClient.ensureQueryData({
         queryKey: lostKeys.list(id),
-        queryFn: () => lostApi.getLostItemsByUserId(id),
+        queryFn: () => lostApi.getLostItemsByUserIdCount(id),
       }),
       queryClient.ensureQueryData({
         queryKey: foundKeys.list(id),
-        queryFn: () => foundApi.getFoundItemsByUserId(id),
-      }),
-      queryClient.ensureQueryData({
-        queryKey: commentKeys.list(id),
-        queryFn: () => commentApi.getCommentsByUserId(id),
+        queryFn: () => foundApi.getFoundItemsByUserIdCount(id),
       }),
     ]);
     return {
       user: userResult,
-      lostItems: lostItems,
-      foundItems: foundItems,
-      comments: comments,
+      lostItemsCount,
+      foundItemsCount,
     };
   } catch (error) {
     console.error('Error loading lost items:', error);

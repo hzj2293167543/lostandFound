@@ -122,3 +122,19 @@
     @apply bg-background text-foreground;
   }
 }
+
+#nprogress {
+  pointer-events: none;
+  position: fixed;
+  z-index: 9999; /* 确保在头部之上 */
+}
+
+#nprogress .bar {
+  background: #29d; /* 颜色可自定义 */
+  position: fixed;
+  z-index: 9999;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+}

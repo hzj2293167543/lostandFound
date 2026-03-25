@@ -1,27 +1,29 @@
+import { commentApi } from '@/api';
 import { Button } from '@/components/ui/button';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import {
   Pagination,
   PaginationContent,
   PaginationItem,
-  PaginationPrevious,
   PaginationLink,
   PaginationNext,
+  PaginationPrevious,
 } from '@/components/ui/pagination';
-import { ThumbsUp, ChevronUp, ChevronDown } from 'lucide-react';
-import { RefObject, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react';
-import { Link, useActionData, useSubmit } from 'react-router';
-import { Comment } from '@lostfound/shared';
-import { useAuthStore } from '@/stores/AuthStore';
 import { Textarea } from '@/components/ui/textarea';
+import { useAuthStore } from '@/stores/AuthStore';
 import { ItemTypeMap } from '@/types/type';
-import { LOST_DETAIL_INTENT } from '../../type';
-import { commentApi } from '@/api';
-import { toast } from 'sonner';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { FieldErrors, useForm } from 'react-hook-form';
-import * as z from 'zod';
-import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { getErrorMsg } from '@/utils';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Comment } from '@lostfound/shared';
+import { ChevronDown, ChevronUp, ThumbsUp } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { FieldErrors, useForm } from 'react-hook-form';
+import { Link, useActionData, useSubmit } from 'react-router';
+import { toast } from 'sonner';
+import * as z from 'zod';
+import { LOST_DETAIL_INTENT } from '../../type';
+import { queryClient } from '@/lib/queryClient';
+import { commentKeys } from '@/queryKeys';
 
 const replySchema = z.object({
   content: z.string().min(1, '回复内容不能为空'),
@@ -63,6 +65,9 @@ export default function CommentItem({
 
     try {
       await commentApi.likeComment(comment.id, !isLiked);
+      queryClient.refetchQueries({
+        queryKey: commentKeys.list(itemId, { type: ItemTypeMap.LOST }),
+      });
     } catch {
       toast.error('点赞失败');
       setIsLiked(!isLiked);
@@ -80,7 +85,7 @@ export default function CommentItem({
           />
         </Link>
 
-        <div className="flex-1">
+        <div className="flex-1 w-10">
           <div className="flex justify-between items-start mb-1">
             <div className="flex items-center gap-2">
               <Link to={`/profile/${comment.user.id}`}>
@@ -98,7 +103,7 @@ export default function CommentItem({
               )}
             </div>
           </div>
-          <p className="text-gray-600">{comment.content}</p>
+          <p className="w-full break-words whitespace-pre-wrap text-gray-600">{comment.content}</p>
 
           <div className="flex justify-start items-center mt-2 gap-x-2">
             <span className="text-xs text-gray-500">{comment.time}</span>
@@ -111,7 +116,7 @@ export default function CommentItem({
             </Button>
             <Button
               size="sm"
-              className="px-0 bg-transparent text-gray-700 hover:text-blue-300 hover:bg-transparent cursor-pointer"
+              className=" px-0 bg-transparent text-gray-700 hover:text-blue-300 hover:bg-transparent cursor-pointer"
               onClick={handleReplyClick}>
               回复
             </Button>

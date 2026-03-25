@@ -22,6 +22,8 @@ import { Link, useActionData, useSubmit } from 'react-router';
 import { toast } from 'sonner';
 import z from 'zod';
 import { FOUND_DETAIL_INTENT } from '../../type';
+import { queryClient } from '@/lib/queryClient';
+import { commentKeys } from '@/queryKeys';
 const replySchema = z.object({
   content: z.string().min(1, '回复内容不能为空'),
 });
@@ -56,6 +58,9 @@ export function CommentItem({
 
     try {
       await commentApi.likeComment(comment.id, !isLiked);
+      queryClient.refetchQueries({
+        queryKey: commentKeys.list(itemId, { type: ItemTypeMap.FOUND }),
+      });
     } catch {
       toast.error('点赞失败');
       setIsLiked(!isLiked);
@@ -74,7 +79,7 @@ export function CommentItem({
           />
         </Link>
 
-        <div className="flex-1">
+        <div className="flex-1 w-10">
           <div className="flex justify-between items-start mb-1">
             <div className="flex items-center gap-2">
               <Link to={`/profile/${comment.user.id}`}>
@@ -92,7 +97,7 @@ export function CommentItem({
               )}
             </div>
           </div>
-          <p className="text-gray-600">{comment.content}</p>
+          <p className="w-full break-words whitespace-pre-wrap text-gray-600">{comment.content}</p>
 
           <div className="flex justify-start items-center mt-2 gap-x-2">
             <span className="text-xs text-gray-500">{comment.time}</span>

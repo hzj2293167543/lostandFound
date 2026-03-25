@@ -71,7 +71,8 @@ client.interceptors.response.use(
       const message = data?.message || error.message || '请求失败';
 
       if (status === 401) {
-        localStorage.removeItem('token');
+        useAuthStore.getState().logout();
+        // 这里可以添加全局提示
         // 避免重复跳转
         if (window.location.pathname !== '/login') {
           window.location.href = '/login';

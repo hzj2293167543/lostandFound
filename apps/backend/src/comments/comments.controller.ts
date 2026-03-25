@@ -17,16 +17,17 @@ import { AuthGuard } from '@nestjs/passport';
 import { CommentsService } from './comments.service';
 
 @Controller('comments')
-@UseGuards(AuthGuard('jwt'))
 export class CommentsController {
   constructor(private commentsService: CommentsService) {}
 
   @Get()
+  @UseGuards(AuthGuard('jwt'))
   findByItem(
     @Query('itemId', new ParseIntPipe()) itemId: number,
     @Query('itemType', new ParseIntPipe()) itemType: number,
     @CurrentUser() user: User
   ): Promise<CommentItem[]> {
+    console.log(itemId, itemType, user.id, user);
     return this.commentsService.findByItem(itemId, itemType, user.id);
   }
 
@@ -36,6 +37,7 @@ export class CommentsController {
   }
 
   @Get(':id/liked')
+  @UseGuards(AuthGuard('jwt'))
   isLiked(@Param('id', new ParseIntPipe()) id: number, @CurrentUser() user: User) {
     return this.commentsService.findLiked(id, user.id);
   }
@@ -52,6 +54,7 @@ export class CommentsController {
   }
 
   @Post()
+  @UseGuards(AuthGuard('jwt'))
   create(@Body() data: CommentCreateDto, @CurrentUser() user: User) {
     console.log(data);
     const result = commentCreateDtoSchema.safeParse(data);
@@ -65,6 +68,7 @@ export class CommentsController {
   }
 
   @Post(':id/like')
+  @UseGuards(AuthGuard('jwt'))
   likeComment(
     @Param('id', new ParseIntPipe()) id: number,
     @CurrentUser() user: User,

@@ -14,7 +14,8 @@ import { ThumbsUp } from 'lucide-react';
 import { memo, useState } from 'react';
 import { List } from 'react-window';
 import { useUserCommentInfinite } from '../../hooks/useUserCommentInfinite';
-const ITEM_HEIGHT = 120;
+
+const ITEM_HEIGHT = 200;
 
 function CommentRow(props: CellRowCommentProps<CommentItem>) {
   const {
@@ -55,7 +56,8 @@ function CommentRow(props: CellRowCommentProps<CommentItem>) {
               </span>
             )}
           </CardTitle>
-          <CardDescription className={isExpanded ? '' : 'line-clamp-3'}>
+          <CardDescription
+            className={`break-words whitespace-pre-wrap ${isExpanded ? `overflow-auto h-[100px]` : 'line-clamp-3'}`}>
             {comment.content}
           </CardDescription>
         </CardHeader>
@@ -114,13 +116,22 @@ export default memo(function PersonalInfoDetailComments({ userId }: { userId: nu
     );
   }
 
+  const getRowHeight = (index: number) => {
+    const comment = itemData.items[index];
+    if (!comment) return 200; // 默认高度
+    let height = 120; // 基础高度
+    if (comment.content.length > 100) height += 90; // 内容较多时增加
+    if (expandedComments[comment.id]) height += 80; // 展开状态增加
+    return height;
+  };
+
   return (
     <>
       <h2 className="text-2xl font-bold">我的评论</h2>
       <div ref={parentRef} className="h-[650px] relative ">
         <List
           style={{ scrollbarWidth: 'none' }}
-          rowHeight={ITEM_HEIGHT}
+          rowHeight={getRowHeight}
           rowCount={rowCount}
           onScroll={handleScroll}
           rowProps={{ data: commentItemData }}

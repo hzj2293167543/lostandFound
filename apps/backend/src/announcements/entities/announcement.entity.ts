@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 
@@ -23,7 +24,11 @@ export class Announcement {
   time: Date;
 
   @ManyToOne(() => User)
+  @JoinColumn({ name: 'author_id' })
   author: User;
+
+  @Column({ name: 'author_id' })
+  authorId: number;
 
   @CreateDateColumn()
   createdAt: Date;

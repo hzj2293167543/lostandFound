@@ -1,45 +1,33 @@
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { lostApi, foundApi, userApi } from '@/api';
-import { LostItem, FoundItem } from '@lostfound/shared';
+import { adminApi } from '@/api';
+import { adminKeys } from '@/keys/admin';
+import { Loader2 } from 'lucide-react';
 
 export default function AdminDashboard() {
-  const [stats, setStats] = useState({
-    lostCount: 0,
-    foundCount: 0,
-    userCount: 0,
+  const { data: stats, isLoading: statsLoading } = useQuery({
+    queryKey: adminKeys.stats(),
+    queryFn: () => adminApi.getStats(),
   });
-  const [recentLost, setRecentLost] = useState<LostItem[]>([]);
-  const [recentFound, setRecentFound] = useState<FoundItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [lostItems, foundItems] = await Promise.all([
-          lostApi.getLostItems(),
-          foundApi.getFoundItems(),
-        ]);
+  const { data: recentLost = [], isLoading: lostLoading } = useQuery({
+    queryKey: adminKeys.recentLost(),
+    queryFn: () => adminApi.getRecentLostItems(),
+  });
 
-        setStats({
-          lostCount: lostItems.length,
-          foundCount: foundItems.length,
-          userCount: 0, // 需要添加用户计数 API
-        });
-        setRecentLost(lostItems.slice(0, 5));
-        setRecentFound(foundItems.slice(0, 5));
-      } catch (error) {
-        console.error('获取数据失败:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const { data: recentFound = [], isLoading: foundLoading } = useQuery({
+    queryKey: adminKeys.recentFound(),
+    queryFn: () => adminApi.getRecentFoundItems(),
+  });
 
-    fetchData();
-  }, []);
+  const isLoading = statsLoading || lostLoading || foundLoading;
 
   if (isLoading) {
-    return <div>加载中...</div>;
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      </div>
+    );
   }
 
   return (
@@ -52,7 +40,7 @@ export default function AdminDashboard() {
             <CardTitle className="text-sm font-medium text-gray-500">失物总数</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{stats.lostCount}</div>
+            <div className="text-3xl font-bold">{stats?.lostCount || 0}</div>
           </CardContent>
         </Card>
         <Card>
@@ -60,7 +48,7 @@ export default function AdminDashboard() {
             <CardTitle className="text-sm font-medium text-gray-500">招领总数</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{stats.foundCount}</div>
+            <div className="text-3xl font-bold">{stats?.foundCount || 0}</div>
           </CardContent>
         </Card>
         <Card>
@@ -68,7 +56,7 @@ export default function AdminDashboard() {
             <CardTitle className="text-sm font-medium text-gray-500">用户总数</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{stats.userCount}</div>
+            <div className="text-3xl font-bold">{stats?.userCount || 0}</div>
           </CardContent>
         </Card>
       </div>
@@ -84,8 +72,8 @@ export default function AdminDashboard() {
                 <div
                   key={item.id}
                   className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                  <span className="font-medium">{item.title}</span>
-                  <span className="text-sm text-gray-500">{item.time}</span>
+                  <span className="font-medium truncate">{item.title}</span>
+                  <span className="text-sm text-gray-500 ml-2 shrink-0">{item.time}</span>
                 </div>
               ))}
               {recentLost.length === 0 && <p className="text-gray-500">暂无数据</p>}
@@ -102,8 +90,8 @@ export default function AdminDashboard() {
                 <div
                   key={item.id}
                   className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                  <span className="font-medium">{item.title}</span>
-                  <span className="text-sm text-gray-500">{item.time}</span>
+                  <span className="font-medium truncate">{item.title}</span>
+                  <span className="text-sm text-gray-500 ml-2 shrink-0">{item.time}</span>
                 </div>
               ))}
               {recentFound.length === 0 && <p className="text-gray-500">暂无数据</p>}

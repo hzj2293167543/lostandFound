@@ -12,6 +12,8 @@ export const userApi = {
 
   getUserById: (id: number) => get<User>(`/users/${id}`),
 
+  getAllUsers: () => get<User[]>('/users'),
+
   updateUser: (data: UserEditDto) => patch<User>('/users', data),
 
   updatePassword: (data: UserEditPasswordDto) => patch<void>('/users/password', data),

@@ -41,3 +41,12 @@ export const CountSchema = z.object({
 });
 
 export type Count = z.infer<typeof CountSchema>;
+
+export const AdminStatsSchema = z.object({
+  lostCount: z.number(),
+  foundCount: z.number(),
+  userCount: z.number(),
+  announcementCount: z.number(),
+});
+
+export type AdminStats = z.infer<typeof AdminStatsSchema>;

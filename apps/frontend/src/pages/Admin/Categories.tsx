@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,54 +11,74 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { categoryApi } from '@/api';
+import { adminApi } from '@/api';
+import { adminKeys } from '@/keys/admin';
 import { Category } from '@lostfound/shared';
 import { toast } from 'sonner';
+import { Loader2 } from 'lucide-react';
 
 export default function AdminCategories() {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [formData, setFormData] = useState({ name: '' });
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
+  const { data: categories = [], isLoading } = useQuery({
+    queryKey: adminKeys.categories(),
+    queryFn: () => adminApi.getAllCategories(),
+  });
 
-  const fetchCategories = async () => {
-    try {
-      const data = await categoryApi.getCategories();
-      setCategories(data);
-    } catch (error) {
-      console.error('获取分类列表失败:', error);
-    } finally {
-      setIsLoading(false);
-    }
+  const createMutation = useMutation({
+    mutationFn: (name: string) => adminApi.createCategory(name),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminKeys.categories() });
+      toast.success('分类创建成功！');
+      closeDialog();
+    },
+    onError: () => {
+      toast.error('创建失败');
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, name }: { id: number; name: string }) => adminApi.updateCategory(id, name),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminKeys.categories() });
+      toast.success('分类更新成功！');
+      closeDialog();
+    },
+    onError: () => {
+      toast.error('更新失败');
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => adminApi.deleteCategory(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminKeys.categories() });
+      toast.success('删除成功');
+    },
+    onError: () => {
+      toast.error('删除失败');
+    },
+  });
+
+  const closeDialog = () => {
+    setIsDialogOpen(false);
+    setEditingCategory(null);
+    setFormData({ name: '' });
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     if (!formData.name.trim()) {
       toast.error('请输入分类名称');
       return;
     }
-
-    try {
-      if (editingCategory) {
-        // 编辑分类
-        toast.success('分类更新成功！');
-      } else {
-        // 新增分类
-        toast.success('分类创建成功！');
-      }
-      setIsDialogOpen(false);
-      setEditingCategory(null);
-      setFormData({ name: '' });
-      fetchCategories();
-    } catch (error) {
-      toast.error('操作失败');
+    if (editingCategory) {
+      updateMutation.mutate({ id: editingCategory.id, name: formData.name });
+    } else {
+      createMutation.mutate(formData.name);
     }
   };
 
@@ -67,16 +88,9 @@ export default function AdminCategories() {
     setIsDialogOpen(true);
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = (id: number) => {
     if (!confirm('确定要删除这个分类吗？')) return;
-
-    try {
-      // await categoryApi.deleteCategory(id);
-      setCategories(categories.filter((c) => c.id !== id));
-      toast.success('删除成功');
-    } catch (error) {
-      toast.error('删除失败');
-    }
+    deleteMutation.mutate(id);
   };
 
   const handleAdd = () => {
@@ -85,8 +99,14 @@ export default function AdminCategories() {
     setIsDialogOpen(true);
   };
 
+  const isSubmitting = createMutation.isPending || updateMutation.isPending;
+
   if (isLoading) {
-    return <div>加载中...</div>;
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      </div>
+    );
   }
 
   return (
@@ -103,10 +123,18 @@ export default function AdminCategories() {
               <div className="flex justify-between items-center">
                 <CardTitle className="text-base">{category.name}</CardTitle>
                 <div className="space-x-2">
-                  <Button size="sm" variant="outline" onClick={() => handleEdit(category)}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleEdit(category)}
+                    disabled={updateMutation.isPending}>
                     编辑
                   </Button>
-                  <Button size="sm" variant="destructive" onClick={() => handleDelete(category.id)}>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => handleDelete(category.id)}
+                    disabled={deleteMutation.isPending}>
                     删除
                   </Button>
                 </div>
@@ -136,14 +164,17 @@ export default function AdminCategories() {
                   value={formData.name}
                   onChange={(e) => setFormData({ name: e.target.value })}
                   placeholder="请输入分类名称"
+                  disabled={isSubmitting}
                 />
               </div>
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+              <Button type="button" variant="outline" onClick={closeDialog} disabled={isSubmitting}>
                 取消
               </Button>
-              <Button type="submit">{editingCategory ? '保存' : '创建'}</Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? '保存中...' : editingCategory ? '保存' : '创建'}
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>

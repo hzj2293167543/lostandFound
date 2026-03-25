@@ -4,3 +4,4 @@ export * from './found.schema';
 export * from './uploadType.schema';
 export * from './comment.schema';
 export * from './user.schema';
+export * from './announcement.schema';

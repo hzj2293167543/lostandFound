@@ -14,6 +14,7 @@ import * as fs from 'fs';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UploadModule } from './common/upload/upload.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { AdminModule } from './admin/admin.module';
 
 const env = process.env.NODE_ENV || 'development'; // 默认开发环境
 const filePath = join(__dirname, '..', 'config', `.env.${env}.yaml`);
@@ -66,6 +67,7 @@ const filePath = join(__dirname, '..', 'config', `.env.${env}.yaml`);
     FoundItemsModule,
     AnnouncementsModule,
     CommentsModule,
+    AdminModule,
   ],
 })
 export class AppModule {}

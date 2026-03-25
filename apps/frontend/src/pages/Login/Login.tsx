@@ -7,10 +7,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useAuthStore } from '@/stores/AuthStore';
 import { toast } from 'sonner';
 import { LoginDto, LoginDtoSchema } from '@lostfound/shared';
+import { ROLE } from '@/stores/type';
 
 export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const login = useAuthStore.use.login();
+  const role = useAuthStore.use.user()?.role;
   const navigate = useNavigate();
 
   // 登录表单数据
@@ -35,7 +37,11 @@ export default function Login() {
     try {
       await login(formData);
       toast.success('登录成功');
-      navigate('/');
+      if (role === ROLE.管理员) {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
     } catch (error) {
       const message = error instanceof Error ? error.message : '登录失败，请检查邮箱和密码';
       toast.error(message);

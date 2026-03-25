@@ -65,11 +65,11 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 function AdminRoute({ children }: { children: React.ReactNode }) {
   const isAdmin = useIsAdmin();
-  const isLoading = useAuthStore.use.isLoading();
+  // const isLoading = useAuthStore.use.isLoading();
 
-  if (isLoading) {
-    return <Loading />;
-  }
+  // if (isLoading) {
+  //   return <Loading />;
+  // }
 
   if (!isAdmin) {
     return <Navigate to="/" replace />;

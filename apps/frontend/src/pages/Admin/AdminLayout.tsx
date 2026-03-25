@@ -1,11 +1,19 @@
-import { useState } from 'react';
-import { Link, Outlet, useNavigate } from 'react-router-dom';
-import { memo } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAuthStore, useIsAdmin } from '@/stores/AuthStore';
+import { FileText, LayoutDashboard, LogOut, Package, Users } from 'lucide-react';
+import { memo } from 'react';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { LayoutDashboard, Users, Package, FileText, LogOut } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
+
+const menuItems = [
+  { id: 'dashboard', label: '控制台', icon: LayoutDashboard, path: '/admin' },
+  { id: 'users', label: '用户管理', icon: Users, path: '/admin/users' },
+  { id: 'categories', label: '分类管理', icon: FileText, path: '/admin/categories' },
+  { id: 'lost', label: '失物管理', icon: Package, path: '/admin/lost' },
+  { id: 'found', label: '招领管理', icon: Package, path: '/admin/found' },
+  { id: 'announcements', label: '公告管理', icon: FileText, path: '/admin/announcements' },
+];
 
 export default memo(function AdminLayout() {
   const { user, logout } = useAuthStore(
@@ -15,9 +23,10 @@ export default memo(function AdminLayout() {
     }))
   );
   const isAdmin = useIsAdmin();
-
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const location = useLocation();
+
+  const activeTab = menuItems.find((item) => location.pathname === item.path)?.id || 'dashboard';
 
   if (!isAdmin) {
     return (
@@ -36,15 +45,6 @@ export default memo(function AdminLayout() {
     toast.success('已退出登录');
     navigate('/');
   };
-
-  const menuItems = [
-    { id: 'dashboard', label: '控制台', icon: LayoutDashboard, path: '/admin' },
-    { id: 'users', label: '用户管理', icon: Users, path: '/admin/users' },
-    { id: 'categories', label: '分类管理', icon: FileText, path: '/admin/categories' },
-    { id: 'lost', label: '失物管理', icon: Package, path: '/admin/lost' },
-    { id: 'found', label: '招领管理', icon: Package, path: '/admin/found' },
-    { id: 'announcements', label: '公告管理', icon: FileText, path: '/admin/announcements' },
-  ];
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -81,8 +81,7 @@ export default memo(function AdminLayout() {
                     activeTab === item.id
                       ? 'bg-blue-100 text-blue-600'
                       : 'text-gray-600 hover:bg-gray-50'
-                  }`}
-                  onClick={() => setActiveTab(item.id)}>
+                  }`}>
                   <item.icon className="w-5 h-5" />
                   <span>{item.label}</span>
                 </Link>

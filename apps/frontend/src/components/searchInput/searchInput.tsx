@@ -11,6 +11,7 @@ interface SearchInputProps {
   delay?: number;
   showPending?: boolean;
   value?: string;
+  className?: string;
 }
 
 /**
@@ -30,6 +31,7 @@ export function SearchInput({
   placeholder = '搜索...',
   showPending = true,
   value: externalValue,
+  className,
 }: SearchInputProps) {
   const [localValue, setLocalValue] = useState(externalValue ?? '');
   const [isPending, startTransition] = useTransition();
@@ -82,6 +84,7 @@ export function SearchInput({
       <div className="relative">
         <Input
           id="search-input"
+          className={className}
           placeholder={placeholder}
           value={localValue}
           onChange={handleChange}

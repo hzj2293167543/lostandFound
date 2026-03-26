@@ -21,6 +21,8 @@ export default function AdminCategories() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [formData, setFormData] = useState({ name: '' });
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [deleteCategoryId, setDeleteCategoryId] = useState<number | null>(null);
   const queryClient = useQueryClient();
 
   const { data: categories = [], isLoading } = useQuery({
@@ -54,12 +56,18 @@ export default function AdminCategories() {
 
   const deleteMutation = useMutation({
     mutationFn: (id: number) => adminApi.deleteCategory(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: adminKeys.categories() });
-      toast.success('删除成功');
+    onSuccess: (result) => {
+      if (result.success) {
+        queryClient.invalidateQueries({ queryKey: adminKeys.categories() });
+        toast.success(result.message);
+      } else {
+        toast.error(result.message);
+      }
+      closeDeleteDialog();
     },
     onError: () => {
       toast.error('删除失败');
+      closeDeleteDialog();
     },
   });
 
@@ -67,6 +75,11 @@ export default function AdminCategories() {
     setIsDialogOpen(false);
     setEditingCategory(null);
     setFormData({ name: '' });
+  };
+
+  const closeDeleteDialog = () => {
+    setIsDeleteDialogOpen(false);
+    setDeleteCategoryId(null);
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -88,9 +101,14 @@ export default function AdminCategories() {
     setIsDialogOpen(true);
   };
 
-  const handleDelete = (id: number) => {
-    if (!confirm('确定要删除这个分类吗？')) return;
-    deleteMutation.mutate(id);
+  const handleDeleteClick = (category: Category) => {
+    setDeleteCategoryId(category.id);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleDelete = () => {
+    if (!deleteCategoryId) return;
+    deleteMutation.mutate(deleteCategoryId);
   };
 
   const handleAdd = () => {
@@ -121,7 +139,12 @@ export default function AdminCategories() {
           <Card key={category.id}>
             <CardHeader className="pb-2">
               <div className="flex justify-between items-center">
-                <CardTitle className="text-base">{category.name}</CardTitle>
+                <CardTitle className="text-base">
+                  {category.name}
+                  {category.defaultSince !== null && (
+                    <span className="ml-2 text-xs text-green-600">(默认)</span>
+                  )}
+                </CardTitle>
                 <div className="space-x-2">
                   <Button
                     size="sm"
@@ -130,13 +153,15 @@ export default function AdminCategories() {
                     disabled={updateMutation.isPending}>
                     编辑
                   </Button>
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    onClick={() => handleDelete(category.id)}
-                    disabled={deleteMutation.isPending}>
-                    删除
-                  </Button>
+                  {category.defaultSince === null && (
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => handleDeleteClick(category)}
+                      disabled={deleteMutation.isPending}>
+                      删除
+                    </Button>
+                  )}
                 </div>
               </div>
             </CardHeader>
@@ -177,6 +202,27 @@ export default function AdminCategories() {
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>删除分类</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-gray-600">
+              确定要删除这个分类吗？该分类下的物品将自动迁移到默认分类。
+            </p>
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={closeDeleteDialog}>
+              取消
+            </Button>
+            <Button type="button" onClick={handleDelete} disabled={deleteMutation.isPending}>
+              {deleteMutation.isPending ? '删除中...' : '确认删除'}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

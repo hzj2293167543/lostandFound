@@ -54,6 +54,28 @@ export default function AdminUsers() {
     },
   });
 
+  const softDeleteMutation = useMutation({
+    mutationFn: (id: number) => adminApi.softDeleteUser(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminKeys.users() });
+      toast.success('用户已删除');
+    },
+    onError: () => {
+      toast.error('删除失败');
+    },
+  });
+
+  const restoreMutation = useMutation({
+    mutationFn: (id: number) => adminApi.restoreUser(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminKeys.users() });
+      toast.success('用户已恢复');
+    },
+    onError: () => {
+      toast.error('恢复失败');
+    },
+  });
+
   const handleBanUser = (userId: number) => {
     banMutation.mutate(userId);
   };
@@ -82,6 +104,11 @@ export default function AdminUsers() {
     count: filteredUsers.length,
     getScrollElement: () => parentRef.current,
     estimateSize: () => ITEM_HEIGHT,
+    measureElement: (el) => {
+      const height = el.scrollHeight;
+      console.log('测量元素高度', height);
+      return height;
+    },
     overscan: 5,
   });
 
@@ -108,6 +135,20 @@ export default function AdminUsers() {
                   解封
                 </Button>
               )}
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => softDeleteMutation.mutate(user.id)}
+                disabled={softDeleteMutation.isPending}>
+                删除
+              </Button>
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={() => restoreMutation.mutate(user.id)}
+                disabled={restoreMutation.isPending}>
+                恢复
+              </Button>
             </div>
           </div>
         </CardHeader>
@@ -117,11 +158,19 @@ export default function AdminUsers() {
             <p>电话: {user.contact}</p>
             <p>角色: {user.role === 1 ? '管理员' : '普通用户'}</p>
             <p>状态: {user.status === 1 ? '正常' : '已封禁'}</p>
+            {user.deletedAt && (
+              <p className="text-red-500">已删除: {user.deletedAt.toLocaleString()}</p>
+            )}
           </div>
         </CardContent>
       </Card>
     ),
-    [banMutation.isPending, unbanMutation.isPending]
+    [
+      banMutation.isPending,
+      unbanMutation.isPending,
+      softDeleteMutation.isPending,
+      restoreMutation.isPending,
+    ]
   );
 
   const mockReports: Report[] = [];
@@ -186,6 +235,8 @@ export default function AdminUsers() {
                   return (
                     <div
                       key={virtualItem.key}
+                      data-index={virtualItem.index}
+                      ref={rowVirtualizer.measureElement}
                       style={{
                         position: 'absolute',
                         top: 0,

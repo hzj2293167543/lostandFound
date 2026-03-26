@@ -36,9 +36,12 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
-    const user = await this.usersRepository.findOne({ where: { email: loginDto.email } });
+    const user = await this.usersRepository.findOne({
+      where: { email: loginDto.email },
+      withDeleted: true,
+    });
 
-    if (user.status === 0) {
+    if (user.status === 0 || user.deletedAt) {
       throw new UnauthorizedException('账号已被禁用');
     }
 

@@ -52,14 +52,29 @@ export class AdminController {
     return this.adminService.updateUserStatus(+id, status);
   }
 
+  @Delete('users/:id')
+  softDeleteUser(@Param('id') id: string) {
+    return this.adminService.softDeleteUser(+id);
+  }
+
+  @Post('users/:id/restore')
+  restoreUser(@Param('id') id: string) {
+    return this.adminService.restoreUser(+id);
+  }
+
   @Get('lost')
   getAllLostItems() {
     return this.adminService.getAllLostItems();
   }
 
   @Delete('lost/:id')
-  deleteLostItem(@Param('id') id: string) {
-    return this.adminService.deleteLostItem(+id);
+  softDeleteLostItem(@Param('id') id: string) {
+    return this.adminService.softDeleteLostItem(+id);
+  }
+
+  @Post('lost/:id/restore')
+  restoreLostItem(@Param('id') id: string) {
+    return this.adminService.restoreLostItem(+id);
   }
 
   @Get('found')
@@ -68,8 +83,13 @@ export class AdminController {
   }
 
   @Delete('found/:id')
-  deleteFoundItem(@Param('id') id: string) {
-    return this.adminService.deleteFoundItem(+id);
+  softDeleteFoundItem(@Param('id') id: string) {
+    return this.adminService.softDeleteFoundItem(+id);
+  }
+
+  @Post('found/:id/restore')
+  restoreFoundItem(@Param('id') id: string) {
+    return this.adminService.restoreFoundItem(+id);
   }
 
   @Get('categories')

@@ -11,12 +11,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { FOUND_STATUS_NAME, FOUND_STATUS } from '@lostfound/shared';
+import { FoundItemStatus, FOUND_STATUS_NAME } from '@lostfound/shared';
 import { adminApi } from '@/api';
 import { adminKeys } from '@/keys/admin';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { SearchInput } from '@/components/searchInput/searchInput';
 
 export default function AdminFound() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -34,8 +35,8 @@ export default function AdminFound() {
     queryFn: () => adminApi.getAllCategories(),
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: (id: number) => adminApi.deleteFoundItem(id),
+  const softDeleteMutation = useMutation({
+    mutationFn: (id: number) => adminApi.softDeleteFoundItem(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: adminKeys.found() });
       toast.success('删除成功');
@@ -47,14 +48,14 @@ export default function AdminFound() {
 
   const handleDelete = (id: number) => {
     if (!confirm('确定要删除这条招领信息吗？')) return;
-    deleteMutation.mutate(id);
+    softDeleteMutation.mutate(id);
   };
 
   const filteredItems = items.filter((item) => {
     const matchesSearch =
       item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || item.status.code === Number(statusFilter);
+    const matchesStatus = statusFilter === 'all' || item.status === Number(statusFilter);
     const matchesCategory =
       categoryFilter === 'all' || item.category?.id === Number(categoryFilter);
     return matchesSearch && matchesStatus && matchesCategory;
@@ -73,10 +74,11 @@ export default function AdminFound() {
       <h1 className="text-2xl font-bold mb-6">招领管理</h1>
 
       <div className="flex gap-4 mb-6 flex-wrap">
-        <Input
+        <SearchInput
+          showLabel={false}
           placeholder="搜索招领..."
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onSearch={(value) => setSearchQuery(value)}
           className="w-64"
         />
         <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -85,11 +87,14 @@ export default function AdminFound() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">全部状态</SelectItem>
-            <SelectItem value={String(FOUND_STATUS.待认领)}>
-              {FOUND_STATUS_NAME[FOUND_STATUS.待认领]}
+            <SelectItem value={String(FoundItemStatus.招领中)}>
+              {FOUND_STATUS_NAME[FoundItemStatus.招领中]}
             </SelectItem>
-            <SelectItem value={String(FOUND_STATUS.已认领)}>
-              {FOUND_STATUS_NAME[FOUND_STATUS.已认领]}
+            <SelectItem value={String(FoundItemStatus.已归还)}>
+              {FOUND_STATUS_NAME[FoundItemStatus.已归还]}
+            </SelectItem>
+            <SelectItem value={String(FoundItemStatus.已撤销)}>
+              {FOUND_STATUS_NAME[FoundItemStatus.已撤销]}
             </SelectItem>
           </SelectContent>
         </Select>
@@ -115,9 +120,8 @@ export default function AdminFound() {
               <div className="flex justify-between items-center">
                 <CardTitle className="text-base">{item.title}</CardTitle>
                 <div className="space-x-2 flex items-center">
-                  <Badge
-                    variant={item.status.code === FOUND_STATUS.待认领 ? 'default' : 'secondary'}>
-                    {item.status.name}
+                  <Badge variant={item.status === FoundItemStatus.招领中 ? 'default' : 'secondary'}>
+                    {FOUND_STATUS_NAME[item.status]}
                   </Badge>
                   <Link to={`/found/${item.id}`}>
                     <Button size="sm" variant="outline">
@@ -128,7 +132,7 @@ export default function AdminFound() {
                     size="sm"
                     variant="destructive"
                     onClick={() => handleDelete(item.id)}
-                    disabled={deleteMutation.isPending}>
+                    disabled={softDeleteMutation.isPending}>
                     删除
                   </Button>
                 </div>

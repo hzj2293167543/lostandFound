@@ -16,9 +16,9 @@ export function mapLostItemToVo(item: LostItemEntity, commentCount: number): Los
     image: item.image,
     commentCount,
     user: {
-      id: item.user.id,
-      name: item.user.name,
-      avatar: item.user.avatar,
+      id: item.user?.id,
+      name: item.user?.name ?? '用户已注销',
+      avatar: item.user?.avatar,
     },
   };
 }

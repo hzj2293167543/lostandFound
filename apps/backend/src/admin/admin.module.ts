@@ -10,17 +10,20 @@ import { LostItem } from '../lost-items/entities/lost-item.entity';
 import { LostItemsModule } from '../lost-items/lost-items.module';
 import { User } from '../users/entities/user.entity';
 import { UsersModule } from '../users/users.module';
+import { Comment } from '../comments/entities/comment.entity';
+import { CommentsModule } from '../comments/comments.module';
 import { AdminController } from './admin.controller';
 import { AdminService } from './admin.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Category, Announcement, LostItem, FoundItem]),
+    TypeOrmModule.forFeature([User, Category, Announcement, LostItem, FoundItem, Comment]),
     UsersModule,
     CategoriesModule,
     AnnouncementsModule,
     LostItemsModule,
     FoundItemsModule,
+    CommentsModule,
   ],
   controllers: [AdminController],
   providers: [AdminService],

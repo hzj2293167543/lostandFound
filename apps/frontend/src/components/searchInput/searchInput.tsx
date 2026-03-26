@@ -5,6 +5,7 @@ import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 
 interface SearchInputProps {
+  showLabel?: boolean;
   label?: string;
   onSearch: (value: string) => void;
   placeholder?: string;
@@ -26,6 +27,7 @@ interface SearchInputProps {
  */
 export function SearchInput({
   onSearch,
+  showLabel = true,
   label = '搜索',
   delay = NORMAL_DELAY,
   placeholder = '搜索...',
@@ -80,7 +82,11 @@ export function SearchInput({
 
   return (
     <div className="space-y-2">
-      <Label htmlFor="search-input">{label}</Label>
+      {showLabel && (
+        <Label key="label" className="block" htmlFor="search-input">
+          {label}
+        </Label>
+      )}
       <div className="relative">
         <Input
           id="search-input"

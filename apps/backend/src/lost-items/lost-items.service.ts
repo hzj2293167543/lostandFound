@@ -15,6 +15,7 @@ import { Category } from 'src/categories/entities/category.entity';
 import { Repository } from 'typeorm';
 import { LostItem } from './entities/lost-item.entity';
 import { mapLostItemToVo } from './lost-items.mapper';
+import { CategoriesService } from '@/categories/categories.service';
 export interface FindAllParams {
   page: number;
   limit: number;
@@ -28,10 +29,9 @@ export class LostItemsService {
   constructor(
     @InjectRepository(LostItem)
     private lostItemsRepository: Repository<LostItem>,
-    @InjectRepository(Category)
-    private categoriesRepository: Repository<Category>,
     private uploadService: UploadService,
-    private commentsService: CommentsService
+    private commentsService: CommentsService,
+    private categoriesService: CategoriesService
   ) {}
 
   async findAllPaginated(params: FindAllParams): Promise<PageResponse<LostItemVo>> {
@@ -121,9 +121,7 @@ export class LostItemsService {
   }
 
   async create(data: LostCreateDto & { userId: number }): Promise<LostItem> {
-    const categoryPo = await this.categoriesRepository.findOne({
-      where: { id: data.category },
-    });
+    const categoryPo = await this.categoriesService.findOne(data.category);
     if (!categoryPo) {
       throw new NotFoundException('分类不存在');
     }

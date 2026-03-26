@@ -17,6 +17,9 @@ export class Category {
   @Column({ length: 50 })
   name: string;
 
+  @Column({ default: null })
+  defaultSince: Date;
+
   @CreateDateColumn()
   createdAt: Date;
 

@@ -26,26 +26,37 @@ export const adminApi = {
   getRecentFoundItems: (config?: AxiosRequestConfig) =>
     get<RecentItem[]>('/admin/found/recent', config),
 
-  getAllUsers: (config?: AxiosRequestConfig) => get<User[]>('/admin/users', config),
+  getAllUsers: (config?: AxiosRequestConfig) =>
+    get<(User & { deletedAt?: Date })[]>('/admin/users', config),
 
   updateUserStatus: (userId: number, status: number) =>
     put<User>(`/admin/users/${userId}/status`, { status }),
 
+  softDeleteUser: (id: number) => remove<void>(`/admin/users/${id}`),
+
+  restoreUser: (id: number) => post<void>(`/admin/users/${id}/restore`, {}),
+
   getAllLostItems: (config?: AxiosRequestConfig) => get<LostItem[]>('/admin/lost', config),
 
-  deleteLostItem: (id: number) => remove<void>(`/admin/lost/${id}`),
+  softDeleteLostItem: (id: number) => remove<void>(`/admin/lost/${id}`),
+
+  restoreLostItem: (id: number) => post<void>(`/admin/lost/${id}/restore`, {}),
 
   getAllFoundItems: (config?: AxiosRequestConfig) => get<FoundItem[]>('/admin/found', config),
 
-  deleteFoundItem: (id: number) => remove<void>(`/admin/found/${id}`),
+  softDeleteFoundItem: (id: number) => remove<void>(`/admin/found/${id}`),
 
-  getAllCategories: (config?: AxiosRequestConfig) => get<Category[]>('/admin/categories', config),
+  restoreFoundItem: (id: number) => post<void>(`/admin/found/${id}/restore`, {}),
+
+  getAllCategories: (config?: AxiosRequestConfig) =>
+    get<(Category & { defaultSince?: Date })[]>('/admin/categories', config),
 
   createCategory: (name: string) => post<Category>('/admin/categories', { name }),
 
   updateCategory: (id: number, name: string) => put<Category>(`/admin/categories/${id}`, { name }),
 
-  deleteCategory: (id: number) => remove<void>(`/admin/categories/${id}`),
+  deleteCategory: (id: number) =>
+    remove<{ success: boolean; message: string }>(`/admin/categories/${id}`),
 
   getAllAnnouncements: (config?: AxiosRequestConfig) =>
     get<Announcement[]>('/admin/announcements', config),

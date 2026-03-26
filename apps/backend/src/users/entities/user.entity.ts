@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  DeleteDateColumn,
   OneToMany,
 } from 'typeorm';
 import { LostItem } from '../../lost-items/entities/lost-item.entity';
@@ -27,7 +28,6 @@ export class User {
   @Column({ length: 255, nullable: true })
   email: string;
 
-  // 1: 正常, 0: 禁用
   @Column({ type: 'tinyint', default: 1 })
   status: number;
 
@@ -40,7 +40,6 @@ export class User {
   @Column({ length: 255, nullable: true })
   password: string;
 
-  // 0: 普通用户, 1: 管理员
   @Column({ type: 'tinyint', default: 0 })
   role: number;
 
@@ -49,6 +48,9 @@ export class User {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
 
   @OneToMany(() => LostItem, (lostItem) => lostItem.user)
   lostItems: LostItem[];

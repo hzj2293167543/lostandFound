@@ -34,8 +34,8 @@ export default function AdminLost() {
     queryFn: () => adminApi.getAllCategories(),
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: (id: number) => adminApi.deleteLostItem(id),
+  const softDeleteMutation = useMutation({
+    mutationFn: (id: number) => adminApi.softDeleteLostItem(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: adminKeys.lost() });
       toast.success('删除成功');
@@ -47,7 +47,7 @@ export default function AdminLost() {
 
   const handleDelete = (id: number) => {
     if (!confirm('确定要删除这条失物信息吗？')) return;
-    deleteMutation.mutate(id);
+    softDeleteMutation.mutate(id);
   };
 
   const filteredItems = items.filter((item) => {
@@ -128,7 +128,7 @@ export default function AdminLost() {
                     size="sm"
                     variant="destructive"
                     onClick={() => handleDelete(item.id)}
-                    disabled={deleteMutation.isPending}>
+                    disabled={softDeleteMutation.isPending}>
                     删除
                   </Button>
                 </div>

@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useRef, useState, useMemo, useCallback } from 'react';
+import { useVirtualizer } from '@tanstack/react-virtual';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
@@ -14,21 +14,23 @@ import {
 import { FoundItemStatus, FOUND_STATUS_NAME } from '@lostfound/shared';
 import { adminApi } from '@/api';
 import { adminKeys } from '@/keys/admin';
+import { useAdminInfiniteFoundItems } from '@/hooks/useAdminInfinite';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { SearchInput } from '@/components/searchInput/searchInput';
+
+const ITEM_HEIGHT = 250;
 
 export default function AdminFound() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const queryClient = useQueryClient();
+  const parentRef = useRef<HTMLDivElement>(null);
 
-  const { data: items = [], isLoading } = useQuery({
-    queryKey: adminKeys.found(),
-    queryFn: () => adminApi.getAllFoundItems(),
-  });
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useAdminInfiniteFoundItems(20);
 
   const { data: categories = [] } = useQuery({
     queryKey: adminKeys.categories(),
@@ -38,7 +40,7 @@ export default function AdminFound() {
   const softDeleteMutation = useMutation({
     mutationFn: (id: number) => adminApi.softDeleteFoundItem(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: adminKeys.found() });
+      queryClient.invalidateQueries({ queryKey: adminKeys.foundInfinite() });
       toast.success('删除成功');
     },
     onError: () => {
@@ -51,15 +53,75 @@ export default function AdminFound() {
     softDeleteMutation.mutate(id);
   };
 
-  const filteredItems = items.filter((item) => {
-    const matchesSearch =
-      item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || item.status === Number(statusFilter);
-    const matchesCategory =
-      categoryFilter === 'all' || item.category?.id === Number(categoryFilter);
-    return matchesSearch && matchesStatus && matchesCategory;
+  const items = useMemo(() => {
+    return data?.pages.flatMap((page) => page.items) || [];
+  }, [data]);
+
+  const filteredItems = useMemo(() => {
+    return items.filter((item) => {
+      const matchesSearch =
+        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.description.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesStatus = statusFilter === 'all' || item.status === Number(statusFilter);
+      const matchesCategory =
+        categoryFilter === 'all' || item.category?.id === Number(categoryFilter);
+      return matchesSearch && matchesStatus && matchesCategory;
+    });
+  }, [items, searchQuery, statusFilter, categoryFilter]);
+
+  const rowVirtualizer = useVirtualizer({
+    count: filteredItems.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => ITEM_HEIGHT,
+    overscan: 5,
   });
+
+  const renderItemRow = useCallback(
+    (item: (typeof filteredItems)[0]) => (
+      <Card key={item.id}>
+        <CardHeader className="pb-2">
+          <div className="flex justify-between items-center">
+            <CardTitle className="text-base">{item.title}</CardTitle>
+            <div className="space-x-2 flex items-center">
+              <Badge variant={item.status === FoundItemStatus.招领中 ? 'default' : 'secondary'}>
+                {FOUND_STATUS_NAME[item.status]}
+              </Badge>
+              <Link to={`/found/${item.id}`}>
+                <Button size="sm" variant="outline">
+                  查看
+                </Button>
+              </Link>
+              <Button
+                size="sm"
+                variant="destructive"
+                onClick={() => handleDelete(item.id)}
+                disabled={softDeleteMutation.isPending}>
+                删除
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="text-sm text-gray-600 space-y-1">
+            <p>分类: {item.category?.name || '未分类'}</p>
+            <p>描述: {item.description}</p>
+            <p>捡到地点: {item.location}</p>
+            <p>捡到时间: {item.time}</p>
+          </div>
+        </CardContent>
+      </Card>
+    ),
+    [softDeleteMutation.isPending]
+  );
+
+  const handleScroll = useCallback(() => {
+    const el = parentRef.current;
+    if (!el) return;
+    const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 500;
+    if (nearBottom && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   if (isLoading) {
     return (
@@ -113,49 +175,46 @@ export default function AdminFound() {
         </Select>
       </div>
 
-      <div className="space-y-4">
-        {filteredItems.map((item) => (
-          <Card key={item.id}>
-            <CardHeader className="pb-2">
-              <div className="flex justify-between items-center">
-                <CardTitle className="text-base">{item.title}</CardTitle>
-                <div className="space-x-2 flex items-center">
-                  <Badge variant={item.status === FoundItemStatus.招领中 ? 'default' : 'secondary'}>
-                    {FOUND_STATUS_NAME[item.status]}
-                  </Badge>
-                  <Link to={`/found/${item.id}`}>
-                    <Button size="sm" variant="outline">
-                      查看
-                    </Button>
-                  </Link>
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    onClick={() => handleDelete(item.id)}
-                    disabled={softDeleteMutation.isPending}>
-                    删除
-                  </Button>
+      {filteredItems.length === 0 ? (
+        <p className="text-gray-500 text-center py-8">
+          {searchQuery || statusFilter !== 'all' || categoryFilter !== 'all'
+            ? '未找到匹配的招领'
+            : '暂无招领记录'}
+        </p>
+      ) : (
+        <div ref={parentRef} className="h-[650px] overflow-auto" onScroll={handleScroll}>
+          <div
+            style={{
+              height: `${rowVirtualizer.getTotalSize()}px`,
+              width: '100%',
+              position: 'relative',
+            }}>
+            {rowVirtualizer.getVirtualItems().map((virtualItem) => {
+              const item = filteredItems[virtualItem.index];
+              if (!item) return null;
+              return (
+                <div
+                  key={virtualItem.key}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    transform: `translateY(${virtualItem.start}px)`,
+                    padding: '0 0 16px 0',
+                  }}>
+                  {renderItemRow(item)}
                 </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-sm text-gray-600 space-y-1">
-                <p>分类: {item.category?.name || '未分类'}</p>
-                <p>描述: {item.description}</p>
-                <p>捡到地点: {item.location}</p>
-                <p>捡到时间: {item.time}</p>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-        {filteredItems.length === 0 && (
-          <p className="text-gray-500 text-center py-8">
-            {searchQuery || statusFilter !== 'all' || categoryFilter !== 'all'
-              ? '未找到匹配的招领'
-              : '暂无招领记录'}
-          </p>
-        )}
-      </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+      {isFetchingNextPage && (
+        <div className="flex justify-center py-4">
+          <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
+        </div>
+      )}
     </div>
   );
 }

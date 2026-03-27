@@ -1,6 +1,18 @@
 import { CommentItem, Comment } from '@lostfound/shared';
 
 /**
+ * 格式化日期对象为YYYY-MM-DD格式
+ * @param date 日期对象
+ * @returns 格式化后的日期字符串
+ */
+export const formatDate = (date: Date | undefined): string => {
+  if (!date) return '';
+  const dateObj = new Date(date);
+  if (!isNaN(dateObj.getTime())) return '';
+  return dateObj.toLocaleDateString().replaceAll('/', '-');
+};
+
+/**
  * 格式化日期字符串YYYY/MM/DD -> YYYY-MM-DD 格式
  * @param dateStr 日期字符串
  * @returns 格式化后的日期字符串

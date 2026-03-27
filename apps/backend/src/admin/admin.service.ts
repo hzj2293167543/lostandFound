@@ -83,6 +83,23 @@ export class AdminService {
     return this.usersRepository.find({ where: { role: 0 }, withDeleted: true });
   }
 
+  async getUsersPaginated(page: number, pageSize: number) {
+    const [items, total] = await this.usersRepository.findAndCount({
+      where: { role: 0 },
+      withDeleted: true,
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+      order: { createdAt: 'DESC' },
+    });
+    return {
+      items,
+      total,
+      page,
+      pageSize,
+      totalPages: Math.ceil(total / pageSize),
+    };
+  }
+
   async updateUserStatus(userId: number, status: number): Promise<User> {
     await this.usersRepository.update(userId, { status });
     return this.usersRepository.findOne({ where: { id: userId } });
@@ -102,6 +119,22 @@ export class AdminService {
     });
   }
 
+  async getLostItemsPaginated(page: number, pageSize: number) {
+    const [items, total] = await this.lostItemsRepository.findAndCount({
+      relations: ['category'],
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+      order: { time: 'DESC' },
+    });
+    return {
+      items,
+      total,
+      page,
+      pageSize,
+      totalPages: Math.ceil(total / pageSize),
+    };
+  }
+
   async softDeleteLostItem(id: number): Promise<void> {
     await this.commentsRepository.softDelete({ itemId: id, itemType: CommentItemType.LostItem });
     await this.lostItemsRepository.softDelete(id);
@@ -116,6 +149,22 @@ export class AdminService {
     return this.foundItemsRepository.find({
       relations: ['category'],
     });
+  }
+
+  async getFoundItemsPaginated(page: number, pageSize: number) {
+    const [items, total] = await this.foundItemsRepository.findAndCount({
+      relations: ['category'],
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+      order: { time: 'DESC' },
+    });
+    return {
+      items,
+      total,
+      page,
+      pageSize,
+      totalPages: Math.ceil(total / pageSize),
+    };
   }
 
   async softDeleteFoundItem(id: number): Promise<void> {
@@ -188,6 +237,21 @@ export class AdminService {
     return this.announcementsRepository.find({
       order: { time: 'DESC' },
     });
+  }
+
+  async getAnnouncementsPaginated(page: number, pageSize: number) {
+    const [items, total] = await this.announcementsRepository.findAndCount({
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+      order: { time: 'DESC' },
+    });
+    return {
+      items,
+      total,
+      page,
+      pageSize,
+      totalPages: Math.ceil(total / pageSize),
+    };
   }
 
   createAnnouncement(data: Partial<AnnouncementCreateDto>): Promise<Announcement> {

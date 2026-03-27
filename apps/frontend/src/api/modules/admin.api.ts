@@ -9,6 +9,7 @@ import {
   FoundItem,
   AnnouncementCreateDto,
   AnnouncementEditDto,
+  PageResponse,
 } from '@lostfound/shared';
 
 interface RecentItem {
@@ -29,6 +30,9 @@ export const adminApi = {
   getAllUsers: (config?: AxiosRequestConfig) =>
     get<(User & { deletedAt?: Date })[]>('/admin/users', config),
 
+  getUsersPaginated: (page: number, pageSize: number) =>
+    get<PageResponse<User>>(`/admin/users/paginated?page=${page}&pageSize=${pageSize}`),
+
   updateUserStatus: (userId: number, status: number) =>
     put<User>(`/admin/users/${userId}/status`, { status }),
 
@@ -38,11 +42,17 @@ export const adminApi = {
 
   getAllLostItems: (config?: AxiosRequestConfig) => get<LostItem[]>('/admin/lost', config),
 
+  getLostItemsPaginated: (page: number, pageSize: number) =>
+    get<PageResponse<LostItem>>(`/admin/lost/paginated?page=${page}&pageSize=${pageSize}`),
+
   softDeleteLostItem: (id: number) => remove<void>(`/admin/lost/${id}`),
 
   restoreLostItem: (id: number) => post<void>(`/admin/lost/${id}/restore`, {}),
 
   getAllFoundItems: (config?: AxiosRequestConfig) => get<FoundItem[]>('/admin/found', config),
+
+  getFoundItemsPaginated: (page: number, pageSize: number) =>
+    get<PageResponse<FoundItem>>(`/admin/found/paginated?page=${page}&pageSize=${pageSize}`),
 
   softDeleteFoundItem: (id: number) => remove<void>(`/admin/found/${id}`),
 
@@ -60,6 +70,9 @@ export const adminApi = {
 
   getAllAnnouncements: (config?: AxiosRequestConfig) =>
     get<Announcement[]>('/admin/announcements', config),
+
+  getAnnouncementsPaginated: (page: number, pageSize: number) =>
+    get<PageResponse<Announcement>>(`/admin/announcements/paginated?page=${page}&pageSize=${pageSize}`),
 
   createAnnouncement: (data: Partial<AnnouncementCreateDto>) =>
     post<Announcement>('/admin/announcements', data),

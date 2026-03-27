@@ -4,8 +4,12 @@ export const adminKeys = {
   recentLost: () => [...adminKeys.all, 'recent-lost'] as const,
   recentFound: () => [...adminKeys.all, 'recent-found'] as const,
   users: () => [...adminKeys.all, 'users'] as const,
+  usersInfinite: () => [...adminKeys.all, 'users-infinite'] as const,
   lost: () => [...adminKeys.all, 'lost'] as const,
+  lostInfinite: () => [...adminKeys.all, 'lost-infinite'] as const,
   found: () => [...adminKeys.all, 'found'] as const,
+  foundInfinite: () => [...adminKeys.all, 'found-infinite'] as const,
   categories: () => [...adminKeys.all, 'categories'] as const,
   announcements: () => [...adminKeys.all, 'announcements'] as const,
+  announcementsInfinite: () => [...adminKeys.all, 'announcements-infinite'] as const,
 };

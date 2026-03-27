@@ -1,4 +1,4 @@
-import { useRef, useCallback, useEffectEvent } from 'react';
+import { useRef, useCallback, useEffectEvent, useMemo, useState } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { adminApi } from '@/api';
 import { Button } from '@/components/ui/button';
@@ -14,17 +14,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { adminKeys } from '@/keys/admin';
+import { useAdminInfiniteAnnouncements } from '@/hooks/useAdminInfinite';
 import { useAuthStore } from '@/stores/AuthStore';
 import { formatDateForInput } from '@/utils';
-import {
-  Announcement,
-  AnnouncementCreateDto,
-  AnnouncementEditDto,
-  isEmpty,
-} from '@lostfound/shared';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Announcement, AnnouncementCreateDto, AnnouncementEditDto } from '@lostfound/shared';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
-import { useState } from 'react';
 import { toast } from 'sonner';
 
 const ITEM_HEIGHT = 200;
@@ -33,12 +28,6 @@ export default function AdminAnnouncements() {
   const usrId = useAuthStore.use.user()?.id;
   const userName = useAuthStore.use.user()?.name;
   const parentRef = useRef<HTMLDivElement>(null);
-
-  const { data: announcements = [], isLoading } = useQuery({
-    queryKey: adminKeys.announcements(),
-    queryFn: () => adminApi.getAllAnnouncements(),
-  });
-
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingAnnouncement, setEditingAnnouncement] = useState<Announcement | null>(null);
@@ -48,11 +37,18 @@ export default function AdminAnnouncements() {
     author: userName,
   });
 
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useAdminInfiniteAnnouncements(20);
+
+  const announcements = useMemo(() => {
+    return data?.pages.flatMap((page) => page.items) || [];
+  }, [data]);
+
   const createMutation = useMutation({
     mutationFn: (data: Partial<AnnouncementCreateDto>) =>
       adminApi.createAnnouncement({ ...data, author: usrId! }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: adminKeys.announcements() });
+      queryClient.invalidateQueries({ queryKey: adminKeys.announcementsInfinite() });
       toast.success('公告发布成功！');
       closeDialog();
     },
@@ -65,7 +61,7 @@ export default function AdminAnnouncements() {
     mutationFn: ({ id, data }: { id: number; data: Partial<AnnouncementEditDto> }) =>
       adminApi.updateAnnouncement(id, { ...data, author: usrId! }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: adminKeys.announcements() });
+      queryClient.invalidateQueries({ queryKey: adminKeys.announcementsInfinite() });
       toast.success('公告更新成功！');
       closeDialog();
     },
@@ -77,7 +73,7 @@ export default function AdminAnnouncements() {
   const deleteMutation = useMutation({
     mutationFn: (id: number) => adminApi.deleteAnnouncement(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: adminKeys.announcements() });
+      queryClient.invalidateQueries({ queryKey: adminKeys.announcementsInfinite() });
       toast.success('删除成功');
     },
     onError: () => {
@@ -91,6 +87,15 @@ export default function AdminAnnouncements() {
     estimateSize: () => ITEM_HEIGHT,
     overscan: 5,
   });
+
+  const handleScroll = useCallback(() => {
+    const el = parentRef.current;
+    if (!el) return;
+    const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 500;
+    if (nearBottom && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const closeDialog = () => {
     setIsDialogOpen(false);
@@ -136,7 +141,7 @@ export default function AdminAnnouncements() {
   };
 
   const renderAnnouncementRow = useCallback(
-    (announcement: Announcement) => (
+    (announcement: (typeof announcements)[0]) => (
       <Card key={announcement.id}>
         <CardHeader className="pb-2">
           <div className="flex justify-between items-center">
@@ -191,7 +196,11 @@ export default function AdminAnnouncements() {
       {announcements.length === 0 ? (
         <p className="text-gray-500 text-center py-8">暂无公告数据</p>
       ) : (
-        <div ref={parentRef} className="h-[650px] overflow-auto" style={{ scrollbarWidth: 'none' }}>
+        <div
+          ref={parentRef}
+          className="h-[650px] overflow-auto"
+          style={{ scrollbarWidth: 'none' }}
+          onScroll={handleScroll}>
           <div
             style={{
               height: `${rowVirtualizer.getTotalSize()}px`,
@@ -217,6 +226,11 @@ export default function AdminAnnouncements() {
               );
             })}
           </div>
+        </div>
+      )}
+      {isFetchingNextPage && (
+        <div className="flex justify-center py-4">
+          <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
         </div>
       )}
 

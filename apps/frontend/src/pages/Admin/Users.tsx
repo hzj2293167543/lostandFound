@@ -1,25 +1,18 @@
-import { useRef, useState, useMemo, useCallback } from 'react';
+import { useRef, useCallback, useMemo, useState } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { adminApi } from '@/api';
-import { SearchInput } from '@/components/searchInput/searchInput';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { adminApi } from '@/api';
 import { adminKeys } from '@/keys/admin';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useAdminInfiniteUsers } from '@/hooks/useAdminInfinite';
+import { SearchInput } from '@/components/searchInput/searchInput';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
-interface Report {
-  id: number;
-  reporterId: number;
-  reportedUserId: number;
-  reason: string;
-  status: 'pending' | 'resolved' | 'rejected';
-  createdAt: string;
-}
-
-const ITEM_HEIGHT = 220;
+const ITEM_HEIGHT = 250;
+const PAGE_SIZE = 20;
 
 export default function AdminUsers() {
   const [activeTab, setActiveTab] = useState<'users' | 'reports'>('users');
@@ -27,15 +20,13 @@ export default function AdminUsers() {
   const queryClient = useQueryClient();
   const parentRef = useRef<HTMLDivElement>(null);
 
-  const { data: users = [], isLoading } = useQuery({
-    queryKey: adminKeys.users(),
-    queryFn: () => adminApi.getAllUsers(),
-  });
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useAdminInfiniteUsers(PAGE_SIZE);
 
   const banMutation = useMutation({
     mutationFn: (userId: number) => adminApi.updateUserStatus(userId, 0),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: adminKeys.users() });
+      queryClient.invalidateQueries({ queryKey: adminKeys.usersInfinite() });
       toast.success('用户已封禁');
     },
     onError: () => {
@@ -46,7 +37,7 @@ export default function AdminUsers() {
   const unbanMutation = useMutation({
     mutationFn: (userId: number) => adminApi.updateUserStatus(userId, 1),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: adminKeys.users() });
+      queryClient.invalidateQueries({ queryKey: adminKeys.usersInfinite() });
       toast.success('用户已解封');
     },
     onError: () => {
@@ -54,43 +45,9 @@ export default function AdminUsers() {
     },
   });
 
-  const softDeleteMutation = useMutation({
-    mutationFn: (id: number) => adminApi.softDeleteUser(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: adminKeys.users() });
-      toast.success('用户已删除');
-    },
-    onError: () => {
-      toast.error('删除失败');
-    },
-  });
-
-  const restoreMutation = useMutation({
-    mutationFn: (id: number) => adminApi.restoreUser(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: adminKeys.users() });
-      toast.success('用户已恢复');
-    },
-    onError: () => {
-      toast.error('恢复失败');
-    },
-  });
-
-  const handleBanUser = (userId: number) => {
-    banMutation.mutate(userId);
-  };
-
-  const handleUnbanUser = (userId: number) => {
-    unbanMutation.mutate(userId);
-  };
-
-  const handleResolveReport = (reportId: number) => {
-    toast.success('举报已处理');
-  };
-
-  const handleRejectReport = (reportId: number) => {
-    toast.success('举报已忽略');
-  };
+  const users = useMemo(() => {
+    return data?.pages.flatMap((page) => page.items) || [];
+  }, [data]);
 
   const filteredUsers = useMemo(() => {
     return users.filter(
@@ -104,16 +61,11 @@ export default function AdminUsers() {
     count: filteredUsers.length,
     getScrollElement: () => parentRef.current,
     estimateSize: () => ITEM_HEIGHT,
-    measureElement: (el) => {
-      const height = el.scrollHeight;
-      console.log('测量元素高度', height);
-      return height;
-    },
     overscan: 5,
   });
 
   const renderUserRow = useCallback(
-    (user: (typeof users)[0]) => (
+    (user: (typeof filteredUsers)[0]) => (
       <Card key={user.id}>
         <CardHeader className="pb-2">
           <div className="flex justify-between items-center">
@@ -123,32 +75,18 @@ export default function AdminUsers() {
                 <Button
                   size="sm"
                   variant="destructive"
-                  onClick={() => handleBanUser(user.id)}
+                  onClick={() => banMutation.mutate(user.id)}
                   disabled={banMutation.isPending}>
                   封禁
                 </Button>
               ) : (
                 <Button
                   size="sm"
-                  onClick={() => handleUnbanUser(user.id)}
+                  onClick={() => unbanMutation.mutate(user.id)}
                   disabled={unbanMutation.isPending}>
                   解封
                 </Button>
               )}
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => softDeleteMutation.mutate(user.id)}
-                disabled={softDeleteMutation.isPending}>
-                删除
-              </Button>
-              <Button
-                size="sm"
-                variant="secondary"
-                onClick={() => restoreMutation.mutate(user.id)}
-                disabled={restoreMutation.isPending}>
-                恢复
-              </Button>
             </div>
           </div>
         </CardHeader>
@@ -157,24 +95,25 @@ export default function AdminUsers() {
             <p>邮箱: {user.email}</p>
             <p>电话: {user.contact}</p>
             <p>角色: {user.role === 1 ? '管理员' : '普通用户'}</p>
-            <p>状态: {user.status === 1 ? '正常' : '已封禁'}</p>
-            {user.deletedAt && (
-              <p className="text-red-500">已删除: {user.deletedAt.toLocaleString()}</p>
-            )}
+            <p>{user.status === 1 ? '正常' : '已封禁'}</p>
           </div>
         </CardContent>
       </Card>
     ),
-    [
-      banMutation.isPending,
-      unbanMutation.isPending,
-      softDeleteMutation.isPending,
-      restoreMutation.isPending,
-    ]
+    [banMutation.isPending, unbanMutation.isPending]
   );
 
-  const mockReports: Report[] = [];
+  const mockReports: any[] = [];
   const pendingReportsCount = mockReports.filter((r) => r.status === 'pending').length;
+
+  const handleScroll = useCallback(() => {
+    const el = parentRef.current;
+    if (!el) return;
+    const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 500;
+    if (nearBottom && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   if (isLoading) {
     return (
@@ -208,11 +147,11 @@ export default function AdminUsers() {
         <div>
           <div className="flex justify-between items-center mb-4">
             <SearchInput
-              className="w-64"
-              label="用户列表"
+              showLabel={false}
               placeholder="搜索用户..."
               value={searchQuery}
-              onSearch={(e) => setSearchQuery(e)}
+              onSearch={(value) => setSearchQuery(value)}
+              className="w-64"
             />
           </div>
           {filteredUsers.length === 0 ? (
@@ -223,7 +162,8 @@ export default function AdminUsers() {
             <div
               ref={parentRef}
               className="h-[650px] overflow-auto"
-              style={{ scrollbarWidth: 'none' }}>
+              style={{ scrollbarWidth: 'none' }}
+              onScroll={handleScroll}>
               <div
                 style={{
                   height: `${rowVirtualizer.getTotalSize()}px`,
@@ -232,11 +172,10 @@ export default function AdminUsers() {
                 }}>
                 {rowVirtualizer.getVirtualItems().map((virtualItem) => {
                   const user = filteredUsers[virtualItem.index];
+                  if (!user) return null;
                   return (
                     <div
                       key={virtualItem.key}
-                      data-index={virtualItem.index}
-                      ref={rowVirtualizer.measureElement}
                       style={{
                         position: 'absolute',
                         top: 0,
@@ -245,11 +184,16 @@ export default function AdminUsers() {
                         transform: `translateY(${virtualItem.start}px)`,
                         padding: '0 0 16px 0',
                       }}>
-                      {renderUserRow(user!)}
+                      {renderUserRow(user)}
                     </div>
                   );
                 })}
               </div>
+            </div>
+          )}
+          {isFetchingNextPage && (
+            <div className="flex justify-center py-4">
+              <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
             </div>
           )}
         </div>
@@ -282,24 +226,6 @@ export default function AdminUsers() {
                     <div className="text-sm text-gray-600 space-y-2">
                       <p>举报原因: {report.reason}</p>
                       <p>举报时间: {report.createdAt}</p>
-                      {report.status === 'pending' && (
-                        <div className="flex space-x-2 mt-2">
-                          <Button
-                            size="sm"
-                            onClick={() => {
-                              handleResolveReport(report.id);
-                              handleBanUser(report.reportedUserId);
-                            }}>
-                            封禁用户
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleRejectReport(report.id)}>
-                            忽略
-                          </Button>
-                        </div>
-                      )}
                     </div>
                   </CardContent>
                 </Card>

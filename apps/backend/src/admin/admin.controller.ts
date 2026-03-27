@@ -9,6 +9,7 @@ import {
   UseGuards,
   ParseIntPipe,
   Patch,
+  Query,
 } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -47,6 +48,14 @@ export class AdminController {
     return this.adminService.getAllUsers();
   }
 
+  @Get('users/paginated')
+  getUsersPaginated(
+    @Query('page') page: string,
+    @Query('pageSize') pageSize: string
+  ) {
+    return this.adminService.getUsersPaginated(+page, +pageSize);
+  }
+
   @Put('users/:id/status')
   updateUserStatus(@Param('id') id: string, @Body('status') status: number) {
     return this.adminService.updateUserStatus(+id, status);
@@ -67,6 +76,14 @@ export class AdminController {
     return this.adminService.getAllLostItems();
   }
 
+  @Get('lost/paginated')
+  getLostItemsPaginated(
+    @Query('page') page: string,
+    @Query('pageSize') pageSize: string
+  ) {
+    return this.adminService.getLostItemsPaginated(+page, +pageSize);
+  }
+
   @Delete('lost/:id')
   softDeleteLostItem(@Param('id') id: string) {
     return this.adminService.softDeleteLostItem(+id);
@@ -80,6 +97,14 @@ export class AdminController {
   @Get('found')
   getAllFoundItems() {
     return this.adminService.getAllFoundItems();
+  }
+
+  @Get('found/paginated')
+  getFoundItemsPaginated(
+    @Query('page') page: string,
+    @Query('pageSize') pageSize: string
+  ) {
+    return this.adminService.getFoundItemsPaginated(+page, +pageSize);
   }
 
   @Delete('found/:id')
@@ -115,6 +140,14 @@ export class AdminController {
   @Get('announcements')
   getAllAnnouncements() {
     return this.adminService.getAllAnnouncements();
+  }
+
+  @Get('announcements/paginated')
+  getAnnouncementsPaginated(
+    @Query('page') page: string,
+    @Query('pageSize') pageSize: string
+  ) {
+    return this.adminService.getAnnouncementsPaginated(+page, +pageSize);
   }
 
   @Post('announcements')

@@ -28,7 +28,6 @@ export class CommentsController {
     @Query('itemType', new ParseIntPipe()) itemType: number,
     @CurrentUser() user: User
   ): Promise<CommentItem[]> {
-    console.log(itemId, itemType, user.id, user);
     return this.commentsService.findByItem(itemId, itemType, user.id);
   }
 
@@ -90,7 +89,6 @@ export class CommentsController {
   @Post()
   @UseGuards(AuthGuard('jwt'), MuteGuard)
   create(@Body() data: CommentCreateDto, @CurrentUser() user: User) {
-    console.log(data);
     const result = commentCreateDtoSchema.safeParse(data);
     if (!result.success) {
       throw new BadRequestException(result.error);

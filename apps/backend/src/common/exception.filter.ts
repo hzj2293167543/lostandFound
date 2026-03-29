@@ -5,6 +5,7 @@ import {
   HttpException,
   HttpStatus,
   Inject,
+  ForbiddenException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
@@ -19,6 +20,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let message = 'Internal server error';
+    let bizCode = '';
 
     if (exception instanceof HttpException) {
       status = exception.getStatus();
@@ -27,6 +29,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
         message = exceptionResponse;
       } else if (typeof exceptionResponse === 'object') {
         const responseObj = exceptionResponse as Record<string, unknown>;
+        bizCode = (responseObj.bizCode as string | undefined) || null;
         if (Array.isArray(responseObj.message)) {
           message = responseObj.message[0] as string;
         } else if (responseObj.message) {
@@ -52,6 +55,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       code: status,
       message,
       data: null,
+      bizCode,
     });
   }
 }

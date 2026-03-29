@@ -1,6 +1,7 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { ApiResponse } from '@lostfound/shared';
 import { useAuthStore } from '@/stores/AuthStore';
+import { EVENT } from '@/constants/events';
 
 // 创建 axios 实例
 const client: AxiosInstance = axios.create({
@@ -77,6 +78,19 @@ client.interceptors.response.use(
         if (window.location.pathname !== '/login') {
           window.location.href = '/login';
         }
+      } else if (status === 403 && data?.bizCode === 'Banned') {
+        console.error('用户已被禁用');
+        // 这里可以添加全局提示
+        useAuthStore.getState().logout();
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login';
+        }
+
+        window.dispatchEvent(
+          new CustomEvent(EVENT.APP_ERROR_TOAST, {
+            detail: { message: data.message },
+          })
+        );
       }
       return Promise.reject(new Error(message));
     } else if (error.request) {

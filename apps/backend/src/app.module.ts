@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, ValidationPipe } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
@@ -16,7 +16,11 @@ import { UploadModule } from './common/upload/upload.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { AdminModule } from './admin/admin.module';
 import { ReportsModule } from './reports/reports.module';
-import { GuardsModule } from './common/guards/guards.module';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { BanGuard } from './common/guards/ban.guard';
+import { OptionalJwtAuthGuard } from './common/guards/OptionalJwtAuthGuard.guard';
+import { TransformInterceptor } from './common/response.interceptor';
+import { AllExceptionsFilter } from './common/exception.filter';
 
 const env = process.env.NODE_ENV || 'development'; // 默认开发环境
 const filePath = join(__dirname, '..', 'config', `.env.${env}.yaml`);
@@ -71,7 +75,36 @@ const filePath = join(__dirname, '..', 'config', `.env.${env}.yaml`);
     CommentsModule,
     AdminModule,
     ReportsModule,
-    GuardsModule,
+  ],
+  providers: [
+    // 1️⃣ 全局管道 (因为需要传参 whitelist/transform，所以用 useFactory)
+    {
+      provide: APP_PIPE,
+      useFactory: () =>
+        new ValidationPipe({
+          whitelist: true,
+          transform: true,
+        }),
+    },
+    // 2️⃣ 全局拦截器
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: TransformInterceptor,
+    },
+    // 3️⃣ 全局异常过滤器
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter, // NestJS 会自动把 ConfigService 注入给它！
+    },
+    // 4️⃣ 全局守卫 (顺序：先解包token -> 再查封禁)
+    {
+      provide: APP_GUARD,
+      useClass: OptionalJwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: BanGuard,
+    },
   ],
 })
 export class AppModule {}

@@ -65,7 +65,6 @@ export class AnnouncementsService {
       relations: ['author'],
       take: limit === undefined ? undefined : limit,
     });
-    console.log('announcements', announcements);
     return announcements.map((announcement) => mapAnnouncementToVo(announcement));
   }
 

@@ -184,8 +184,6 @@ export class LostItemsService {
   }
 
   async findUserCount(userId: number): Promise<Count> {
-    console.log(LostItemStatus.已找到);
-
     const result = await this.lostItemsRepository
       .createQueryBuilder('item')
       .select('COUNT(*)', 'total')

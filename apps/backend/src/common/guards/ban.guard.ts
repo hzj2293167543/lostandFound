@@ -1,16 +1,28 @@
-import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
+  UseGuards,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, IsNull, MoreThan } from 'typeorm';
 import { Punishment, PunishmentType } from '../../reports/entities/punishment.entity';
 import { Reflector } from '@nestjs/core';
 import { SKIP_BAN } from '../decorators/skipBan.decorator';
+import { UserStatus } from '../constants/constants';
+import { User } from '@/users/entities/user.entity';
+import { AuthGuard } from '@nestjs/passport';
+import { ReportsService } from '@/reports/reports.service';
+import { UsersService } from '@/users/users.service';
+import { diffDay } from '@lostfound/shared';
 
 @Injectable()
 export class BanGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
-    @InjectRepository(Punishment)
-    private punishmentRepository: Repository<Punishment>
+    private reportService: ReportsService,
+    private usersService: UsersService
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -26,26 +38,23 @@ export class BanGuard implements CanActivate {
     if (!user || !user.id) {
       return true;
     }
-
-    const now = new Date();
-
-    const activeBan = await this.punishmentRepository.findOne({
-      where: [
-        {
-          userId: user.id,
-          type: PunishmentType.Ban,
-          expireAt: IsNull(),
-        },
-        {
-          userId: user.id,
-          type: PunishmentType.Ban,
-          expireAt: MoreThan(now),
-        },
-      ],
-    });
-
-    if (activeBan) {
-      throw new ForbiddenException('您已被封禁，无法进行此操作');
+    let expireStr = '';
+    const activeBanPublic = await this.reportService.getActiveBan(user.id);
+    const activeBanAdmin = await this.usersService.getActiveBan(user.id);
+    if (activeBanPublic) {
+      const now = new Date();
+      const expireAt = activeBanPublic.expireAt;
+      const durationTime = diffDay(expireAt, now);
+      expireStr = expireAt ? `，将于 ${durationTime.toFixed(2)}天后解除` : '，已被永久封禁';
+    }
+    if (activeBanAdmin) {
+      expireStr = '，已被管理员封禁';
+    }
+    if (activeBanPublic || activeBanAdmin) {
+      throw new ForbiddenException({
+        message: `您已被封禁${expireStr}，无法进行此操作`,
+        bizCode: 'Banned',
+      });
     }
 
     return true;

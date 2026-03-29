@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
+import { UserStatus } from '@/common/constants/constants';
 
 @Injectable()
 export class UsersService {
@@ -42,5 +43,12 @@ export class UsersService {
   async updateAvatar(id: number, avatar: string): Promise<User> {
     await this.usersRepository.update(id, { avatar });
     return this.findOne(id);
+  }
+
+  async getActiveBan(userId: number): Promise<boolean> {
+    const activeBan = await this.usersRepository.exists({
+      where: { id: userId, status: UserStatus.Banned },
+    });
+    return Boolean(activeBan);
   }
 }

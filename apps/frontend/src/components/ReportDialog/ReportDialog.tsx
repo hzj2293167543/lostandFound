@@ -38,7 +38,6 @@ export function ReportDialog({
     queryFn: () => reportApi.getReportReasons(targetType),
     enabled: open,
   });
-  console.log(reasons);
 
   const createMutation = useMutation({
     mutationFn: () =>

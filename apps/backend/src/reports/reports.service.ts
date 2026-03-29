@@ -1,16 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, IsNull, MoreThanOrEqual, Repository } from 'typeorm';
+import { In, IsNull, MoreThan, MoreThanOrEqual, Repository } from 'typeorm';
 import { Report } from './entities/report.entity';
 import { ReportReason } from './entities/report-reason.entity';
-import { CreateReportDto, ReportStatus, TReportTargetType } from '@lostfound/shared';
+import { CreateReportDto, ReportStatus, TReportTargetType, User } from '@lostfound/shared';
+import { Punishment, PunishmentType } from './entities/punishment.entity';
 @Injectable()
 export class ReportsService {
   constructor(
     @InjectRepository(Report)
     private reportRepository: Repository<Report>,
     @InjectRepository(ReportReason)
-    private reportReasonRepository: Repository<ReportReason>
+    private reportReasonRepository: Repository<ReportReason>,
+    @InjectRepository(Punishment)
+    private punishmentRepository: Repository<Punishment>
   ) {}
 
   async create(reporterId: number, dto: CreateReportDto): Promise<Report> {
@@ -59,5 +62,22 @@ export class ReportsService {
       },
     });
     return !!existing;
+  }
+
+  getActiveBan(userId: number): Promise<Punishment | null> {
+    return this.punishmentRepository.findOne({
+      where: [
+        {
+          userId,
+          type: PunishmentType.Ban,
+          expireAt: IsNull(),
+        },
+        {
+          userId,
+          type: PunishmentType.Ban,
+          expireAt: MoreThan(new Date()),
+        },
+      ],
+    });
   }
 }

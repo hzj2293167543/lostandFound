@@ -102,7 +102,6 @@ export function useFoundCreate(categories: Category[]) {
   }, [actionData, form]);
 
   const onError = (errors: FieldErrors<FoundCreateDto>) => {
-    console.log(errors);
     const firstError = getFirstError(errors);
     toast.error(firstError || '请检查招领信息');
   };

@@ -1,8 +1,11 @@
+import GlobalProgress from '@/components/globalProgress/GlobalProgress';
 import { Outlet } from 'react-router-dom';
 import NavHeader from './components/NavHeader';
-import GlobalProgress from '@/components/globalProgress/GlobalProgress';
+import { useGlobalToast } from '@/hooks/useGlobalToast';
 
 export default function RootLayout() {
+  useGlobalToast();
+
   return (
     <div className="min-h-screen bg-gray-50">
       <GlobalProgress />

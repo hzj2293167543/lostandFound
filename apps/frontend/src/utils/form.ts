@@ -21,6 +21,8 @@ export const getFirstError = (errors: FieldErrors) => {
  * @returns 错误信息
  */
 export function getErrorMsg(errors: unknown, defaultMsg = '请求失败') {
+  // console.log(errors);
+
   if (errors instanceof Error) {
     return errors.message;
   } else if (errors instanceof Response) {

@@ -7,12 +7,16 @@ import { Announcement } from '../announcements/entities/announcement.entity';
 import { LostItem } from '../lost-items/entities/lost-item.entity';
 import { FoundItem } from '../found-items/entities/found-item.entity';
 import { Comment } from '../comments/entities/comment.entity';
+import { Report } from '../reports/entities/report.entity';
+import { ReportReason } from '../reports/entities/report-reason.entity';
+import { Punishment, PunishmentType } from '../reports/entities/punishment.entity';
+import { ReportStatus, TReportTargetType, TReportStatusType } from '@lostfound/shared';
+import { CommentItemType } from '@/common/constants/constants';
 import {
   AnnouncementCreateDto,
   Announcement as AnnouncementDto,
   AnnouncementEditDto,
 } from '@lostfound/shared';
-import { CommentItemType } from '@/common/constants/constants';
 export interface AdminStats {
   lostCount: number;
   foundCount: number;
@@ -40,7 +44,13 @@ export class AdminService {
     @InjectRepository(FoundItem)
     private foundItemsRepository: Repository<FoundItem>,
     @InjectRepository(Comment)
-    private commentsRepository: Repository<Comment>
+    private commentsRepository: Repository<Comment>,
+    @InjectRepository(Report)
+    private reportsRepository: Repository<Report>,
+    @InjectRepository(ReportReason)
+    private reportReasonsRepository: Repository<ReportReason>,
+    @InjectRepository(Punishment)
+    private punishmentsRepository: Repository<Punishment>
   ) {}
 
   async getStats(): Promise<AdminStats> {
@@ -280,5 +290,105 @@ export class AdminService {
 
   async deleteAnnouncement(id: number): Promise<void> {
     await this.announcementsRepository.delete(id);
+  }
+
+  async getReportsPaginated(page: number, pageSize: number, status?: TReportStatusType) {
+    const where = status !== undefined ? { status } : undefined;
+    const [items, total] = await this.reportsRepository.findAndCount({
+      where,
+      relations: ['reporter', 'reason', 'handler'],
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+      order: { createdAt: 'DESC' },
+    });
+    return {
+      items,
+      total,
+      page,
+      pageSize,
+      totalPages: Math.ceil(total / pageSize),
+    };
+  }
+
+  async handleReport(
+    reportId: number,
+    handlerId: number,
+    status: TReportStatusType,
+    handlingResult?: string,
+    punishmentType?: PunishmentType,
+    punishmentDurationDays?: number
+  ): Promise<Report> {
+    const report = await this.reportsRepository.findOne({
+      where: { id: reportId },
+      relations: ['reporter', 'reason'],
+    });
+
+    if (!report) {
+      throw new Error('Report not found');
+    }
+
+    await this.reportsRepository.update(reportId, {
+      status,
+      handlerId,
+      handledAt: new Date(),
+      handlingResult,
+    });
+
+    if (status === ReportStatus.Approved && report.targetType === 3 && report.targetId) {
+      const punishment = this.punishmentsRepository.create({
+        userId: report.targetId,
+        type: punishmentType || PunishmentType.Ban,
+        durationDays: punishmentDurationDays || 0,
+        expireAt:
+          punishmentDurationDays && punishmentDurationDays > 0
+            ? new Date(Date.now() + punishmentDurationDays * 24 * 60 * 60 * 1000)
+            : null,
+        reason: report.reason?.reasonText || report.reasonDesc || handlingResult,
+        handlerId,
+        reportId,
+      });
+      await this.punishmentsRepository.save(punishment);
+
+      if (punishmentType === PunishmentType.Ban || !punishmentType) {
+        await this.usersRepository.update(report.targetId, { status: 0 });
+      }
+    }
+
+    return this.reportsRepository.findOne({
+      where: { id: reportId },
+      relations: ['reporter', 'reason', 'handler'],
+    });
+  }
+
+  async getReportStats() {
+    const [pending, approved, rejected] = await Promise.all([
+      this.reportsRepository.count({ where: { status: ReportStatus.Pending } }),
+      this.reportsRepository.count({ where: { status: ReportStatus.Approved } }),
+      this.reportsRepository.count({ where: { status: ReportStatus.Rejected } }),
+    ]);
+    return { pending, approved, rejected, total: pending + approved + rejected };
+  }
+
+  async revokePunishment(punishmentId: number): Promise<void> {
+    const punishment = await this.punishmentsRepository.findOne({
+      where: { id: punishmentId },
+    });
+
+    if (!punishment) {
+      throw new Error('Punishment not found');
+    }
+
+    if (punishment.type === PunishmentType.Ban) {
+      await this.usersRepository.update(punishment.userId, { status: 1 });
+    }
+
+    await this.punishmentsRepository.delete(punishmentId);
+  }
+
+  async getUserPunishments(userId: number) {
+    return this.punishmentsRepository.find({
+      where: { userId },
+      order: { createdAt: 'DESC' },
+    });
   }
 }

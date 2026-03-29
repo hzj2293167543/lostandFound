@@ -1,10 +1,12 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuthStore } from '@/stores/AuthStore';
-import { User } from '@lostfound/shared';
+import { ReportTargetType, User } from '@lostfound/shared';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import PersonalEdit from './PersonalEdit';
+import { ReportDialog } from '@/components/ReportDialog/ReportDialog';
+import { Flag } from 'lucide-react';
 
 export default function PersonalInformation({
   userRaw,
@@ -15,6 +17,7 @@ export default function PersonalInformation({
 }) {
   'use no memo';
   const [open, setOpen] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
   const logout = useAuthStore.use.logout();
   const handleLogout = () => {
     try {
@@ -45,9 +48,14 @@ export default function PersonalInformation({
             <p className="text-gray-600 text-center mb-6">
               {userRaw.description || '这个人很懒，什么都没有留下'}
             </p>
-            {isSelf && (
+            {isSelf ? (
               <Button className="w-full" onClick={() => setOpen(true)}>
                 编辑个人信息
+              </Button>
+            ) : (
+              <Button variant="outline" className="w-full" onClick={() => setReportOpen(true)}>
+                <Flag className="w-4 h-4 mr-2" />
+                举报用户
               </Button>
             )}
           </div>
@@ -61,6 +69,15 @@ export default function PersonalInformation({
         )}
       </Card>
       {isSelf && <PersonalEdit userRaw={userRaw} open={open} setOpen={setOpen} />}
+      {!isSelf && (
+        <ReportDialog
+          open={reportOpen}
+          onOpenChange={setReportOpen}
+          targetType={ReportTargetType.User}
+          targetId={userRaw.id}
+          targetSnapshot={{ name: userRaw.name, email: userRaw.email }}
+        />
+      )}
     </>
   );
 }

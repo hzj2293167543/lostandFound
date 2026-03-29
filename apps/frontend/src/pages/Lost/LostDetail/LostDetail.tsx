@@ -25,7 +25,7 @@ export default function LostDetailPage() {
         <div className="lg:col-span-2">
           <LostDetailItem lostDetail={lostDetail} />
           {/* 评论区 */}
-          <Comments comments={comments} itemId={lostDetail.id} />
+          <Comments itemId={lostDetail.id} />
         </div>
         {/* 右侧相关信息 */}
         <div className="lg:col-span-1">

@@ -1,6 +1,7 @@
-import { Controller, Post, Body, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Body, BadRequestException, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto, LoginDto, RegisterDtoSchema, LoginDtoSchema } from '@lostfound/shared';
+import { SkipBan } from '@/common/decorators/skipBan.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -20,6 +21,7 @@ export class AuthController {
   }
 
   @Post('login')
+  @SkipBan()
   login(@Body() dto: LoginDto) {
     const validatedDto = LoginDtoSchema.safeParse(dto);
     if (!validatedDto.success) {

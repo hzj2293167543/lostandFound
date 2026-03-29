@@ -6,3 +6,4 @@ export * from './category.api';
 export * from './comment.api';
 export * from './upload.api';
 export * from './admin.api';
+export * from './report.api';

@@ -6,12 +6,15 @@ import * as bcrypt from 'bcrypt';
 import { User } from '../users/entities/user.entity';
 import { LoginDto, LoginBackDto } from '@lostfound/shared';
 import { userToLoginBackDto } from './auth.mapper';
+import { Punishment } from '@/reports/entities/punishment.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    @InjectRepository(Punishment)
+    private punishmentRepository: Repository<Punishment>,
     private jwtService: JwtService
   ) {}
 
@@ -40,6 +43,15 @@ export class AuthService {
       where: { email: loginDto.email },
       withDeleted: true,
     });
+
+    const isBanned = await this.punishmentRepository.findOne({
+      where: {
+        userId: user.id,
+      },
+    });
+    if (isBanned) {
+      throw new UnauthorizedException('账号已被封禁，请联系管理员');
+    }
 
     if (user.status === 0 || user.deletedAt) {
       throw new UnauthorizedException('账号已被禁用');

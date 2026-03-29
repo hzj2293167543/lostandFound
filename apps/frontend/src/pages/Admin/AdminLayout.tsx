@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { useAuthStore, useIsAdmin } from '@/stores/AuthStore';
-import { FileText, LayoutDashboard, LogOut, Package, Users } from 'lucide-react';
+import { FileText, LayoutDashboard, LogOut, Package, Users, AlertTriangle } from 'lucide-react';
 import { memo } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -9,6 +9,7 @@ import { useShallow } from 'zustand/react/shallow';
 const menuItems = [
   { id: 'dashboard', label: '控制台', icon: LayoutDashboard, path: '/admin' },
   { id: 'users', label: '用户管理', icon: Users, path: '/admin/users' },
+  { id: 'reports', label: '举报管理', icon: AlertTriangle, path: '/admin/reports' },
   { id: 'categories', label: '分类管理', icon: FileText, path: '/admin/categories' },
   { id: 'lost', label: '失物管理', icon: Package, path: '/admin/lost' },
   { id: 'found', label: '招领管理', icon: Package, path: '/admin/found' },

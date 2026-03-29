@@ -10,6 +10,7 @@ import { ItemTypeMap } from '@/types/type';
 export const lostDetailAction: ActionFunction = async ({ request }) => {
   let intent;
   let result;
+
   try {
     const json = await request.json();
     intent = json.intent;
@@ -30,6 +31,6 @@ export const lostDetailAction: ActionFunction = async ({ request }) => {
     return { success: true, result, intent };
   } catch (error) {
     const errorMsg = getErrorMsg(error, '创建评论失败');
-    return { success: false, error: errorMsg };
+    return { success: false, error: errorMsg, intent };
   }
 };

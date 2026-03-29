@@ -10,6 +10,10 @@ import {
   AnnouncementCreateDto,
   AnnouncementEditDto,
   PageResponse,
+  ReportVo as Report,
+  ReportStatus,
+  TReportTargetType,
+  TReportStatusType,
 } from '@lostfound/shared';
 
 interface RecentItem {
@@ -72,7 +76,9 @@ export const adminApi = {
     get<Announcement[]>('/admin/announcements', config),
 
   getAnnouncementsPaginated: (page: number, pageSize: number) =>
-    get<PageResponse<Announcement>>(`/admin/announcements/paginated?page=${page}&pageSize=${pageSize}`),
+    get<PageResponse<Announcement>>(
+      `/admin/announcements/paginated?page=${page}&pageSize=${pageSize}`
+    ),
 
   createAnnouncement: (data: Partial<AnnouncementCreateDto>) =>
     post<Announcement>('/admin/announcements', data),
@@ -81,6 +87,34 @@ export const adminApi = {
     patch<Announcement>(`/admin/announcements/${id}`, data),
 
   deleteAnnouncement: (id: number) => remove<void>(`/admin/announcements/${id}`),
+
+  getReportStats: () =>
+    get<{ pending: number; approved: number; rejected: number; total: number }>(
+      '/admin/reports/stats'
+    ),
+
+  getReportsPaginated: (page: number, pageSize: number, status?: TReportStatusType) =>
+    get<PageResponse<Report>>(
+      `/admin/reports/paginated?page=${page}&pageSize=${pageSize}${status !== undefined ? `&status=${status}` : ''}`
+    ),
+
+  handleReport: (
+    id: number,
+    status: TReportStatusType,
+    handlingResult?: string,
+    punishmentType?: number,
+    punishmentDurationDays?: number
+  ) =>
+    post<Report>(`/admin/reports/${id}/handle`, {
+      status,
+      handlingResult,
+      punishmentType,
+      punishmentDurationDays,
+    }),
+
+  revokePunishment: (id: number) => remove<void>(`/admin/punishments/${id}`),
+
+  getUserPunishments: (userId: number) => get<any[]>(`/admin/users/${userId}/punishments`),
 };
 
 export default adminApi;

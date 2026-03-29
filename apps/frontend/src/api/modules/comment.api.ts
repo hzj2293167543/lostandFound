@@ -6,6 +6,16 @@ export const commentApi = {
   getCommentsByItem: (itemId: number, itemType: number) =>
     get<CommentItem[]>('/comments', { params: { itemId, itemType } }),
 
+  getCommentsByItemPaginated: (itemId: number, itemType: number, page?: number, limit?: number) =>
+    get<PageResponse<CommentItem>>('/comments/paginated', {
+      params: { itemId, itemType, page, limit },
+    }),
+
+  getChildComments: (parentId: number, page?: number, limit?: number) =>
+    get<PageResponse<CommentItem>>(`/comments/${parentId}/children`, {
+      params: { page, limit },
+    }),
+
   getCommentsByUserId: (userId: number, page?: number, limit?: number) =>
     get<PageResponse<CommentItem>>(`/comments/user/${userId}`, {
       params: { page, limit },

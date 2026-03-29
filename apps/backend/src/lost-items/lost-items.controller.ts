@@ -22,9 +22,10 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { CurrentUser } from 'src/common/decorators/currentUser.decorators';
+import { CurrentUser } from '@/common/decorators/currentUser.decorator';
 import { LostItemsService } from './lost-items.service';
 import { ZodValidationPipe } from '@/common/pipe';
+import { MuteGuard } from '@/common/guards/mute.guard';
 
 @Controller('lost-items')
 export class LostItemsController {
@@ -83,7 +84,7 @@ export class LostItemsController {
   }
 
   @Post()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), MuteGuard)
   create(
     @Body(new ZodValidationPipe(LostCreateDtoSchema)) data: LostCreateDto,
     @CurrentUser() user: User

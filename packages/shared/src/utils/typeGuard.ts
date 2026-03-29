@@ -33,3 +33,12 @@ export function isNull(value: unknown): value is null {
 export function isEmpty(value: unknown): value is string {
   return isUndefined(value) || isNull(value);
 }
+
+/**
+ * 检查值是否为 Date 类型
+ * @param value 要检查的值
+ * @returns 如果值是有效的 Date 类型（且时间戳不是 NaN）则返回 true，否则返回 false
+ */
+export function isValidDate(value: unknown): value is Date {
+  return value instanceof Date && !isNaN(value.getTime());
+}

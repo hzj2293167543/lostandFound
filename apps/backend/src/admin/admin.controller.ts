@@ -21,7 +21,12 @@ import {
   AnnouncementCreateDto,
   AnnouncementEditDto,
   AnnouncementEditDtoSchema,
+  ReportStatus,
+  TReportTargetType,
+  TReportStatusType,
 } from '@lostfound/shared';
+import { CurrentUser } from '@/common/decorators/currentUser.decorator';
+import { User } from '../users/entities/user.entity';
 
 @Controller('admin')
 @UseGuards(AuthGuard('jwt'))
@@ -49,10 +54,7 @@ export class AdminController {
   }
 
   @Get('users/paginated')
-  getUsersPaginated(
-    @Query('page') page: string,
-    @Query('pageSize') pageSize: string
-  ) {
+  getUsersPaginated(@Query('page') page: string, @Query('pageSize') pageSize: string) {
     return this.adminService.getUsersPaginated(+page, +pageSize);
   }
 
@@ -77,10 +79,7 @@ export class AdminController {
   }
 
   @Get('lost/paginated')
-  getLostItemsPaginated(
-    @Query('page') page: string,
-    @Query('pageSize') pageSize: string
-  ) {
+  getLostItemsPaginated(@Query('page') page: string, @Query('pageSize') pageSize: string) {
     return this.adminService.getLostItemsPaginated(+page, +pageSize);
   }
 
@@ -100,10 +99,7 @@ export class AdminController {
   }
 
   @Get('found/paginated')
-  getFoundItemsPaginated(
-    @Query('page') page: string,
-    @Query('pageSize') pageSize: string
-  ) {
+  getFoundItemsPaginated(@Query('page') page: string, @Query('pageSize') pageSize: string) {
     return this.adminService.getFoundItemsPaginated(+page, +pageSize);
   }
 
@@ -143,10 +139,7 @@ export class AdminController {
   }
 
   @Get('announcements/paginated')
-  getAnnouncementsPaginated(
-    @Query('page') page: string,
-    @Query('pageSize') pageSize: string
-  ) {
+  getAnnouncementsPaginated(@Query('page') page: string, @Query('pageSize') pageSize: string) {
     return this.adminService.getAnnouncementsPaginated(+page, +pageSize);
   }
 
@@ -174,5 +167,52 @@ export class AdminController {
   @Delete('announcements/:id')
   deleteAnnouncement(@Param('id') id: string) {
     return this.adminService.deleteAnnouncement(+id);
+  }
+
+  @Get('reports/stats')
+  getReportStats() {
+    return this.adminService.getReportStats();
+  }
+
+  @Get('reports/paginated')
+  getReportsPaginated(
+    @Query('page') page: string,
+    @Query('pageSize') pageSize: string,
+    @Query('status') status?: string
+  ) {
+    return this.adminService.getReportsPaginated(
+      +page,
+      +pageSize,
+      status !== undefined ? (Number(status) as TReportStatusType) : undefined
+    );
+  }
+
+  @Post('reports/:id/handle')
+  handleReport(
+    @Param('id') id: string,
+    @Body('status') status: TReportStatusType,
+    @Body('handlingResult') handlingResult: string,
+    @Body('punishmentType') punishmentType: number,
+    @Body('punishmentDurationDays') punishmentDurationDays: number,
+    @CurrentUser() user: User
+  ) {
+    return this.adminService.handleReport(
+      +id,
+      user.id,
+      status,
+      handlingResult,
+      punishmentType,
+      punishmentDurationDays
+    );
+  }
+
+  @Delete('punishments/:id')
+  revokePunishment(@Param('id') id: string) {
+    return this.adminService.revokePunishment(+id);
+  }
+
+  @Get('users/:userId/punishments')
+  getUserPunishments(@Param('userId') userId: string) {
+    return this.adminService.getUserPunishments(+userId);
   }
 }

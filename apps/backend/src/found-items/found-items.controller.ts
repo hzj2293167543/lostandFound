@@ -22,8 +22,9 @@ import {
   GetFoundItemsParams,
   GetFoundItemsParamsSchema,
 } from '@lostfound/shared';
-import { CurrentUser } from 'src/common/decorators/currentUser.decorators';
+import { CurrentUser } from '@/common/decorators/currentUser.decorator';
 import { ZodValidationPipe } from '@/common/pipe';
+import { MuteGuard } from '@/common/guards/mute.guard';
 
 @Controller('found-items')
 export class FoundItemsController {
@@ -82,7 +83,7 @@ export class FoundItemsController {
   }
 
   @Post()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), MuteGuard)
   create(@Body() data: FoundCreateDto, @CurrentUser() user: User) {
     return this.foundItemsService.create({
       ...data,

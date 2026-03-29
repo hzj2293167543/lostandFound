@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import {
@@ -12,13 +13,15 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { ItemTypeMap } from '@/types/type';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Comment } from '@lostfound/shared';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useActionData, useSubmit } from 'react-router-dom';
 import * as z from 'zod';
 import { FOUND_DETAIL_INTENT } from '../../type';
 import { CommentItem } from './CommentItem';
+import { toast } from 'sonner';
+import { useItemCommentInfinite } from '@/hooks/useItemCommentInfinite';
+import { getPageNumbers, PAGE_SIZE } from '@/utils';
 
 const commentSchema = z.object({
   content: z.string().min(1, '评论内容不能为空'),
@@ -26,12 +29,17 @@ const commentSchema = z.object({
 
 type CommentFormValues = z.infer<typeof commentSchema>;
 
-const PAGE_SIZE = 10;
-
-export default function Comments({ comments, itemId }: { comments: Comment[]; itemId: number }) {
-  const [currentPage, setCurrentPage] = useState(1);
+export default function Comments({ itemId }: { itemId: number }) {
   const actionData = useActionData<{ success: boolean; intent?: number; error?: string }>();
   const submit = useSubmit();
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } =
+    useItemCommentInfinite(itemId, ItemTypeMap.FOUND);
+
+  const comments = data?.pages.flatMap((p) => p.items) || [];
+  const totalComments = data?.pages[0]?.total || 0;
+  const totalPages = data?.pages[0]?.totalPages || 1;
 
   const form = useForm<CommentFormValues>({
     resolver: zodResolver(commentSchema),
@@ -41,11 +49,15 @@ export default function Comments({ comments, itemId }: { comments: Comment[]; it
   });
 
   useEffect(() => {
-    if (actionData?.intent === FOUND_DETAIL_INTENT.COMMENT && actionData.success) {
+    if (actionData?.intent !== FOUND_DETAIL_INTENT.COMMENT) return;
+    if (actionData.success) {
       form.reset();
       setCurrentPage(1);
+      refetch();
+    } else if (!actionData.success) {
+      toast.error(actionData.error || '发布失败');
     }
-  }, [actionData, form]);
+  }, [actionData, form, refetch]);
 
   const [replyState, setReplyState] = useState<{ replyId: number | undefined }>({
     replyId: undefined,
@@ -65,9 +77,26 @@ export default function Comments({ comments, itemId }: { comments: Comment[]; it
     await submit(JSON.stringify(payload), { method: 'POST', encType: 'application/json' });
   };
 
-  const totalComments = comments?.length || 0;
-  const totalPages = Math.ceil(totalComments / PAGE_SIZE);
   const displayedComments = comments.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    if (page <= totalPages) {
+      fetchNextPage();
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>评论</CardTitle>
+        </CardHeader>
+        <CardContent className="flex justify-center py-8">
+          <Skeleton className="h-6 w-24" />
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -96,7 +125,7 @@ export default function Comments({ comments, itemId }: { comments: Comment[]; it
           </form>
         </Form>
 
-        {totalComments === 0 ? null : (
+        {comments.length === 0 ? null : (
           <>
             <div className="space-y-6">
               {displayedComments.map((commentItem) => (
@@ -108,6 +137,8 @@ export default function Comments({ comments, itemId }: { comments: Comment[]; it
                     replyId: replyState.replyId,
                     setReplyState: handleReplyStateChange,
                   }}
+                  onCommentChange={() => refetch()}
+                  reloadRootChildren={() => refetch()}
                 />
               ))}
             </div>
@@ -120,19 +151,19 @@ export default function Comments({ comments, itemId }: { comments: Comment[]; it
                         href="#"
                         onClick={(e) => {
                           e.preventDefault();
-                          setCurrentPage((p) => Math.max(1, p - 1));
+                          handlePageChange(Math.max(1, currentPage - 1));
                         }}
                         className={currentPage <= 1 ? 'pointer-events-none opacity-50' : ''}
                       />
                     </PaginationItem>
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    {getPageNumbers(currentPage, totalPages).map((page) => (
                       <PaginationItem key={page}>
                         <PaginationLink
                           href="#"
                           isActive={page === currentPage}
                           onClick={(e) => {
                             e.preventDefault();
-                            setCurrentPage(page);
+                            handlePageChange(page);
                           }}>
                           {page}
                         </PaginationLink>
@@ -143,7 +174,7 @@ export default function Comments({ comments, itemId }: { comments: Comment[]; it
                         href="#"
                         onClick={(e) => {
                           e.preventDefault();
-                          setCurrentPage((p) => Math.min(totalPages, p + 1));
+                          handlePageChange(Math.min(totalPages, currentPage + 1));
                         }}
                         className={
                           currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''

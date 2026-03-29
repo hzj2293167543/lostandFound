@@ -39,13 +39,13 @@ export class AllExceptionsFilter implements ExceptionFilter {
         status = HttpStatus.CONFLICT;
         message = '数据已存在，请勿重复提交';
       } else {
-        message = '数据库操作失败';
+        message = err.message || '数据库操作失败';
       }
     } else if (exception instanceof Error) {
       if (this.configService.get('app.env') === 'development') {
         console.error(exception); // 日志记录真实错误
       }
-      message = 'Internal server error';
+      message = exception.message || 'Internal server error';
     }
 
     response.status(status).json({

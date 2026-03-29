@@ -1,4 +1,4 @@
-import { CurrentUser } from '@/common/decorators/currentUser.decorators';
+import { CurrentUser } from '@/common/decorators/currentUser.decorator';
 import { CommentCreateDto, commentCreateDtoSchema, CommentItem, User } from '@lostfound/shared';
 import {
   BadRequestException,
@@ -15,6 +15,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { CommentsService } from './comments.service';
+import { MuteGuard } from '@/common/guards/mute.guard';
 
 @Controller('comments')
 export class CommentsController {
@@ -31,9 +32,42 @@ export class CommentsController {
     return this.commentsService.findByItem(itemId, itemType, user.id);
   }
 
+  @Get('paginated')
+  @UseGuards(AuthGuard('jwt'))
+  findByItemPaginated(
+    @Query('itemId', new ParseIntPipe()) itemId: number,
+    @Query('itemType', new ParseIntPipe()) itemType: number,
+    @Query('page', new ParseIntPipe({ optional: true })) page?: number,
+    @Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
+    @CurrentUser() user?: User
+  ) {
+    const validPage = (page ?? 1) > 0 ? page : 1;
+    const validLimit = (limit ?? 10) > 0 ? limit : 10;
+    return this.commentsService.findByItemPaginated(
+      itemId,
+      itemType,
+      user?.id,
+      validPage,
+      validLimit
+    );
+  }
+
   @Get(':id/likes')
   like(@Param('id', new ParseIntPipe()) id: number) {
     return this.commentsService.findLikes(id);
+  }
+
+  @Get(':rootId/children')
+  @UseGuards(AuthGuard('jwt'))
+  getChildren(
+    @Param('rootId', new ParseIntPipe()) rootId: number,
+    @Query('page', new ParseIntPipe({ optional: true })) page?: number,
+    @Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
+    @CurrentUser() user?: User
+  ) {
+    const validPage = (page ?? 1) > 0 ? page : 1;
+    const validLimit = (limit ?? 10) > 0 ? limit : 10;
+    return this.commentsService.findChildrenPaginated(rootId, user?.id, validPage, validLimit);
   }
 
   @Get(':id/liked')
@@ -54,7 +88,7 @@ export class CommentsController {
   }
 
   @Post()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), MuteGuard)
   create(@Body() data: CommentCreateDto, @CurrentUser() user: User) {
     console.log(data);
     const result = commentCreateDtoSchema.safeParse(data);

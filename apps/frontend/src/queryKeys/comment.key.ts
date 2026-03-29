@@ -5,4 +5,6 @@ export const commentKeys = {
   list: <T extends Record<string, unknown>>(userId: number, filters?: T) =>
     [...commentKeys.lists(), userId, filters] as const,
   userCommentList: (userId: number) => [...commentKeys.all, 'user', userId] as const,
+  itemComments: (itemId: number, itemType: number) =>
+    [...commentKeys.all, 'item', itemId, itemType] as const,
 };

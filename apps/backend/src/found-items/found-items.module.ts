@@ -6,10 +6,12 @@ import { FoundItem } from './entities/found-item.entity';
 import { Category } from '@/categories/entities/category.entity';
 import { UploadService } from '@/common/upload/upload.service';
 import { CommentsModule } from '@/comments/comments.module';
+import { Punishment } from '@/reports/entities/punishment.entity';
+import { MuteGuard } from '@/common/guards/mute.guard';
 @Module({
-  imports: [TypeOrmModule.forFeature([FoundItem, Category]), CommentsModule],
+  imports: [TypeOrmModule.forFeature([FoundItem, Category, Punishment]), CommentsModule],
   controllers: [FoundItemsController],
-  providers: [FoundItemsService, UploadService],
+  providers: [FoundItemsService, UploadService, MuteGuard],
   exports: [FoundItemsService],
 })
 export class FoundItemsModule {}

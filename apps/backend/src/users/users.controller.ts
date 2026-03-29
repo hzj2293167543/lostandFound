@@ -8,7 +8,7 @@ import {
   UserEditPasswordDto,
   UserEditPasswordDtoSchema,
 } from '@lostfound/shared';
-import { CurrentUser } from '@/common/decorators/currentUser.decorators';
+import { CurrentUser } from '@/common/decorators/currentUser.decorator';
 
 @Controller('users')
 export class UsersController {

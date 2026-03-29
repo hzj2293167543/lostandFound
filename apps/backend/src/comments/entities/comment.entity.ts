@@ -22,18 +22,23 @@ export class Comment {
   time: Date;
 
   @Column({ nullable: true })
-  @JoinColumn({ name: 'parent_id' })
   parentId: number | null;
 
   @ManyToOne(() => Comment, { nullable: true })
   @JoinColumn({ name: 'parent_id' })
   parent: Comment | null;
 
+  @Column({ nullable: true })
+  rootId: number | null;
+
+  @ManyToOne(() => Comment, { nullable: true })
+  @JoinColumn({ name: 'root_id' })
+  root: Comment | null;
+
   @Column()
-  @JoinColumn({ name: 'user_id' })
   userId: number;
 
-  @ManyToOne(() => User, (user) => user.comments)
+  @ManyToOne(() => User)
   @JoinColumn({ name: 'user_id' })
   user: User;
 

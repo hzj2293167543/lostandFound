@@ -24,7 +24,7 @@ export default function FoundDetailPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
           <FoundDetailItem foundDetail={foundDetail} />
-          <Comments comments={comments} itemId={foundDetail.id} />
+          <Comments itemId={foundDetail.id} />
         </div>
         <div className="lg:col-span-1">
           <FoundAction />

@@ -24,6 +24,7 @@ const AdminLost = lazy(() => import('./pages/Admin/Lost'));
 const AdminFound = lazy(() => import('./pages/Admin/Found'));
 const AdminCategories = lazy(() => import('./pages/Admin/Categories'));
 const AdminAnnouncements = lazy(() => import('./pages/Admin/Announcements'));
+const AdminReports = lazy(() => import('./pages/Admin/Reports'));
 
 import { foundDetailLoader } from './pages/Found/FoundDetail/foundDetail.loader';
 import { foundDetailAction } from './pages/Found/FoundDetail/foundDetail.action';
@@ -212,6 +213,10 @@ export const router = createBrowserRouter([
       {
         path: 'announcements',
         element: <AdminAnnouncements />,
+      },
+      {
+        path: 'reports',
+        element: <AdminReports />,
       },
     ],
   },

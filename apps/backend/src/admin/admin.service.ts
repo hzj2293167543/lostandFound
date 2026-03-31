@@ -1,22 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Not, IsNull, In } from 'typeorm';
+import { Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
-import { Category } from '../categories/entities/category.entity';
-import { Announcement } from '../announcements/entities/announcement.entity';
 import { LostItem } from '../lost-items/entities/lost-item.entity';
 import { FoundItem } from '../found-items/entities/found-item.entity';
-import { Comment } from '../comments/entities/comment.entity';
-import { Report } from '../reports/entities/report.entity';
-import { ReportReason } from '../reports/entities/report-reason.entity';
-import { Punishment, PunishmentType } from '../reports/entities/punishment.entity';
-import { ReportStatus, TReportTargetType, TReportStatusType } from '@lostfound/shared';
-import { CommentItemType } from '@/common/constants/constants';
-import {
-  AnnouncementCreateDto,
-  Announcement as AnnouncementDto,
-  AnnouncementEditDto,
-} from '@lostfound/shared';
+import { Announcement } from '../announcements/entities/announcement.entity';
+import { ItemManagementService, RecentItem } from './item-management.service';
+import { ReportService } from './report.service';
+
 export interface AdminStats {
   lostCount: number;
   foundCount: number;
@@ -24,69 +15,23 @@ export interface AdminStats {
   announcementCount: number;
 }
 
-export interface RecentItem {
-  id: number;
-  title: string;
-  time: Date;
-}
-
 @Injectable()
 export class AdminService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-    @InjectRepository(Category)
-    private categoriesRepository: Repository<Category>,
-    @InjectRepository(Announcement)
-    private announcementsRepository: Repository<Announcement>,
-    @InjectRepository(LostItem)
-    private lostItemsRepository: Repository<LostItem>,
-    @InjectRepository(FoundItem)
-    private foundItemsRepository: Repository<FoundItem>,
-    @InjectRepository(Comment)
-    private commentsRepository: Repository<Comment>,
-    @InjectRepository(Report)
-    private reportsRepository: Repository<Report>,
-    @InjectRepository(ReportReason)
-    private reportReasonsRepository: Repository<ReportReason>,
-    @InjectRepository(Punishment)
-    private punishmentsRepository: Repository<Punishment>
+    private itemManagementService: ItemManagementService,
+    private reportService: ReportService
   ) {}
 
   async getStats(): Promise<AdminStats> {
     const [lostCount, foundCount, userCount, announcementCount] = await Promise.all([
-      this.lostItemsRepository.count(),
-      this.foundItemsRepository.count(),
+      this.usersRepository.manager.getRepository(LostItem).count(),
+      this.usersRepository.manager.getRepository(FoundItem).count(),
       this.usersRepository.count(),
-      this.announcementsRepository.count(),
+      this.usersRepository.manager.getRepository(Announcement).count(),
     ]);
     return { lostCount, foundCount, userCount, announcementCount };
-  }
-
-  async getRecentLostItems(limit: number = 5): Promise<RecentItem[]> {
-    const items = await this.lostItemsRepository.find({
-      order: { time: 'DESC' },
-      take: limit,
-      select: ['id', 'title', 'time'],
-    });
-    return items.map((item) => ({
-      id: item.id,
-      title: item.title,
-      time: item.time,
-    }));
-  }
-
-  async getRecentFoundItems(limit: number = 5): Promise<RecentItem[]> {
-    const items = await this.foundItemsRepository.find({
-      order: { time: 'DESC' },
-      take: limit,
-      select: ['id', 'title', 'time'],
-    });
-    return items.map((item) => ({
-      id: item.id,
-      title: item.title,
-      time: item.time,
-    }));
   }
 
   getAllUsers(): Promise<User[]> {
@@ -123,272 +68,91 @@ export class AdminService {
     await this.usersRepository.restore(id);
   }
 
-  async getAllLostItems(): Promise<LostItem[]> {
-    return this.lostItemsRepository.find({
-      relations: ['category'],
-    });
+  getRecentLostItems(limit: number = 5): Promise<RecentItem[]> {
+    return this.itemManagementService.getRecentLostItems(limit);
   }
 
-  async getLostItemsPaginated(page: number, pageSize: number) {
-    const [items, total] = await this.lostItemsRepository.findAndCount({
-      relations: ['category'],
-      skip: (page - 1) * pageSize,
-      take: pageSize,
-      order: { time: 'DESC' },
-    });
-    return {
-      items,
-      total,
-      page,
-      pageSize,
-      totalPages: Math.ceil(total / pageSize),
-    };
+  getRecentFoundItems(limit: number = 5): Promise<RecentItem[]> {
+    return this.itemManagementService.getRecentFoundItems(limit);
   }
 
-  async softDeleteLostItem(id: number): Promise<void> {
-    await this.commentsRepository.softDelete({ itemId: id, itemType: CommentItemType.LostItem });
-    await this.lostItemsRepository.softDelete(id);
+  getAllLostItems() {
+    return this.itemManagementService.getAllLostItems();
   }
 
-  async restoreLostItem(id: number): Promise<void> {
-    await this.lostItemsRepository.restore(id);
-    await this.commentsRepository.restore({ itemId: id, itemType: CommentItemType.LostItem });
+  getLostItemsPaginated(page: number, pageSize: number) {
+    return this.itemManagementService.getLostItemsPaginated(page, pageSize);
   }
 
-  async getAllFoundItems(): Promise<FoundItem[]> {
-    return this.foundItemsRepository.find({
-      relations: ['category'],
-    });
+  softDeleteLostItem(id: number): Promise<void> {
+    return this.itemManagementService.softDeleteLostItem(id);
   }
 
-  async getFoundItemsPaginated(page: number, pageSize: number) {
-    const [items, total] = await this.foundItemsRepository.findAndCount({
-      relations: ['category'],
-      skip: (page - 1) * pageSize,
-      take: pageSize,
-      order: { time: 'DESC' },
-    });
-    return {
-      items,
-      total,
-      page,
-      pageSize,
-      totalPages: Math.ceil(total / pageSize),
-    };
+  restoreLostItem(id: number): Promise<void> {
+    return this.itemManagementService.restoreLostItem(id);
   }
 
-  async softDeleteFoundItem(id: number): Promise<void> {
-    await this.commentsRepository.softDelete({ itemId: id, itemType: CommentItemType.FoundItem });
-    await this.foundItemsRepository.softDelete(id);
+  getAllFoundItems() {
+    return this.itemManagementService.getAllFoundItems();
   }
 
-  async restoreFoundItem(id: number): Promise<void> {
-    await this.foundItemsRepository.restore(id);
-    await this.commentsRepository.restore({ itemId: id, itemType: CommentItemType.FoundItem });
+  getFoundItemsPaginated(page: number, pageSize: number) {
+    return this.itemManagementService.getFoundItemsPaginated(page, pageSize);
   }
 
-  async getAllCategories(): Promise<Category[]> {
-    return this.categoriesRepository.find();
+  softDeleteFoundItem(id: number): Promise<void> {
+    return this.itemManagementService.softDeleteFoundItem(id);
   }
 
-  async createCategory(name: string): Promise<Category> {
-    const category = this.categoriesRepository.create({ name });
-    return this.categoriesRepository.save(category);
+  restoreFoundItem(id: number): Promise<void> {
+    return this.itemManagementService.restoreFoundItem(id);
   }
 
-  async updateCategory(id: number, name: string): Promise<Category> {
-    await this.categoriesRepository.update(id, { name });
-    return this.categoriesRepository.findOne({ where: { id } });
+  getReportsPaginated(query: Parameters<typeof this.reportService.getReportsPaginated>[0]) {
+    return this.reportService.getReportsPaginated(query);
   }
 
-  async deleteCategory(id: number): Promise<{ success: boolean; message: string }> {
-    const categoryToDelete = await this.categoriesRepository.findOne({ where: { id } });
-    if (!categoryToDelete) {
-      return { success: false, message: '分类不存在' };
-    }
-
-    if (categoryToDelete.defaultSince !== null) {
-      return { success: false, message: '系统默认分类不能被删除' };
-    }
-
-    const defaultCategory = await this.categoriesRepository.findOne({
-      where: { defaultSince: Not(IsNull()) },
-    });
-
-    if (!defaultCategory) {
-      return { success: false, message: '系统中没有默认分类，无法删除' };
-    }
-
-    const itemsWithCategory = await Promise.all([
-      this.lostItemsRepository.count({ where: { categoryId: id } }),
-      this.foundItemsRepository.count({ where: { categoryId: id } }),
-    ]);
-
-    const totalItems = itemsWithCategory[0] + itemsWithCategory[1];
-
-    if (totalItems > 0) {
-      await Promise.all([
-        this.lostItemsRepository.update({ categoryId: id }, { categoryId: defaultCategory.id }),
-        this.foundItemsRepository.update({ categoryId: id }, { categoryId: defaultCategory.id }),
-      ]);
-    }
-
-    await this.categoriesRepository.delete(id);
-    return {
-      success: true,
-      message:
-        totalItems > 0
-          ? `分类删除成功，已将 ${totalItems} 个物品迁移到分类「${defaultCategory.name}」`
-          : '分类删除成功',
-    };
-  }
-
-  getAllAnnouncements(): Promise<Announcement[]> {
-    return this.announcementsRepository.find({
-      order: { time: 'DESC' },
-    });
-  }
-
-  async getAnnouncementsPaginated(page: number, pageSize: number) {
-    const [items, total] = await this.announcementsRepository.findAndCount({
-      skip: (page - 1) * pageSize,
-      take: pageSize,
-      order: { time: 'DESC' },
-    });
-    return {
-      items,
-      total,
-      page,
-      pageSize,
-      totalPages: Math.ceil(total / pageSize),
-    };
-  }
-
-  createAnnouncement(data: Partial<AnnouncementCreateDto>): Promise<Announcement> {
-    const { author, ...rest } = data;
-    const announcement = this.announcementsRepository.create({
-      ...rest,
-      authorId: author,
-      time: new Date(),
-    });
-    return this.announcementsRepository.save(announcement);
-  }
-
-  async updateAnnouncement(id: number, data: Partial<AnnouncementEditDto>): Promise<Announcement> {
-    const exists = await this.announcementsRepository.exists({ where: { id } });
-    if (!exists) {
-      throw new Error('Announcement not found');
-    }
-    const { author, ...rest } = data;
-    const announcement = new Announcement();
-    Object.assign(announcement, rest);
-    announcement.authorId = author;
-    announcement.time = new Date();
-    await this.announcementsRepository.update(id, announcement);
-    return this.announcementsRepository.findOne({ where: { id } });
-  }
-
-  async deleteAnnouncement(id: number): Promise<void> {
-    await this.announcementsRepository.delete(id);
-  }
-
-  async getReportsPaginated(page: number, pageSize: number, status?: TReportStatusType) {
-    const where = status !== undefined ? { status } : undefined;
-    const [items, total] = await this.reportsRepository.findAndCount({
-      where,
-      relations: ['reporter', 'reason', 'handler'],
-      skip: (page - 1) * pageSize,
-      take: pageSize,
-      order: { createdAt: 'DESC' },
-    });
-    return {
-      items,
-      total,
-      page,
-      pageSize,
-      totalPages: Math.ceil(total / pageSize),
-    };
-  }
-
-  async handleReport(
+  handleUserReport(
     reportId: number,
     handlerId: number,
-    status: TReportStatusType,
-    handlingResult?: string,
-    punishmentType?: PunishmentType,
-    punishmentDurationDays?: number
-  ): Promise<Report> {
-    const report = await this.reportsRepository.findOne({
-      where: { id: reportId },
-      relations: ['reporter', 'reason'],
-    });
-
-    if (!report) {
-      throw new Error('Report not found');
-    }
-
-    await this.reportsRepository.update(reportId, {
-      status,
-      handlerId,
-      handledAt: new Date(),
-      handlingResult,
-    });
-
-    if (status === ReportStatus.Approved && report.targetType === 3 && report.targetId) {
-      const punishment = this.punishmentsRepository.create({
-        userId: report.targetId,
-        type: punishmentType || PunishmentType.Ban,
-        durationDays: punishmentDurationDays || 0,
-        expireAt:
-          punishmentDurationDays && punishmentDurationDays > 0
-            ? new Date(Date.now() + punishmentDurationDays * 24 * 60 * 60 * 1000)
-            : null,
-        reason: report.reason?.reasonText || report.reasonDesc || handlingResult,
-        handlerId,
-        reportId,
-      });
-      await this.punishmentsRepository.save(punishment);
-
-      if (punishmentType === PunishmentType.Ban || !punishmentType) {
-        await this.usersRepository.update(report.targetId, { status: 0 });
-      }
-    }
-
-    return this.reportsRepository.findOne({
-      where: { id: reportId },
-      relations: ['reporter', 'reason', 'handler'],
-    });
+    data: Parameters<typeof this.reportService.handleUserReport>[2]
+  ) {
+    return this.reportService.handleUserReport(reportId, handlerId, data);
   }
 
-  async getReportStats() {
-    const [pending, approved, rejected] = await Promise.all([
-      this.reportsRepository.count({ where: { status: ReportStatus.Pending } }),
-      this.reportsRepository.count({ where: { status: ReportStatus.Approved } }),
-      this.reportsRepository.count({ where: { status: ReportStatus.Rejected } }),
-    ]);
-    return { pending, approved, rejected, total: pending + approved + rejected };
+  handleCommentReport(
+    reportId: number,
+    handlerId: number,
+    data: Parameters<typeof this.reportService.handleCommentReport>[2]
+  ) {
+    return this.reportService.handleCommentReport(reportId, handlerId, data);
   }
 
-  async revokePunishment(punishmentId: number): Promise<void> {
-    const punishment = await this.punishmentsRepository.findOne({
-      where: { id: punishmentId },
-    });
-
-    if (!punishment) {
-      throw new Error('Punishment not found');
-    }
-
-    if (punishment.type === PunishmentType.Ban) {
-      await this.usersRepository.update(punishment.userId, { status: 1 });
-    }
-
-    await this.punishmentsRepository.delete(punishmentId);
+  handleLostReport(
+    reportId: number,
+    handlerId: number,
+    data: Parameters<typeof this.reportService.handleLostReport>[2]
+  ) {
+    return this.reportService.handleLostReport(reportId, handlerId, data);
   }
 
-  async getUserPunishments(userId: number) {
-    return this.punishmentsRepository.find({
-      where: { userId },
-      order: { createdAt: 'DESC' },
-    });
+  handleFoundReport(
+    reportId: number,
+    handlerId: number,
+    data: Parameters<typeof this.reportService.handleFoundReport>[2]
+  ) {
+    return this.reportService.handleFoundReport(reportId, handlerId, data);
+  }
+
+  getReportStats() {
+    return this.reportService.getReportStats();
+  }
+
+  revokePunishment(punishmentId: number): Promise<void> {
+    return this.reportService.revokePunishment(punishmentId);
+  }
+
+  getUserPunishments(userId: number) {
+    return this.reportService.getUserPunishments(userId);
   }
 }

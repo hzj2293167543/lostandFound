@@ -1,4 +1,3 @@
-import { Category } from '@/categories/entities/category.entity';
 import { CommentsModule } from '@/comments/comments.module';
 import { UploadService } from '@/common/upload/upload.service';
 import { Module } from '@nestjs/common';

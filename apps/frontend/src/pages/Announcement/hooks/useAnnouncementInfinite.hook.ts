@@ -3,6 +3,7 @@ import { announcementKeys } from '@/queryKeys';
 import { Announcement, GetAnnouncementsParams, PageResponse } from '@lostfound/shared';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useCallback, useMemo, useRef } from 'react';
+import type { UIEvent } from 'react';
 
 const PAGE_NUM = 6;
 export function useAnnouncementInfinite(filters?: GetAnnouncementsParams) {
@@ -38,7 +39,7 @@ export function useAnnouncementInfinite(filters?: GetAnnouncementsParams) {
   }, [allItems.length, hasNextPage, isFetchingNextPage]);
 
   const handleScroll = useCallback(
-    (event: React.UIEvent<HTMLDivElement>) => {
+    (event: UIEvent<HTMLDivElement>) => {
       const { scrollTop, clientHeight, scrollHeight } = event.target as HTMLDivElement;
       const bottom = scrollHeight - scrollTop - clientHeight;
       if (bottom < 300 && hasNextPage && !isFetchingNextPage) {

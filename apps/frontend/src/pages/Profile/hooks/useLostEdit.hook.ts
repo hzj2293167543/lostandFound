@@ -7,7 +7,7 @@ import { LostUpdateDto, LostUpdateDtoSchema } from '@lostfound/shared';
 import { useMutation, useQueries } from '@tanstack/react-query';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { FieldErrors, useForm } from 'react-hook-form';
-import { useLoaderData, useRevalidator } from 'react-router';
+import { useLoaderData } from 'react-router';
 import { toast } from 'sonner';
 
 export function useLostEdit(lostItemId: number) {
@@ -15,7 +15,7 @@ export function useLostEdit(lostItemId: number) {
   const [imagePreview, setImagePreview] = useState<string>('');
   const [isUploading, setIsUploading] = useState(false);
   const { user } = useLoaderData();
-  const revalidator = useRevalidator();
+
   const form = useForm<LostUpdateDto>({
     resolver: zodResolver(LostUpdateDtoSchema),
     defaultValues: {

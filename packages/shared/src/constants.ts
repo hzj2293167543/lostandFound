@@ -30,3 +30,17 @@ export const ReportStatus = {
 } as const;
 
 export type TReportStatusType = (typeof ReportStatus)[keyof typeof ReportStatus];
+
+export const PUNISHMENT_TYPE = {
+  Warning: 1,
+  Mute: 2,
+  Ban: 3,
+} as const;
+
+export type TPunishmentType = (typeof PUNISHMENT_TYPE)[keyof typeof PUNISHMENT_TYPE];
+
+export const PUNISHMENT_TYPE_NAME = {
+  [PUNISHMENT_TYPE.Warning]: '警告',
+  [PUNISHMENT_TYPE.Mute]: '禁言',
+  [PUNISHMENT_TYPE.Ban]: '封禁',
+} as const;

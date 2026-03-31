@@ -7,6 +7,7 @@ import {
   mapObjToFormData,
   safeParse,
 } from '../../utils';
+import type { FieldErrors } from 'react-hook-form';
 
 describe('utils', () => {
   describe('formatDateForInput', () => {
@@ -52,7 +53,8 @@ describe('utils', () => {
           children: [],
         },
       ];
-      const tree = buildTree(comments as any);
+      // @ts-expect-error – 故意传入错误类型以测试组件容错性
+      const tree = buildTree(comments as unknown);
       expect(tree).toHaveLength(2);
       expect(tree[0].id).toBe(1);
     });
@@ -76,7 +78,8 @@ describe('utils', () => {
           children: [],
         },
       ];
-      const tree = buildTree(comments as any);
+      // @ts-expect-error – 故意传入错误类型以测试组件容错性
+      const tree = buildTree(comments as unknown);
       expect(tree).toHaveLength(1);
       expect(tree[0].children).toHaveLength(1);
     });
@@ -89,8 +92,8 @@ describe('form', () => {
       const errors = {
         email: { message: 'Invalid email' },
         name: { message: 'Name required' },
-      } as any;
-      expect(getFirstError(errors)).toBe('Invalid email');
+      } as unknown;
+      expect(getFirstError(errors as FieldErrors)).toBe('Invalid email');
     });
 
     it('returns empty string for empty errors', () => {
@@ -126,7 +129,7 @@ describe('form', () => {
 
   describe('safeParse', () => {
     it('parses valid data', () => {
-      const schema = { parse: (data: any) => data };
+      const schema = { parse: (data: unknown) => data };
       const result = safeParse(schema, { name: 'test' });
       expect(result).toEqual({ name: 'test' });
     });

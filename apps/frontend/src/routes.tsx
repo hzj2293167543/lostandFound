@@ -1,6 +1,6 @@
 // frontend/src/routes.tsx
 import { createBrowserRouter, Navigate } from 'react-router-dom';
-import { lazy, Suspense } from 'react';
+import { lazy, ReactNode, Suspense } from 'react';
 
 import RootLayout from './layouts/RootLayout';
 import Error from './pages/Error/Error';
@@ -36,7 +36,7 @@ import { lostLoader } from './pages/Lost/LostPage/lost.loader';
 import { announcementsLoader } from './pages/Announcement/Announcements/announcements.loader';
 import { announcementDetailLoader } from './pages/Announcement/AnnouncementDetail/announcementDetail.loader';
 import profileLoader from './pages/Profile/profile.loader';
-import { useAuthStore, useIsAdmin, useIsAuthenticated } from './stores/AuthStore';
+import { useIsAdmin, useIsAuthenticated } from './stores/AuthStore';
 import { lostAction } from './pages/Lost/LostPage/lost.action';
 import { lostDetailAction } from './pages/Lost/LostDetail/lostDetail.action';
 import { profileAction } from './pages/Profile/profile.action';
@@ -49,7 +49,7 @@ function Loading() {
   );
 }
 
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
+function ProtectedRoute({ children }: { children: ReactNode }) {
   const isAuthenticated = useIsAuthenticated();
   // const isLoading = useAuthStore.use.isLoading();
 
@@ -61,10 +61,10 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     return <Navigate to="/login" replace />;
   }
 
-  return <>{children}</>;
+  return <> {children}</>;
 }
 
-function AdminRoute({ children }: { children: React.ReactNode }) {
+function AdminRoute({ children }: { children: ReactNode }) {
   const isAdmin = useIsAdmin();
   // const isLoading = useAuthStore.use.isLoading();
 
@@ -76,7 +76,7 @@ function AdminRoute({ children }: { children: React.ReactNode }) {
     return <Navigate to="/" replace />;
   }
 
-  return <>{children}</>;
+  return <> {children} </>;
 }
 
 export const router = createBrowserRouter([

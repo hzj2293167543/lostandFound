@@ -1,10 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, IsNull, MoreThan, MoreThanOrEqual, Repository } from 'typeorm';
+import { IsNull, MoreThan, MoreThanOrEqual, Repository } from 'typeorm';
 import { Report } from './entities/report.entity';
 import { ReportReason } from './entities/report-reason.entity';
-import { CreateReportDto, ReportStatus, TReportTargetType, User } from '@lostfound/shared';
+import {
+  CreateUserReportDto,
+  CreateCommentReportDto,
+  CreateLostReportDto,
+  CreateFoundReportDto,
+  ReportStatus,
+  TReportTargetType,
+} from '@lostfound/shared';
 import { Punishment, PunishmentType } from './entities/punishment.entity';
+
+type CreateReportDto =
+  | CreateUserReportDto
+  | CreateCommentReportDto
+  | CreateLostReportDto
+  | CreateFoundReportDto;
+
 @Injectable()
 export class ReportsService {
   constructor(
@@ -16,7 +30,10 @@ export class ReportsService {
     private punishmentRepository: Repository<Punishment>
   ) {}
 
-  async create(reporterId: number, dto: CreateReportDto): Promise<Report> {
+  create(
+    reporterId: number,
+    dto: CreateReportDto & { targetType: TReportTargetType }
+  ): Promise<Report> {
     const report = this.reportRepository.create({
       ...dto,
       reporterId,
@@ -36,7 +53,7 @@ export class ReportsService {
     });
   }
 
-  async getReportsByTarget(targetType: TReportTargetType, targetId: number): Promise<Report[]> {
+  getReportsByTarget(targetType: TReportTargetType, targetId: number): Promise<Report[]> {
     return this.reportRepository.find({
       where: { targetType, targetId },
       relations: ['reporter', 'reason'],

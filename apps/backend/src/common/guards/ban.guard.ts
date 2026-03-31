@@ -1,21 +1,9 @@
-import {
-  Injectable,
-  CanActivate,
-  ExecutionContext,
-  ForbiddenException,
-  UseGuards,
-} from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, IsNull, MoreThan } from 'typeorm';
-import { Punishment, PunishmentType } from '../../reports/entities/punishment.entity';
-import { Reflector } from '@nestjs/core';
-import { SKIP_BAN } from '../decorators/skipBan.decorator';
-import { UserStatus } from '../constants/constants';
-import { User } from '@/users/entities/user.entity';
-import { AuthGuard } from '@nestjs/passport';
 import { ReportsService } from '@/reports/reports.service';
 import { UsersService } from '@/users/users.service';
 import { diffDay } from '@lostfound/shared';
+import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+import { SKIP_BAN } from '../decorators/skipBan.decorator';
 
 @Injectable()
 export class BanGuard implements CanActivate {

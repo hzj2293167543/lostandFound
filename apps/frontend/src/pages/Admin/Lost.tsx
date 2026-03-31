@@ -1,9 +1,8 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { adminApi } from '@/api';
+import { SearchInput } from '@/components/searchInput/searchInput';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Select,
   SelectContent,
@@ -11,16 +10,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { LOST_STATUS_NAME, LostItemStatus } from '@lostfound/shared';
-import { adminApi } from '@/api';
-import { adminKeys } from '@/keys/admin';
-import { toast } from 'sonner';
-import { Loader2, SearchIcon } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { useVirtualizer } from '@tanstack/react-virtual';
-import { SearchInput } from '@/components/searchInput/searchInput';
 import { useAdminInfiniteLostItems } from '@/hooks/useAdminInfinite';
-const ITEM_HEIGHT = 250;
+import { adminKeys } from '@/keys/admin';
+import { LOST_STATUS_NAME, LostItemStatus } from '@lostfound/shared';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useVirtualizer } from '@tanstack/react-virtual';
+import { Loader2 } from 'lucide-react';
+import { useCallback, useMemo, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { toast } from 'sonner';
+const ITEM_HEIGHT = 240;
 const PAGE_SIZE = 20;
 export default function AdminLost() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -48,11 +47,6 @@ export default function AdminLost() {
     },
   });
 
-  const handleDelete = (id: number) => {
-    if (!confirm('确定要删除这条失物信息吗？')) return;
-    softDeleteMutation.mutate(id);
-  };
-
   const filteredItems = items.filter((item) => {
     const matchesSearch =
       item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -73,12 +67,21 @@ export default function AdminLost() {
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const parentRef = useRef<HTMLDivElement>(null);
+  // eslint-disable-next-line react-hooks/incompatible-library
   const rowVirtualizer = useVirtualizer({
     count: filteredItems.length,
     getScrollElement: () => parentRef.current,
     estimateSize: () => ITEM_HEIGHT,
     overscan: 5,
   });
+
+  const handleDelete = useCallback(
+    (id: number) => {
+      if (!confirm('确定要删除这条失物信息吗？')) return;
+      softDeleteMutation.mutate(id);
+    },
+    [softDeleteMutation]
+  );
   const renderItemRow = useCallback(
     (item: (typeof filteredItems)[0]) => {
       return (
@@ -117,7 +120,7 @@ export default function AdminLost() {
         </Card>
       );
     },
-    [softDeleteMutation]
+    [handleDelete, softDeleteMutation]
   );
 
   if (isLoading) {

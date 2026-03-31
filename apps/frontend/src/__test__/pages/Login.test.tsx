@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Login from '@/pages/Login/Login';
-
+import React from 'react';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

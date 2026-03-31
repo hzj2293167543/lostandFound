@@ -11,7 +11,6 @@ import { FoundDetail } from '@lostfound/shared';
 import { toast } from 'sonner';
 
 export default function FoundDetailItem({ foundDetail }: { foundDetail: FoundDetail }) {
-  // 联系发布者
   const handleContact = async () => {
     if (foundDetail.contactPhone) {
       // 可以显示联系方式弹窗

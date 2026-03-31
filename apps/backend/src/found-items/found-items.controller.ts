@@ -1,30 +1,29 @@
+import { CurrentUser } from '@/common/decorators/currentUser.decorator';
+import { MuteGuard } from '@/common/guards/mute.guard';
+import { ZodValidationPipe } from '@/common/pipe';
 import {
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Body,
-  Param,
-  Query,
-  UseGuards,
-  ParseIntPipe,
-  BadRequestException,
-  Patch,
-} from '@nestjs/common';
-import { FoundItemsService } from './found-items.service';
-import { AuthGuard } from '@nestjs/passport';
-import {
-  FoundItem as FoundItemVo,
   FoundCreateDto,
-  User,
+  FoundItem as FoundItemVo,
   FoundUpdateDto,
   GetFoundItemsParams,
   GetFoundItemsParamsSchema,
+  User,
 } from '@lostfound/shared';
-import { CurrentUser } from '@/common/decorators/currentUser.decorator';
-import { ZodValidationPipe } from '@/common/pipe';
-import { MuteGuard } from '@/common/guards/mute.guard';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { FoundItemsService } from './found-items.service';
 
 @Controller('found-items')
 export class FoundItemsController {
@@ -91,15 +90,6 @@ export class FoundItemsController {
     });
   }
 
-  @Put(':id')
-  @UseGuards(AuthGuard('jwt'))
-  update(@Param('id') id: string, @Body() data: any, @CurrentUser() user: User) {
-    if (user.id !== data.userId) {
-      throw new BadRequestException('你只能更新自己的招领物品');
-    }
-    return this.foundItemsService.update(data);
-  }
-
   @Patch()
   @UseGuards(AuthGuard('jwt'))
   async patch(@Body() data: FoundUpdateDto, @CurrentUser() user: User) {
@@ -112,7 +102,11 @@ export class FoundItemsController {
 
   @Delete(':id')
   @UseGuards(AuthGuard('jwt'))
-  delete(@Param('id') id: string, @CurrentUser() user: User) {
+  async delete(@Param('id') id: string, @CurrentUser() user: User) {
+    const foundItem = await this.foundItemsService.findOne(+id);
+    if (user.id !== foundItem.user.id) {
+      throw new BadRequestException('你只能删除自己的招领物品');
+    }
     return this.foundItemsService.delete(+id);
   }
 }

@@ -7,8 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Category, debounce } from '@lostfound/shared';
-import { useMemo, useTransition } from 'react';
+import { Category } from '@lostfound/shared';
 import { ALL_CATEGORY, FilterState, LOST_FILTER_STATUS, SetFilterState } from '../../type';
 import { SEARCH_DEBOUNCE_DELAY } from '@/constants';
 

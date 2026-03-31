@@ -44,6 +44,13 @@ export default [
       globals: { ...globals.node },
     },
   },
+  // 共享目录
+  {
+    files: ['**/shared/src/**/*.ts'],
+    languageOptions: {
+      globals: { ...globals.browser, ...globals.node },
+    },
+  },
   // 配置文件单独给 node 环境
   {
     files: ['**/*.config.{js,ts}', 'scripts/**'],

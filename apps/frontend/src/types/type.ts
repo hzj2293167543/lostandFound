@@ -1,3 +1,4 @@
+import { CSSProperties } from 'react';
 import { ExtendProp } from './utils';
 
 export const ItemTypeMap = {
@@ -33,7 +34,7 @@ export interface CellProps<T> {
 export interface CellPropsExplicit<T> extends CellProps<T> {
   columnIndex: number;
   rowIndex: number;
-  style: React.CSSProperties;
+  style: CSSProperties;
 }
 
 /**
@@ -57,7 +58,7 @@ export interface CellRowProps<T> {
  */
 export interface CellRowPropsExplicit<T> extends CellRowProps<T> {
   index: number;
-  style: React.CSSProperties;
+  style: CSSProperties;
 }
 
 /**
@@ -77,5 +78,5 @@ export type CellRowCommentProps<T> = ExtendProp<
  */
 export interface CellRowCommentPropsExplicit<T> extends CellRowCommentProps<T> {
   index: number;
-  style: React.CSSProperties;
+  style: CSSProperties;
 }

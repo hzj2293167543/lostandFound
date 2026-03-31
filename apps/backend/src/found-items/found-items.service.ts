@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FoundItem } from './entities/found-item.entity';
@@ -168,7 +168,6 @@ export class FoundItemsService {
     page: number = 1,
     limit: number = 10
   ): Promise<PageResponse<FoundItemVo>> {
-    const skip = (page - 1) * limit;
     return this.findAllPaginated({ page, limit, userId });
   }
 }

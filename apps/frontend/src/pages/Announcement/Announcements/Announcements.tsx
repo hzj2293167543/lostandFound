@@ -6,11 +6,9 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { CellRowProps, CellRowPropsExplicit } from '@/types/type';
 import { Announcement, GetAnnouncementsParams } from '@lostfound/shared';
-import { type ChangeEvent, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router';
 import { List } from 'react-window';
 import { useAnnouncementInfinite } from '../hooks/useAnnouncementInfinite.hook';

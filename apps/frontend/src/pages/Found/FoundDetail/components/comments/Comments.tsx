@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import {
   Pagination,
   PaginationContent,
@@ -11,17 +12,16 @@ import {
 } from '@/components/ui/pagination';
 import { Textarea } from '@/components/ui/textarea';
 import { ItemTypeMap } from '@/types/type';
-import { memo, useEffect, useState } from 'react';
-import { useActionData, useSubmit } from 'react-router-dom';
-import { LOST_DETAIL_INTENT } from '../../type';
-import CommentItem from './CommentItem';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { FieldErrors, useForm } from 'react-hook-form';
+import { useEffect, useEffectEvent, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useActionData, useSubmit } from 'react-router-dom';
 import * as z from 'zod';
-import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
-import { getErrorMsg, getPageNumbers, PAGE_SIZE } from '@/utils';
+import { FOUND_DETAIL_INTENT } from '../../../type';
+import { CommentItem } from './CommentItem';
 import { toast } from 'sonner';
 import { useItemCommentInfinite } from '@/hooks/useItemCommentInfinite';
+import { getPageNumbers, PAGE_SIZE } from '@/utils';
 
 const commentSchema = z.object({
   content: z.string().min(1, '评论内容不能为空'),
@@ -29,15 +29,14 @@ const commentSchema = z.object({
 
 type CommentFormValues = z.infer<typeof commentSchema>;
 
-export default memo(function Comments({ itemId }: { itemId: number }) {
-  'use no memo';
+export default function Comments({ itemId }: { itemId: number }) {
   const actionData = useActionData<{ success: boolean; intent?: number; error?: string }>();
   const submit = useSubmit();
   const [currentPage, setCurrentPage] = useState(1);
 
   const { data, isLoading, fetchNextPage, refetch } = useItemCommentInfinite(
     itemId,
-    ItemTypeMap.LOST
+    ItemTypeMap.FOUND
   );
 
   const comments = data?.pages.flatMap((p) => p.items) || [];
@@ -51,16 +50,19 @@ export default memo(function Comments({ itemId }: { itemId: number }) {
     },
   });
 
+  const handleSuccessEffect = useEffectEvent(() => {
+    form.reset();
+    setCurrentPage(1);
+    refetch();
+  });
   useEffect(() => {
-    if (actionData?.intent !== LOST_DETAIL_INTENT.COMMENT) return;
+    if (actionData?.intent !== FOUND_DETAIL_INTENT.COMMENT) return;
     if (actionData.success) {
-      form.reset();
-      setCurrentPage(1);
-      refetch();
+      handleSuccessEffect();
     } else if (!actionData.success) {
       toast.error(actionData.error || '发布失败');
     }
-  }, [actionData, form, refetch]);
+  }, [actionData]);
 
   const [replyState, setReplyState] = useState<{ replyId: number | undefined }>({
     replyId: undefined,
@@ -71,24 +73,16 @@ export default memo(function Comments({ itemId }: { itemId: number }) {
 
   const onSubmit = async (data: CommentFormValues) => {
     const payload = {
-      intent: LOST_DETAIL_INTENT.COMMENT,
+      intent: FOUND_DETAIL_INTENT.COMMENT,
       parentId: null,
       itemId,
-      itemType: ItemTypeMap.LOST,
+      itemType: ItemTypeMap.FOUND,
       content: data.content,
     };
     await submit(JSON.stringify(payload), { method: 'POST', encType: 'application/json' });
   };
 
-  const onError = (errors: FieldErrors<CommentFormValues>) => {
-    const errorMsg = getErrorMsg(errors);
-    if (errorMsg) {
-      toast.error(errorMsg);
-    }
-  };
-
   const displayedComments = comments.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
-
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     if (page <= totalPages) {
@@ -113,11 +107,11 @@ export default memo(function Comments({ itemId }: { itemId: number }) {
     <Card>
       <CardHeader>
         <CardTitle>评论 ({totalComments})</CardTitle>
-        <CardDescription>请文明发言，共同帮助失主找回物品</CardDescription>
+        <CardDescription>请文明发言，确认物品信息</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit, onError)} className="mb-8">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="mb-8">
             <FormField
               control={form.control}
               name="content"
@@ -130,7 +124,7 @@ export default memo(function Comments({ itemId }: { itemId: number }) {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="mt-4 bg-blue-600 hover:bg-blue-700">
+            <Button type="submit" className="mt-4 bg-green-600 hover:bg-green-700">
               提交评论
             </Button>
           </form>
@@ -149,6 +143,7 @@ export default memo(function Comments({ itemId }: { itemId: number }) {
                     setReplyState: handleReplyStateChange,
                   }}
                   onCommentChange={() => refetch()}
+                  reloadRootChildren={() => refetch()}
                 />
               ))}
             </div>
@@ -200,4 +195,4 @@ export default memo(function Comments({ itemId }: { itemId: number }) {
       </CardContent>
     </Card>
   );
-});
+}

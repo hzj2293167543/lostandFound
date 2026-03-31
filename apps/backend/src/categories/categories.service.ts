@@ -18,7 +18,7 @@ export class CategoriesService {
     return this.categoriesRepository.findOne({ where: { id } });
   }
 
-  async create(name: string): Promise<Category> {
+  create(name: string): Promise<Category> {
     const category = this.categoriesRepository.create({ name });
     return this.categoriesRepository.save(category);
   }

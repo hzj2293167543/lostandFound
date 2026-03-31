@@ -4,6 +4,7 @@ import { LG, LOAD_MORE_THRESHOLD, MD } from '@/constants/layout';
 import { debounce, GetLostItemsParams, LostItem, PageResponse } from '@lostfound/shared';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import type { UIEvent } from 'react';
 
 export function useLostInfiniteQuery(filters?: GetLostItemsParams) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -64,7 +65,7 @@ export function useLostInfiniteQuery(filters?: GetLostItemsParams) {
   }, [allItems.length, columnCount, hasNextPage, isFetchingNextPage]);
 
   const handleScroll = useCallback(
-    (event: React.UIEvent<HTMLDivElement>) => {
+    (event: UIEvent<HTMLDivElement>) => {
       const { scrollTop, scrollHeight, clientHeight } = event.currentTarget;
       const bottom = scrollHeight - scrollTop - clientHeight;
       if (bottom < LOAD_MORE_THRESHOLD && hasNextPage && !isFetchingNextPage) {

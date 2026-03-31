@@ -1,8 +1,9 @@
 import { NORMAL_DELAY } from '@/constants';
-import { debounce, isString } from '@lostfound/shared';
-import { ChangeEvent, useEffect, useMemo, useRef, useState, useTransition } from 'react';
+import { isString } from '@lostfound/shared';
+import { ChangeEvent, useEffect, useEffectEvent, useRef, useState, useTransition } from 'react';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
+import type { CompositionEvent } from 'react';
 
 interface SearchInputProps {
   showLabel?: boolean;
@@ -17,13 +18,6 @@ interface SearchInputProps {
 
 /**
  * 搜索输入组件
- * @param param0 搜索输入组件的属性
- * @param param0.onSearch 搜索回调函数，用于处理搜索输入
- * @param param0.placeholder 搜索输入占位符文本
- * @param param0.delay 搜索输入防抖延迟时间（毫秒）
- * @param param0.showPending 是否显示搜索中状态
- * @param param0.value 外部设置的搜索输入值
- * @returns 搜索输入组件的 JSX 元素
  */
 export function SearchInput({
   onSearch,
@@ -39,45 +33,63 @@ export function SearchInput({
   const [isPending, startTransition] = useTransition();
 
   const isComposingRef = useRef(false);
+  // 1. 使用 ref 存储定时器 ID
+  const timerRef = useRef<number | null>(null);
 
+  // 2. 保存最新的 onSearch 引用
   const onSearchRef = useRef(onSearch);
   useEffect(() => {
     onSearchRef.current = onSearch;
   }, [onSearch]);
 
-  useEffect(() => {
+  const handleUpdateLocal = useEffectEvent(() => {
     setLocalValue(externalValue ?? '');
+  });
+
+  useEffect(() => {
+    handleUpdateLocal();
   }, [externalValue]);
 
-  const debouncedUpdate = useMemo(
-    () =>
-      debounce((value) => {
-        if (!isString(value)) return;
-        startTransition(() => {
-          onSearchRef.current(value);
-        });
-      }, delay),
-    [delay]
-  );
+  // 3. 组件卸载时清理定时器
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+    };
+  }, []);
+
+  // 4. 提取一个普通的防抖执行函数（不要用 useMemo 包裹！）
+  // 因为它只是一个普通函数，只在事件处理函数中被调用，编译器不会报错
+  const triggerSearch = (value: string) => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+
+    timerRef.current = window.setTimeout(() => {
+      if (!isString(value)) return;
+      startTransition(() => {
+        onSearchRef.current(value); // 安全读取 ref
+      });
+    }, delay);
+  };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setLocalValue(newValue);
 
-    // 读取 ref 的当前值
     if (!isComposingRef.current) {
-      debouncedUpdate(newValue);
+      triggerSearch(newValue);
     }
   };
 
   const handleCompositionStart = () => {
-    // 改变 ref 的值不会触发 re-render
     isComposingRef.current = true;
   };
 
-  const handleCompositionEnd = (e: React.CompositionEvent<HTMLInputElement>) => {
+  const handleCompositionEnd = (e: CompositionEvent<HTMLInputElement>) => {
     isComposingRef.current = false;
-    debouncedUpdate(e.currentTarget.value);
+    triggerSearch(e.currentTarget.value);
   };
 
   return (

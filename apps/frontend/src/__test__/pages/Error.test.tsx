@@ -1,8 +1,7 @@
-import { describe, it, expect } from 'vitest';
+import Error from '@/pages/Error/Error';
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import Error from '@/pages/Error/Error';
-
+import { describe, expect, it } from 'vitest';
 describe('Error', () => {
   it('renders error page correctly', () => {
     render(

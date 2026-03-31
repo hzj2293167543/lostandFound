@@ -5,7 +5,6 @@ import {
   HttpException,
   HttpStatus,
   Inject,
-  ForbiddenException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';

@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Register from '@/pages/Login/Register';
+import React from 'react';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -58,10 +59,10 @@ describe('Register', () => {
     const passwordInput = screen.getByLabelText(/密码/);
     const confirmPasswordInput = screen.getByLabelText(/确认密码/);
 
-    await user.type(usernameInput, 'testuser');
+    await user.type(usernameInput, 'testUser');
     await user.type(emailInput, 'test@example.com');
     await user.type(passwordInput, 'password123');
-    await user.type(confirmPasswordInput, 'differentpassword');
+    await user.type(confirmPasswordInput, 'differentPassword');
 
     const submitButton = screen.getByRole('button', { name: /注册/ });
     await user.click(submitButton);
@@ -80,12 +81,12 @@ describe('Register', () => {
     const passwordInput = screen.getByLabelText(/密码/);
     const confirmPasswordInput = screen.getByLabelText(/确认密码/);
 
-    await user.type(usernameInput, 'testuser');
+    await user.type(usernameInput, 'testUser');
     await user.type(emailInput, 'test@example.com');
     await user.type(passwordInput, 'password123');
     await user.type(confirmPasswordInput, 'password123');
 
-    expect(usernameInput).toHaveValue('testuser');
+    expect(usernameInput).toHaveValue('testUser');
     expect(emailInput).toHaveValue('test@example.com');
     expect(passwordInput).toHaveValue('password123');
     expect(confirmPasswordInput).toHaveValue('password123');

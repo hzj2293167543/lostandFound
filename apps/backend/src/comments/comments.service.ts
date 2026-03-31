@@ -1,5 +1,5 @@
 import { CommentItemTypeType } from '@/common/constants/constants';
-import { CommentCreateDto, CommentItem, isNull, PageResponse } from '@lostfound/shared';
+import { CommentCreateDto, CommentItem, PageResponse } from '@lostfound/shared';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, Repository } from 'typeorm';

@@ -5,6 +5,7 @@ import { createWriteStream, unlink } from 'fs';
 import { ensureDir } from 'fs-extra';
 import { join } from 'path';
 import { v4 as uuIdv4 } from 'uuid';
+import type { Express } from 'express';
 
 @Injectable()
 export class UploadService {

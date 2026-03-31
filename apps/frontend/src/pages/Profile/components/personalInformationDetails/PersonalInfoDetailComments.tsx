@@ -15,8 +15,6 @@ import { memo, useState } from 'react';
 import { List } from 'react-window';
 import { useUserCommentInfinite } from '../../hooks/useUserCommentInfinite';
 
-const ITEM_HEIGHT = 200;
-
 function CommentRow(props: CellRowCommentProps<CommentItem>) {
   const {
     index,

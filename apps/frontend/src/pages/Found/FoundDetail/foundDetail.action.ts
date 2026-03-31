@@ -26,7 +26,6 @@ export const foundDetailAction: ActionFunction = async ({ request }) => {
     } else {
       throw new Response('无效的操作', { status: 400 });
     }
-    console.log('创建评论成功', result, intent);
     return { success: true, result, intent };
   } catch (error) {
     const errorMessage = getErrorMsg(error, '创建评论失败');

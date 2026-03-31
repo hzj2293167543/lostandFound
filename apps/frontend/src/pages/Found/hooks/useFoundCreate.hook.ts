@@ -5,7 +5,7 @@ import { foundKeys } from '@/queryKeys';
 import { getErrorMsg, getFirstError } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Category, FoundCreateDto, FoundCreateDtoSchema } from '@lostfound/shared';
-import { useEffect, useEffectEvent, useState } from 'react';
+import { ChangeEvent, useEffect, useEffectEvent, useState } from 'react';
 import { FieldErrors, useForm } from 'react-hook-form';
 import { useActionData, useSubmit } from 'react-router';
 import { toast } from 'sonner';
@@ -38,7 +38,7 @@ export function useFoundCreate(categories: Category[]) {
     }
   };
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     try {
       setIsLoading(true);
       const file = e.target.files?.[0];

@@ -49,6 +49,11 @@ export function mapObjToFormData(obj: Record<string, unknown>, includeKeys?: str
   return formData;
 }
 
+const defaultTransform = (v: FormDataEntryValue | null) => {
+  if (v === null) return null;
+  return typeof v === 'string' ? v : v.toString();
+};
+
 /**
  * 从FormData中提取指定字段并转换为指定类型
  * @param formData FormData对象
@@ -59,11 +64,13 @@ export function mapObjToFormData(obj: Record<string, unknown>, includeKeys?: str
 export function fromFormData<T>(
   formData: FormData,
   fields: (keyof T)[],
-  transforms: Partial<Record<keyof T, (v: FormDataEntryValue | null) => any>> = {}
+  transforms: Partial<Record<keyof T, (v: FormDataEntryValue | null) => T[keyof T]>> = {}
 ): T {
   return fields.reduce((obj, key) => {
     const raw = formData.get(key as string);
-    obj[key] = transforms[key] ? transforms[key]!(raw) : raw;
+
+    const transform = transforms[key] || defaultTransform;
+    obj[key] = transform(raw) as T[keyof T];
     return obj;
   }, {} as T);
 }

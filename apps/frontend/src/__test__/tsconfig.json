@@ -2,11 +2,7 @@
   "compilerOptions": {
     "target": "ESNext",
     "useDefineForClassFields": true,
-    "lib": [
-      "DOM",
-      "DOM.Iterable",
-      "ESNext"
-    ],
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "allowJs": false,
     "skipLibCheck": true,
     "esModuleInterop": false,
@@ -21,13 +17,8 @@
     "jsx": "react-jsx", // 关键：支持 React 17+ 的 JSX 转换
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"]
     }
   },
-  "include": [
-    "**/*.test.ts",
-    "stores/useAuthStore.test.tsx"
-  ],
+  "include": ["**/*.test.ts", "stores/useAuthStore.test.tsx"]
 }

@@ -16,7 +16,7 @@ describe('Button', () => {
   it('renders different sizes', () => {
     const { container: sm } = render(<Button size="sm">Small</Button>);
     const { container: lg } = render(<Button size="lg">Large</Button>);
-    
+
     expect(sm.firstChild).toHaveClass('h-8');
     expect(lg.firstChild).toHaveClass('h-10');
   });

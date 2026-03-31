@@ -4,8 +4,8 @@ import { PasswordSchema } from '../common.schema';
 export const UserEditDtoSchema = z
   .object({
     name: z.string().min(3).max(20).optional(),
-    avatar: z.string().url().optional(),
-    email: z.string().email().optional(),
+    avatar: z.url().optional(),
+    email: z.email().optional(),
     contact: z.string().min(3).max(20).optional(),
     description: z.string().min(3).max(200).optional(),
   })

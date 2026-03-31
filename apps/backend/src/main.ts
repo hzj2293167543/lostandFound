@@ -18,4 +18,5 @@ async function bootstrap() {
   const baseUrl = configService.get('app.baseUrl') || 'http://localhost:3000';
   console.log(`Backend API running on ${baseUrl}`);
 }
+// oxlint-disable-next-line unicorn/prefer-top-level-await
 bootstrap();

@@ -12,6 +12,7 @@ import { UploadService } from './upload.service';
 import { UploadTypeDto, MimeSchemas } from '@lostfound/shared';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from '@nestjs/passport';
+import type { Express } from 'express';
 
 @Controller('upload')
 @UseGuards(AuthGuard('jwt'))

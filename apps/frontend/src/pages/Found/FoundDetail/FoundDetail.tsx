@@ -1,12 +1,12 @@
 import { Category, FoundDetail, Comment } from '@lostfound/shared';
 import { Link, useLoaderData } from 'react-router-dom';
-import Comments from './components/Comments';
+import Comments from './components/comments/Comments';
 import FoundAction from './components/FoundAction';
 import FoundDetailItem from './components/FoundDetailItem';
 import FoundTips from './components/FoundTips';
 
 export default function FoundDetailPage() {
-  const { foundDetail, comments, categories } = useLoaderData() as {
+  const { foundDetail } = useLoaderData() as {
     foundDetail: FoundDetail;
     comments: Comment[];
     categories: Category[];
@@ -27,7 +27,7 @@ export default function FoundDetailPage() {
           <Comments itemId={foundDetail.id} />
         </div>
         <div className="lg:col-span-1">
-          <FoundAction />
+          <FoundAction foundDetail={foundDetail} />
           <FoundTips />
         </div>
       </div>

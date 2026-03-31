@@ -81,3 +81,16 @@ export function buildTree(flatList: CommentItem[]): Comment[] {
   });
   return twoLevelComments;
 }
+
+/**
+ * 构建URL查询参数
+ * @param params 查询参数对象
+ * @returns URL查询参数字符串
+ */
+export function buildSearchParams(params: Record<string, unknown>) {
+  const searchParams = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined) searchParams.append(key, String(value));
+  });
+  return searchParams.toString();
+}

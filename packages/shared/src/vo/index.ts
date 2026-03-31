@@ -5,3 +5,4 @@ export * from './found.schema';
 export * from './comment.schema';
 export * from './announcement.schema';
 export * from './api.schema';
+export * from './punishment.schema';

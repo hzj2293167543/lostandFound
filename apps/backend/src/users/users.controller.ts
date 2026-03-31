@@ -1,6 +1,4 @@
-import { Controller, Get, Put, Param, Body, UseGuards, Request, Patch } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { AuthGuard } from '@nestjs/passport';
+import { CurrentUser } from '@/common/decorators/currentUser.decorator';
 import {
   User,
   UserEditDto,
@@ -8,7 +6,9 @@ import {
   UserEditPasswordDto,
   UserEditPasswordDtoSchema,
 } from '@lostfound/shared';
-import { CurrentUser } from '@/common/decorators/currentUser.decorator';
+import { Body, Controller, Get, Param, Patch, Put, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { UsersService } from './users.service';
 
 @Controller('users')
 export class UsersController {
@@ -26,8 +26,8 @@ export class UsersController {
 
   @Put(':id')
   @UseGuards(AuthGuard('jwt'))
-  update(@Param('id') id: string, @Body() updateData: any, @Request() req) {
-    if (req.user.id !== +id) {
+  update(@Param('id') id: string, @Body() updateData: UserEditDto, @CurrentUser() user: User) {
+    if (user.id !== +id) {
       throw new Error('无权限操作');
     }
     return this.usersService.update(+id, updateData);

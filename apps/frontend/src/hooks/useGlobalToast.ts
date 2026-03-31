@@ -6,8 +6,6 @@ import { toast } from 'sonner';
 export const useGlobalToast = () => {
   useEffect(() => {
     const handleToast = (event: CustomEvent) => {
-      console.log('useGlobalToast mounted');
-
       toast.error(event.detail.message);
     };
     window.addEventListener(EVENT.APP_ERROR_TOAST, handleToast as EventListener);

@@ -3,7 +3,7 @@ import { lostKeys } from '@/queryKeys';
 import { LostItem, PageResponse } from '@lostfound/shared';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useMemo, useRef } from 'react';
-
+import type { UIEvent } from 'react';
 export function useUserLostInfinite(userId: number, isSelf: boolean) {
   const parentRef = useRef<HTMLDivElement>(null);
 
@@ -31,7 +31,7 @@ export function useUserLostInfinite(userId: number, isSelf: boolean) {
     return dataRows + loaderRow;
   }, [allItems.length, hasNextPage, isFetchingNextPage]);
 
-  const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
+  const handleScroll = (event: UIEvent<HTMLDivElement>) => {
     const { scrollTop, scrollHeight, clientHeight } = event.currentTarget;
     const bottom = scrollHeight - scrollTop - clientHeight;
     if (bottom < 300 && hasNextPage && !isFetchingNextPage) {

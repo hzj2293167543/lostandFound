@@ -113,7 +113,11 @@ export class LostItemsController {
 
   @Delete(':id')
   @UseGuards(AuthGuard('jwt'))
-  delete(@Param('id') id: string, @CurrentUser() user: User) {
+  async delete(@Param('id') id: string, @CurrentUser() user: User) {
+    const lostItem = await this.lostItemsService.findOne(+id);
+    if (user.id !== lostItem.user.id) {
+      throw new BadRequestException('你只能删除自己的丢失物品');
+    }
     return this.lostItemsService.delete(+id);
   }
 }

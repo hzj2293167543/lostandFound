@@ -11,10 +11,11 @@ import {
   AnnouncementEditDto,
   PageResponse,
   ReportVo as Report,
-  ReportStatus,
-  TReportTargetType,
-  TReportStatusType,
+  HandleReportDto,
+  ReportPaginationParams,
+  Punishment,
 } from '@lostfound/shared';
+import { buildSearchParams } from '@/utils';
 
 interface RecentItem {
   id: number;
@@ -93,28 +94,26 @@ export const adminApi = {
       '/admin/reports/stats'
     ),
 
-  getReportsPaginated: (page: number, pageSize: number, status?: TReportStatusType) =>
-    get<PageResponse<Report>>(
-      `/admin/reports/paginated?page=${page}&pageSize=${pageSize}${status !== undefined ? `&status=${status}` : ''}`
-    ),
+  getReportsPaginated: (params: ReportPaginationParams) => {
+    const searchParams = buildSearchParams(params);
+    return get<PageResponse<Report>>(`/admin/reports/paginated?${searchParams}`);
+  },
 
-  handleReport: (
-    id: number,
-    status: TReportStatusType,
-    handlingResult?: string,
-    punishmentType?: number,
-    punishmentDurationDays?: number
-  ) =>
-    post<Report>(`/admin/reports/${id}/handle`, {
-      status,
-      handlingResult,
-      punishmentType,
-      punishmentDurationDays,
-    }),
+  handleUserReport: (id: number, data: HandleReportDto) =>
+    post<Report>(`/admin/reports/user/${id}/handle`, data),
+
+  handleCommentReport: (id: number, data: HandleReportDto) =>
+    post<Report>(`/admin/reports/comment/${id}/handle`, data),
+
+  handleLostReport: (id: number, data: HandleReportDto) =>
+    post<Report>(`/admin/reports/lost/${id}/handle`, data),
+
+  handleFoundReport: (id: number, data: HandleReportDto) =>
+    post<Report>(`/admin/reports/found/${id}/handle`, data),
 
   revokePunishment: (id: number) => remove<void>(`/admin/punishments/${id}`),
 
-  getUserPunishments: (userId: number) => get<any[]>(`/admin/users/${userId}/punishments`),
+  getUserPunishments: (userId: number) => get<Punishment[]>(`/admin/users/${userId}/punishments`),
 };
 
 export default adminApi;

@@ -5,6 +5,7 @@ import { foundKeys } from '@/queryKeys';
 import { debounce, FoundItem, GetFoundItemsParams, PageResponse } from '@lostfound/shared';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { MD, LG, LOAD_MORE_THRESHOLD } from '@/constants';
+import type { UIEvent } from 'react';
 
 export function useFoundInfinite(filters?: GetFoundItemsParams) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -66,7 +67,7 @@ export function useFoundInfinite(filters?: GetFoundItemsParams) {
   }, [allItems.length, columnCount, hasNextPage, isFetchingNextPage]);
 
   const handleScroll = useCallback(
-    (event: React.UIEvent<HTMLDivElement>) => {
+    (event: UIEvent<HTMLDivElement>) => {
       const { scrollTop, scrollHeight, clientHeight } = event.currentTarget;
       const bottom = scrollHeight - scrollTop - clientHeight;
       if (bottom < LOAD_MORE_THRESHOLD && hasNextPage && !isFetchingNextPage) {

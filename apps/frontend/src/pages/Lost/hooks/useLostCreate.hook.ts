@@ -1,13 +1,11 @@
 import { uploadApi } from '@/api';
 import { useAuthAction } from '@/hooks/useAuthAction';
-import { queryClient } from '@/lib/queryClient';
-import { lostKeys } from '@/queryKeys';
 import { getErrorMsg, getFirstError } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Category, LostCreateDto, LostCreateDtoSchema } from '@lostfound/shared';
-import { useEffect, useEffectEvent, useState } from 'react';
+import { ChangeEvent, useEffect, useEffectEvent, useState } from 'react';
 import { FieldErrors, useForm } from 'react-hook-form';
-import { useActionData, useSubmit, useRevalidator } from 'react-router';
+import { useActionData, useSubmit } from 'react-router';
 import { toast } from 'sonner';
 
 export function useLostCreate(categories: Category[]) {
@@ -15,7 +13,6 @@ export function useLostCreate(categories: Category[]) {
   const [isLoading, setIsLoading] = useState(false);
   const requireAuth = useAuthAction();
   const submit = useSubmit();
-  const revalidator = useRevalidator();
 
   const form = useForm<LostCreateDto>({
     resolver: zodResolver(LostCreateDtoSchema),
@@ -38,7 +35,7 @@ export function useLostCreate(categories: Category[]) {
     }
   };
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     try {
       setIsLoading(true);
       const file = e.target.files?.[0];

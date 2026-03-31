@@ -3,6 +3,7 @@ import { useRef, useMemo } from 'react';
 import { commentApi } from '@/api';
 import { commentKeys } from '@/queryKeys';
 import { CommentItem, PageResponse } from '@lostfound/shared';
+import type { UIEvent } from 'react';
 
 export function useUserCommentInfinite(userId: number) {
   const parentRef = useRef<HTMLDivElement>(null);
@@ -32,7 +33,7 @@ export function useUserCommentInfinite(userId: number) {
     return dataRows + loaderRow;
   }, [allItems.length, hasNextPage, isFetchingNextPage]);
 
-  const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
+  const handleScroll = (event: UIEvent<HTMLDivElement>) => {
     const { scrollTop, scrollHeight, clientHeight } = event.currentTarget;
     const bottom = scrollHeight - scrollTop - clientHeight;
     if (bottom < 300 && hasNextPage && !isFetchingNextPage) {

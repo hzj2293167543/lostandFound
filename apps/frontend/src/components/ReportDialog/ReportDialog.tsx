@@ -13,14 +13,14 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { reportApi } from '@/api';
 import { toast } from 'sonner';
-import { ReportReasonDto, TReportTargetType } from '@lostfound/shared';
+import { ReportReasonDto, ReportTargetType } from '@lostfound/shared';
 
 interface ReportDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  targetType: TReportTargetType;
+  targetType: (typeof ReportTargetType)[keyof typeof ReportTargetType];
   targetId: number;
-  targetSnapshot: Record<string, any>;
+  targetSnapshot: Record<string, unknown>;
 }
 
 export function ReportDialog({
@@ -40,23 +40,32 @@ export function ReportDialog({
   });
 
   const createMutation = useMutation({
-    mutationFn: () =>
-      reportApi.createReport({
-        targetType,
+    mutationFn: () => {
+      const baseData = {
         targetId,
         reasonId: selectedReasonId as number,
         reasonDesc: reasonDesc || '',
         snapshot: targetSnapshot,
-      }),
-    onSuccess: (res) => {
-      if (res.success) {
-        toast.success('举报已提交，感谢您的反馈');
-        onOpenChange(false);
-        setSelectedReasonId(null);
-        setReasonDesc('');
-      } else {
-        toast.error(res.message || '举报失败');
+      };
+
+      switch (targetType) {
+        case ReportTargetType.User:
+          return reportApi.createUserReport(baseData);
+        case ReportTargetType.Comment:
+          return reportApi.createCommentReport(baseData);
+        case ReportTargetType.LostItem:
+          return reportApi.createLostReport(baseData);
+        case ReportTargetType.FoundItem:
+          return reportApi.createFoundReport(baseData);
+        default:
+          throw new Error('无效的举报类型');
       }
+    },
+    onSuccess: () => {
+      toast.success('举报已提交，感谢您的反馈');
+      onOpenChange(false);
+      setSelectedReasonId(null);
+      setReasonDesc('');
     },
     onError: (err) => {
       toast.error(err.message || '举报失败，请稍后重试');
@@ -104,7 +113,7 @@ export function ReportDialog({
             <Textarea
               value={reasonDesc}
               onChange={(e) => setReasonDesc(e.target.value)}
-              placeholder="请提供更多 details 信息..."
+              placeholder="请提供更多详情信息..."
               rows={3}
             />
           </div>

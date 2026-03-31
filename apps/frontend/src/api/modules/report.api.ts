@@ -1,9 +1,25 @@
-import { CreateReportDto, ReportReasonDto, TReportTargetType } from '@lostfound/shared';
+import {
+  CreateUserReportDto,
+  CreateCommentReportDto,
+  CreateLostReportDto,
+  CreateFoundReportDto,
+  ReportReasonDto,
+  TReportTargetType,
+} from '@lostfound/shared';
 import { post, get } from '../client';
 
 export const reportApi = {
-  createReport: (data: CreateReportDto) =>
-    post<{ success: boolean; message: string; data?: any }>('/reports', data),
+  createUserReport: (data: CreateUserReportDto) =>
+    post<{ success: boolean; message: string; data?: unknown }>('/reports/user', data),
+
+  createCommentReport: (data: CreateCommentReportDto) =>
+    post<{ success: boolean; message: string; data?: unknown }>('/reports/comment', data),
+
+  createLostReport: (data: CreateLostReportDto) =>
+    post<{ success: boolean; message: string; data?: unknown }>('/reports/lost', data),
+
+  createFoundReport: (data: CreateFoundReportDto) =>
+    post<{ success: boolean; message: string; data?: unknown }>('/reports/found', data),
 
   getReportReasons: (targetType?: TReportTargetType) =>
     get<ReportReasonDto[]>(`/reports/reasons${targetType ? `?targetType=${targetType}` : ''}`),

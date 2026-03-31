@@ -10,14 +10,14 @@ export const FoundCreateDtoSchema = z.object({
   image: z.string().optional(),
 });
 
-export interface FoundCreateDto extends z.infer<typeof FoundCreateDtoSchema> {}
+export type FoundCreateDto = z.infer<typeof FoundCreateDtoSchema>;
 
 export const FoundUpdateDtoSchema = FoundCreateDtoSchema.extend({
   id: z.number().min(1, 'ID不能为空'),
   status: z.number().min(0, '状态不能为空'),
 });
 
-export interface FoundUpdateDto extends z.infer<typeof FoundUpdateDtoSchema> {}
+export type FoundUpdateDto = z.infer<typeof FoundUpdateDtoSchema>;
 
 export const GetFoundItemsParamsSchema = z.object({
   page: z.coerce.number().nonnegative().optional(),

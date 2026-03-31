@@ -1,9 +1,10 @@
-import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { adminApi } from '@/api';
 import { adminKeys } from '@/keys/admin';
 import {
   LostItem,
   PageResponse,
+  ReportTargetType,
   ReportVo as Report,
   TReportStatusType,
   User,
@@ -49,10 +50,20 @@ export function useAdminInfiniteAnnouncements(pageSize: number = PAGE_SIZE) {
   });
 }
 
-export function useAdminInfiniteReports(pageSize: number = PAGE_SIZE, status?: TReportStatusType) {
+export function useAdminInfiniteReports(
+  pageSize: number = PAGE_SIZE,
+  status?: TReportStatusType,
+  targetType?: (typeof ReportTargetType)[keyof typeof ReportTargetType]
+) {
   return useInfiniteQuery<PageResponse<Report>>({
-    queryKey: [...adminKeys.all, 'reports', status ?? 'all'],
-    queryFn: ({ pageParam }) => adminApi.getReportsPaginated(pageParam as number, pageSize, status),
+    queryKey: [...adminKeys.all, 'reports', status ?? 'all', targetType ?? 'all'],
+    queryFn: ({ pageParam }) =>
+      adminApi.getReportsPaginated({
+        page: pageParam as number,
+        pageSize,
+        ...(status !== undefined && { status }),
+        ...(targetType !== undefined && { targetType }),
+      }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) =>
       lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,

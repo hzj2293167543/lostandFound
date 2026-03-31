@@ -1,4 +1,4 @@
-import { Controller, Post, Body, BadRequestException, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, BadRequestException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto, LoginDto, RegisterDtoSchema, LoginDtoSchema } from '@lostfound/shared';
 import { SkipBan } from '@/common/decorators/skipBan.decorator';

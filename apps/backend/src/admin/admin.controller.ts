@@ -1,37 +1,42 @@
+import { CurrentUser } from '@/common/decorators/currentUser.decorator';
+import { ZodValidationPipe } from '@/common/pipe';
 import {
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Body,
-  Param,
-  UseGuards,
-  ParseIntPipe,
-  Patch,
-  Query,
-} from '@nestjs/common';
-import { AdminService } from './admin.service';
-import { AuthGuard } from '@nestjs/passport';
-import {
-  AnnouncementSchema,
-  UserSchema,
-  Announcement as AnnouncementDto,
-  AnnouncementCreateDtoSchema,
   AnnouncementCreateDto,
+  AnnouncementCreateDtoSchema,
   AnnouncementEditDto,
   AnnouncementEditDtoSchema,
-  ReportStatus,
-  TReportTargetType,
-  TReportStatusType,
+  HandleReportDto,
+  HandleReportDtoSchema,
+  ReportPaginationParams,
+  ReportPaginationParamsSchema,
 } from '@lostfound/shared';
-import { CurrentUser } from '@/common/decorators/currentUser.decorator';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { User } from '../users/entities/user.entity';
+import { AdminService } from './admin.service';
+import { AnnouncementService } from './announcement.service';
+import { CategoryService } from './category.service';
 
 @Controller('admin')
 @UseGuards(AuthGuard('jwt'))
 export class AdminController {
-  constructor(private adminService: AdminService) {}
+  constructor(
+    private adminService: AdminService,
+    private announcementService: AnnouncementService,
+    private categoryService: CategoryService
+  ) {}
 
   @Get('stats')
   getStats() {
@@ -115,32 +120,32 @@ export class AdminController {
 
   @Get('categories')
   getAllCategories() {
-    return this.adminService.getAllCategories();
+    return this.categoryService.getAllCategories();
   }
 
   @Post('categories')
   createCategory(@Body('name') name: string) {
-    return this.adminService.createCategory(name);
+    return this.categoryService.createCategory(name);
   }
 
   @Put('categories/:id')
   updateCategory(@Param('id') id: string, @Body('name') name: string) {
-    return this.adminService.updateCategory(+id, name);
+    return this.categoryService.updateCategory(+id, name);
   }
 
   @Delete('categories/:id')
   deleteCategory(@Param('id') id: string) {
-    return this.adminService.deleteCategory(+id);
+    return this.categoryService.deleteCategory(+id);
   }
 
   @Get('announcements')
   getAllAnnouncements() {
-    return this.adminService.getAllAnnouncements();
+    return this.announcementService.getAllAnnouncements();
   }
 
   @Get('announcements/paginated')
   getAnnouncementsPaginated(@Query('page') page: string, @Query('pageSize') pageSize: string) {
-    return this.adminService.getAnnouncementsPaginated(+page, +pageSize);
+    return this.announcementService.getAnnouncementsPaginated(+page, +pageSize);
   }
 
   @Post('announcements')
@@ -149,7 +154,7 @@ export class AdminController {
     if (!validData.success) {
       throw new Error('Invalid data');
     }
-    return this.adminService.createAnnouncement(validData.data);
+    return this.announcementService.createAnnouncement(validData.data);
   }
 
   @Patch('announcements/:id')
@@ -161,12 +166,12 @@ export class AdminController {
     if (!validData.success) {
       throw new Error('Invalid data');
     }
-    return this.adminService.updateAnnouncement(id, validData.data);
+    return this.announcementService.updateAnnouncement(id, validData.data);
   }
 
   @Delete('announcements/:id')
   deleteAnnouncement(@Param('id') id: string) {
-    return this.adminService.deleteAnnouncement(+id);
+    return this.announcementService.deleteAnnouncement(+id);
   }
 
   @Get('reports/stats')
@@ -176,34 +181,45 @@ export class AdminController {
 
   @Get('reports/paginated')
   getReportsPaginated(
-    @Query('page') page: string,
-    @Query('pageSize') pageSize: string,
-    @Query('status') status?: string
+    @Query(new ZodValidationPipe(ReportPaginationParamsSchema)) query: ReportPaginationParams
   ) {
-    return this.adminService.getReportsPaginated(
-      +page,
-      +pageSize,
-      status !== undefined ? (Number(status) as TReportStatusType) : undefined
-    );
+    return this.adminService.getReportsPaginated(query);
   }
 
-  @Post('reports/:id/handle')
-  handleReport(
+  @Post('reports/user/:id/handle')
+  handleUserReport(
     @Param('id') id: string,
-    @Body('status') status: TReportStatusType,
-    @Body('handlingResult') handlingResult: string,
-    @Body('punishmentType') punishmentType: number,
-    @Body('punishmentDurationDays') punishmentDurationDays: number,
+    @Body(new ZodValidationPipe(HandleReportDtoSchema)) data: HandleReportDto,
     @CurrentUser() user: User
   ) {
-    return this.adminService.handleReport(
-      +id,
-      user.id,
-      status,
-      handlingResult,
-      punishmentType,
-      punishmentDurationDays
-    );
+    return this.adminService.handleUserReport(+id, user.id, data);
+  }
+
+  @Post('reports/comment/:id/handle')
+  handleCommentReport(
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(HandleReportDtoSchema)) data: HandleReportDto,
+    @CurrentUser() user: User
+  ) {
+    return this.adminService.handleCommentReport(+id, user.id, data);
+  }
+
+  @Post('reports/lost/:id/handle')
+  handleLostReport(
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(HandleReportDtoSchema)) data: HandleReportDto,
+    @CurrentUser() user: User
+  ) {
+    return this.adminService.handleLostReport(+id, user.id, data);
+  }
+
+  @Post('reports/found/:id/handle')
+  handleFoundReport(
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(HandleReportDtoSchema)) data: HandleReportDto,
+    @CurrentUser() user: User
+  ) {
+    return this.adminService.handleFoundReport(+id, user.id, data);
   }
 
   @Delete('punishments/:id')

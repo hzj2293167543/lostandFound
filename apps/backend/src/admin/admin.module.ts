@@ -17,6 +17,10 @@ import { ReportReason } from '../reports/entities/report-reason.entity';
 import { Punishment } from '../reports/entities/punishment.entity';
 import { AdminController } from './admin.controller';
 import { AdminService } from './admin.service';
+import { ItemManagementService } from './item-management.service';
+import { ReportService } from './report.service';
+import { AnnouncementService } from './announcement.service';
+import { CategoryService } from './category.service';
 
 @Module({
   imports: [
@@ -39,7 +43,13 @@ import { AdminService } from './admin.service';
     CommentsModule,
   ],
   controllers: [AdminController],
-  providers: [AdminService],
+  providers: [
+    AdminService,
+    ItemManagementService,
+    ReportService,
+    AnnouncementService,
+    CategoryService,
+  ],
   exports: [AdminService],
 })
 export class AdminModule {}

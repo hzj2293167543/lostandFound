@@ -44,6 +44,7 @@ export function useEditPassword(
     if (actionData?.success) {
       toast.success('密码修改成功！');
       queryClient.refetchQueries({ queryKey: userKeys.detail(userRaw.id) });
+      passwordForm.reset();
       onSuccess?.();
     } else if (actionData?.error) {
       toast.error(actionData.error);

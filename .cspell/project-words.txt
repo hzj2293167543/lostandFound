@@ -33,5 +33,12 @@ breakline
 amondnet
 appleboy
 lostfound
+overscan
+partialize
+tinyint
 vercel
 Vercel
+
+# Auto-added words
+Grotesk
+maximalism

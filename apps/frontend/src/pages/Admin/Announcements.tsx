@@ -1,5 +1,3 @@
-import { useRef, useCallback, useEffectEvent, useMemo, useState } from 'react';
-import { useVirtualizer } from '@tanstack/react-virtual';
 import { adminApi } from '@/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,16 +11,18 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { adminKeys } from '@/keys/admin';
 import { useAdminInfiniteAnnouncements } from '@/hooks/useAdminInfinite';
+import { adminKeys } from '@/keys/admin';
 import { useAuthStore } from '@/stores/AuthStore';
 import { formatDateForInput } from '@/utils';
 import { Announcement, AnnouncementCreateDto, AnnouncementEditDto } from '@lostfound/shared';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import { Loader2 } from 'lucide-react';
+import { ChangeEvent, useCallback, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
-const ITEM_HEIGHT = 200;
+const ITEM_HEIGHT = 190;
 
 export default function AdminAnnouncements() {
   const usrId = useAuthStore.use.user()?.id;
@@ -81,6 +81,7 @@ export default function AdminAnnouncements() {
     },
   });
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const rowVirtualizer = useVirtualizer({
     count: announcements.length,
     getScrollElement: () => parentRef.current,
@@ -103,7 +104,7 @@ export default function AdminAnnouncements() {
     setFormData({ title: '', content: '', author: userName });
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!formData.title.trim() || !formData.content.trim()) {
       toast.error('请填写完整的公告信息');
@@ -119,20 +120,26 @@ export default function AdminAnnouncements() {
     }
   };
 
-  const handleEdit = useEffectEvent((announcement: Announcement) => {
-    setEditingAnnouncement(announcement);
-    setFormData({
-      title: announcement.title,
-      content: announcement.content,
-      author: userName,
-    });
-    setIsDialogOpen(true);
-  });
+  const handleEdit = useCallback(
+    (announcement: Announcement) => {
+      setEditingAnnouncement(announcement);
+      setFormData({
+        title: announcement.title,
+        content: announcement.content,
+        author: userName,
+      });
+      setIsDialogOpen(true);
+    },
+    [userName]
+  );
 
-  const handleDelete = useEffectEvent((id: number) => {
-    if (!confirm('确定要删除这条公告吗？')) return;
-    deleteMutation.mutate(id);
-  });
+  const handleDelete = useCallback(
+    (id: number) => {
+      if (!confirm('确定要删除这条公告吗？')) return;
+      deleteMutation.mutate(id);
+    },
+    [deleteMutation]
+  );
 
   const handleAdd = () => {
     setEditingAnnouncement(null);
@@ -173,7 +180,7 @@ export default function AdminAnnouncements() {
         </CardContent>
       </Card>
     ),
-    [updateMutation.isPending, deleteMutation.isPending]
+    [updateMutation.isPending, deleteMutation.isPending, handleEdit, handleDelete]
   );
 
   const isSubmitting = createMutation.isPending || updateMutation.isPending;

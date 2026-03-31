@@ -49,7 +49,7 @@ export default memo(function AdminLayout() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <header className="bg-white shadow-md">
+      <header className="sticky top-0 bg-white shadow-md">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <Link to="/admin" className="text-xl font-bold text-blue-600">
@@ -70,8 +70,8 @@ export default memo(function AdminLayout() {
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-6">
-        <div className="flex gap-6">
+      <div className=" container mx-auto px-4 pt-4">
+        <div className=" min-h-[calc(100vh-100px)] flex gap-6">
           <aside className="w-56 bg-white rounded-lg shadow-md p-4">
             <nav className="space-y-2">
               {menuItems.map((item) => (

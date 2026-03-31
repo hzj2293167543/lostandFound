@@ -43,7 +43,7 @@ export class Report {
   evidenceImages: string[];
 
   @Column({ type: 'json' })
-  snapshot: Record<string, any>;
+  snapshot: Record<string, unknown>;
 
   @Column({ type: 'tinyint', default: ReportStatus.Pending })
   status: TReportStatusType;

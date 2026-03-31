@@ -1,21 +1,21 @@
-import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { adminApi } from '@/api';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from '@/components/ui/dialog';
-import { adminApi } from '@/api';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { adminKeys } from '@/keys/admin';
 import { Category } from '@lostfound/shared';
-import { toast } from 'sonner';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
+import { ChangeEvent, useState } from 'react';
+import { toast } from 'sonner';
 
 export default function AdminCategories() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -82,7 +82,7 @@ export default function AdminCategories() {
     setDeleteCategoryId(null);
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!formData.name.trim()) {
       toast.error('请输入分类名称');

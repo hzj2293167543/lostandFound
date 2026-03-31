@@ -1,25 +1,28 @@
+import { CurrentUser } from '@/common/decorators/currentUser.decorator';
+import { ZodValidationPipe } from '@/common/pipe';
 import {
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Body,
-  Param,
-  UseGuards,
-  Request,
-  Query,
-  BadRequestException,
-  ParseIntPipe,
-} from '@nestjs/common';
-import { AnnouncementsService } from './announcements.service';
-import { AuthGuard } from '@nestjs/passport';
-import {
+  AnnouncementCreateDto,
+  AnnouncementEditDto,
   Announcement as AnnouncementVo,
   GetAnnouncementsParams,
   GetAnnouncementsParamsSchema,
+  User,
 } from '@lostfound/shared';
-import { ZodValidationPipe } from '@/common/pipe';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { AnnouncementsService } from './announcements.service';
 
 @Controller('announcements')
 export class AnnouncementsController {
@@ -61,17 +64,21 @@ export class AnnouncementsController {
 
   @Post()
   @UseGuards(AuthGuard('jwt'))
-  create(@Body() data: any, @Request() req) {
+  create(@Body() data: AnnouncementCreateDto, @CurrentUser() user: User) {
     return this.announcementsService.create({
       ...data,
-      authorId: req.user.id,
+      authorId: user.id,
     });
   }
 
   @Put(':id')
   @UseGuards(AuthGuard('jwt'))
-  update(@Param('id') id: string, @Body() data: any) {
-    return this.announcementsService.update(+id, data);
+  update(@Param('id') id: string, @Body() data: AnnouncementEditDto, @CurrentUser() user: User) {
+    const { author: _, ...rest } = data;
+    return this.announcementsService.update(+id, {
+      ...rest,
+      authorId: user.id,
+    });
   }
 
   @Delete(':id')

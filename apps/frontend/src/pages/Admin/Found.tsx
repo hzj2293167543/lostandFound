@@ -1,9 +1,8 @@
-import { useRef, useState, useMemo, useCallback } from 'react';
-import { useVirtualizer } from '@tanstack/react-virtual';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { adminApi } from '@/api';
+import { SearchInput } from '@/components/searchInput/searchInput';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Select,
   SelectContent,
@@ -11,16 +10,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { FoundItemStatus, FOUND_STATUS_NAME } from '@lostfound/shared';
-import { adminApi } from '@/api';
-import { adminKeys } from '@/keys/admin';
 import { useAdminInfiniteFoundItems } from '@/hooks/useAdminInfinite';
-import { toast } from 'sonner';
+import { adminKeys } from '@/keys/admin';
+import { FOUND_STATUS_NAME, FoundItemStatus } from '@lostfound/shared';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import { Loader2 } from 'lucide-react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { SearchInput } from '@/components/searchInput/searchInput';
+import { toast } from 'sonner';
 
-const ITEM_HEIGHT = 250;
+const ITEM_HEIGHT = 240;
 
 export default function AdminFound() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -48,11 +48,6 @@ export default function AdminFound() {
     },
   });
 
-  const handleDelete = (id: number) => {
-    if (!confirm('确定要删除这条招领信息吗？')) return;
-    softDeleteMutation.mutate(id);
-  };
-
   const items = useMemo(() => {
     return data?.pages.flatMap((page) => page.items) || [];
   }, [data]);
@@ -69,6 +64,7 @@ export default function AdminFound() {
     });
   }, [items, searchQuery, statusFilter, categoryFilter]);
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const rowVirtualizer = useVirtualizer({
     count: filteredItems.length,
     getScrollElement: () => parentRef.current,
@@ -76,6 +72,13 @@ export default function AdminFound() {
     overscan: 5,
   });
 
+  const handleDelete = useCallback(
+    (id: number) => {
+      if (!confirm('确定要删除这条招领信息吗？')) return;
+      softDeleteMutation.mutate(id);
+    },
+    [softDeleteMutation]
+  );
   const renderItemRow = useCallback(
     (item: (typeof filteredItems)[0]) => (
       <Card key={item.id}>
@@ -111,7 +114,7 @@ export default function AdminFound() {
         </CardContent>
       </Card>
     ),
-    [softDeleteMutation.isPending]
+    [handleDelete, softDeleteMutation]
   );
 
   const handleScroll = useCallback(() => {

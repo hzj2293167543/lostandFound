@@ -1,8 +1,17 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ReportDialog } from '@/components/ReportDialog/ReportDialog';
+import { LostDetail, ReportTargetType } from '@lostfound/shared';
 import { Link } from 'react-router';
+import { useState } from 'react';
 
-export default function LostAction() {
+interface LostActionProps {
+  lostDetail: LostDetail;
+}
+
+export default function LostAction({ lostDetail }: LostActionProps) {
+  const [reportOpen, setReportOpen] = useState(false);
+
   return (
     <Card className="mb-6">
       <CardHeader>
@@ -22,11 +31,18 @@ export default function LostAction() {
               查看招领信息
             </Button>
           </Link>
-          <Button variant="outline" className="w-full">
+          <Button variant="outline" className="w-full" onClick={() => setReportOpen(true)}>
             举报信息
           </Button>
         </div>
       </CardContent>
+      <ReportDialog
+        open={reportOpen}
+        onOpenChange={setReportOpen}
+        targetType={ReportTargetType.LostItem}
+        targetId={lostDetail.id}
+        targetSnapshot={{ title: lostDetail.title, content: lostDetail.description }}
+      />
     </Card>
   );
 }

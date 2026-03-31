@@ -1,13 +1,10 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
   UpdateDateColumn,
-  ManyToOne,
-  OneToMany,
 } from 'typeorm';
-import { User } from '../../users/entities/user.entity';
 
 @Entity('categories')
 export class Category {

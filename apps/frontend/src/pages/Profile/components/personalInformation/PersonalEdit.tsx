@@ -61,7 +61,6 @@ export default function PersonalEdit({
     userRaw,
     () => {
       setOpen(false);
-      passwordForm.reset();
     },
     (error) => toast.error(error)
   );

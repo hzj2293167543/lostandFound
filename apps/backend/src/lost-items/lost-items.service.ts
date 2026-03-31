@@ -11,7 +11,6 @@ import {
 } from '@lostfound/shared';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Category } from 'src/categories/entities/category.entity';
 import { Repository } from 'typeorm';
 import { LostItem } from './entities/lost-item.entity';
 import { mapLostItemToVo } from './lost-items.mapper';

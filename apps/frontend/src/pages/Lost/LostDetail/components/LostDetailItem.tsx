@@ -13,7 +13,6 @@ import { toast } from 'sonner';
 import { LOST_STATUS_NAME } from '@/pages/Profile/types';
 
 export default function LostDetailItem({ lostDetail }: { lostDetail: LostDetail }) {
-  // 联系发布者
   const handleContact = async () => {
     if (lostDetail.user?.contact) {
       // 使用临时联系电话

@@ -3,6 +3,7 @@ import { useRef, useMemo } from 'react';
 import { foundApi } from '@/api';
 import { foundKeys } from '@/queryKeys';
 import { FoundItem, PageResponse } from '@lostfound/shared';
+import type { UIEvent } from 'react';
 
 export function useUserFoundInfinite(userId: number, isSelf: boolean) {
   const parentRef = useRef<HTMLDivElement>(null);
@@ -32,7 +33,7 @@ export function useUserFoundInfinite(userId: number, isSelf: boolean) {
     return dataRows + loaderRow;
   }, [allItems.length, hasNextPage, isFetchingNextPage]);
 
-  const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
+  const handleScroll = (event: UIEvent<HTMLDivElement>) => {
     const { scrollTop, scrollHeight, clientHeight } = event.currentTarget;
     const bottom = scrollHeight - scrollTop - clientHeight;
     if (bottom < 300 && hasNextPage && !isFetchingNextPage) {

@@ -1,6 +1,6 @@
 import { commentApi } from '@/api';
+import { ReportDialog } from '@/components/ReportDialog/ReportDialog';
 import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import {
   Pagination,
   PaginationContent,
@@ -10,39 +10,28 @@ import {
   PaginationPrevious,
 } from '@/components/ui/pagination';
 import { Spinner } from '@/components/ui/spinner';
-import { Textarea } from '@/components/ui/textarea';
-import { useAuthStore } from '@/stores/AuthStore';
-import { ItemTypeMap } from '@/types/type';
-import { CHILD_PAGE_SIZE, getErrorMsg, getPageNumbers } from '@/utils';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { CommentItem as CommentItemVo } from '@lostfound/shared';
+import { CHILD_PAGE_SIZE, getPageNumbers } from '@/utils';
+import { CommentItem as CommentItemVo, ReportTargetType } from '@lostfound/shared';
 import { ChevronDown, ChevronUp, ThumbsUp } from 'lucide-react';
-import { useEffect, useEffectEvent, useState } from 'react';
-import { FieldErrors, useForm } from 'react-hook-form';
-import { Link, useFetcher } from 'react-router';
+import { useState } from 'react';
+import { Link } from 'react-router';
 import { toast } from 'sonner';
-import * as z from 'zod';
-import { FOUND_DETAIL_INTENT } from '../../type';
+import { ReplyCommentForm } from './ReplyCommentForm';
 
-const replySchema = z.object({
-  content: z.string().min(1, '回复内容不能为空'),
-});
-
-type ReplyFormValues = z.infer<typeof replySchema>;
-
-export function CommentItem({
+export default function CommentItem({
   comment,
   replyState,
   itemId,
   onCommentChange,
-  reloadRootChildren,
+  reloadRootChildren, // 新增 prop：用于子评论调用以刷新根评论列表
 }: {
   comment: CommentItemVo;
   itemId: number;
   replyState: { replyId: number | undefined; setReplyState: (id: number | undefined) => void };
   onCommentChange?: undefined | (() => void);
-  reloadRootChildren?: () => void;
+  reloadRootChildren?: () => void; // 刷新父级列表的回调
 }) {
+  'use no memo';
   const isRootComment = comment.rootId === null;
 
   const [showChildren, setShowChildren] = useState(false);
@@ -54,6 +43,7 @@ export function CommentItem({
   const [isLiked, setIsLiked] = useState(comment.isLiked);
   const [likeCount, setLikeCount] = useState(comment.likeCount || 0);
   const [isLiking, setIsLiking] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
 
   const loadChildren = async (page: number) => {
     setLoadingChildren(true);
@@ -97,11 +87,13 @@ export function CommentItem({
     }
   };
 
+  // 定义回复成功后的处理逻辑
   const handleReplySuccess = () => {
     if (isRootComment) {
       onCommentChange?.();
       loadChildren(childrenPage);
     } else {
+      // 如果是子评论，调用从父级传下来的刷新方法
       reloadRootChildren?.();
     }
   };
@@ -128,7 +120,7 @@ export function CommentItem({
                   <span className="font-medium text-gray-600">回复</span>
                   <Link
                     to={`/profile/${comment.replyUser.id}`}
-                    className="font-medium text-green-500 hover:text-green-600">
+                    className="font-medium text-blue-500 hover:text-blue-600">
                     @{comment.replyUser.name}：
                   </Link>
                 </div>
@@ -141,17 +133,23 @@ export function CommentItem({
             <span className="text-xs text-gray-500">{comment.time}</span>
             <Button
               size="sm"
-              className="px-0 bg-transparent text-gray-500 hover:text-green-300 hover:bg-transparent cursor-pointer"
+              className="px-0 bg-transparent text-gray-500 hover:text-blue-300 hover:bg-transparent cursor-pointer"
               onClick={handleLikeClick}
               disabled={isLiking}>
-              <ThumbsUp className={`w-4 h-4 ${isLiked && 'fill-green-400 text-green-700'}`} />
+              <ThumbsUp className={`w-4 h-4 ${isLiked && 'fill-blue-400 text-blue-700'}`} />
               <span className="text-xs text-gray-500">{likeCount > 0 ? likeCount : ''}</span>
             </Button>
             <Button
               size="sm"
-              className="px-0 bg-transparent text-gray-700 hover:text-green-300 hover:bg-transparent cursor-pointer"
+              className="px-0 bg-transparent text-gray-700 hover:text-blue-300 hover:bg-transparent cursor-pointer"
               onClick={() => replyState?.setReplyState(comment.id)}>
               回复
+            </Button>
+            <Button
+              size="sm"
+              className="px-0 bg-transparent text-gray-700 hover:text-red-300 hover:bg-transparent cursor-pointer"
+              onClick={() => setReportOpen(true)}>
+              举报
             </Button>
           </div>
           {!showChildren && isRootComment && comment.childrenCount > 0 && (
@@ -159,7 +157,7 @@ export function CommentItem({
               variant="link"
               size="sm"
               onClick={handleExpand}
-              className="text-green-500 pl-0 mt-1">
+              className="text-blue-500 pl-0 mt-1">
               <ChevronDown className="w-4 h-4 mr-1" />
               查看 {comment.childrenCount} 条回复
             </Button>
@@ -173,12 +171,14 @@ export function CommentItem({
                   itemId={itemId}
                   replyState={replyState}
                   onCommentChange={onCommentChange}
+                  // 关键修改：将当前的刷新函数传递给子组件
+                  // 如果当前是根评论，传递自己的 loadData 逻辑（封装一下以便传递当前页码）
                   reloadRootChildren={() => loadChildren(childrenPage)}
                 />
               ))}
               {loadingChildren && (
                 <div className="absolute inset-0 flex justify-center items-center bg-white/80 z-10">
-                  <Spinner className="h-4" />
+                  <Spinner className=" h-4   " />
                 </div>
               )}
               {totalChildrenPages > 1 && (
@@ -232,128 +232,30 @@ export function CommentItem({
                 variant="link"
                 size="sm"
                 onClick={() => setShowChildren(false)}
-                className="text-green-500 pl-0 mt-2">
+                className="text-blue-500 pl-0 mt-2">
                 <ChevronUp className="w-4 h-4 mr-1" />
                 收起回复
               </Button>
             </div>
           )}
           {replyState?.replyId === comment.id && (
-            <ReplyComment
+            <ReplyCommentForm
               comment={comment}
               itemId={itemId}
               replyId={replyState.replyId}
-              onSuccess={handleReplySuccess}
+              onSuccess={handleReplySuccess} // 使用新的处理逻辑
             />
           )}
         </div>
       </div>
       {isRootComment && <div className="my-4 border-t border-gray-200" />}
-    </div>
-  );
-}
-
-function ReplyComment({
-  comment,
-  itemId,
-  replyId,
-  onSuccess,
-}: {
-  comment: CommentItemVo;
-  itemId: number;
-  replyId: number | null;
-  onSuccess: () => void;
-}) {
-  'use no memo';
-  const user = useAuthStore.use.user();
-  const fetcher = useFetcher();
-
-  const form = useForm<ReplyFormValues>({
-    resolver: zodResolver(replySchema),
-    defaultValues: {
-      content: '',
-    },
-  });
-
-  const handleEffect = useEffectEvent(
-    (data: { success: boolean; intent?: number; error?: string }) => {
-      if (data.success) {
-        form.reset();
-        onSuccess();
-      } else if (!data.success) {
-        toast.error(data.error || '发布失败');
-      }
-    }
-  );
-
-  useEffect(() => {
-    const data = fetcher.data as { success: boolean; intent?: number; error?: string } | undefined;
-    if (!data) return;
-    if (data.intent !== FOUND_DETAIL_INTENT.COMMENT) return;
-    handleEffect(data);
-  }, [fetcher.data]);
-
-  useEffect(() => {
-    if (replyId === comment.id) {
-      form.setFocus('content');
-    }
-  }, [replyId, comment.id, form]);
-
-  const onSubmit = async (data: ReplyFormValues) => {
-    const payload = {
-      intent: FOUND_DETAIL_INTENT.COMMENT,
-      parentId: replyId,
-      itemId,
-      itemType: ItemTypeMap.FOUND,
-      content: data.content,
-    };
-    await fetcher.submit(JSON.stringify(payload), {
-      method: 'POST',
-      encType: 'application/json',
-    });
-  };
-
-  const onError = (errors: FieldErrors<ReplyFormValues>) => {
-    const errorMsg = getErrorMsg(errors);
-    if (errorMsg) {
-      toast.error(errorMsg);
-    }
-  };
-
-  return (
-    <div className="flex items-start gap-x-4 mt-2">
-      <img src={user?.avatar} alt={user?.name} className="w-10 h-10 rounded-full flex-shrink-0" />
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit, onError)}
-          className="w-full flex flex-col items-end gap-x-2">
-          <FormField
-            control={form.control}
-            name="content"
-            render={({ field }) => (
-              <FormItem className="w-full">
-                <FormControl>
-                  <Textarea
-                    rows={3}
-                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-400 resize-none max-h-24"
-                    placeholder={`回复 @${comment.user.name}：`}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <div className="flex gap-2 mt-2">
-            <Button
-              type="submit"
-              size="sm"
-              className="px-6 bg-green-600 text-white hover:bg-green-700">
-              发布
-            </Button>
-          </div>
-        </form>
-      </Form>
+      <ReportDialog
+        open={reportOpen}
+        onOpenChange={setReportOpen}
+        targetType={ReportTargetType.Comment}
+        targetId={comment.id}
+        targetSnapshot={{ content: comment.content, userId: comment.user.id }}
+      />
     </div>
   );
 }

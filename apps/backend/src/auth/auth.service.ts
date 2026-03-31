@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { User } from '../users/entities/user.entity';
-import { LoginDto, LoginBackDto } from '@lostfound/shared';
+import { LoginDto } from '@lostfound/shared';
 import { userToLoginBackDto } from './auth.mapper';
 import { Punishment } from '@/reports/entities/punishment.entity';
 

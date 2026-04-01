@@ -84,4 +84,26 @@ const { register, handleSubmit } = useForm({ resolver: zodResolver(schema) });
 
 当单一文件或函数包含超过两个独立业务逻辑（如：同时包含复杂的数据转换和复杂的 UI 状态管理）时，强制触发拆分：提取自定义 Hooks 或抽离工具函数。
 
-## 7. 禁止使用魔法数字
+## 7. 业务逻辑中的数字约束
+
+### 红线
+
+严禁在业务逻辑、条件判断、API 传参中使用魔法数字（如 if (status
+=== 1) 或 delay(2000)）。例外：Tailwind
+CSS 类名中的数值（如 mt-4、w-[100px]）属于样式范畴，不受此规则限制，严禁将其提取为 JS 变量。结构标准必须将数字提取为语义化的常量、Enum 或从 shared 包引入的类型。
+
+✅ 正确:
+
+```ts
+const USER_STATUS = { ACTIVE: 1, BANNED: 2 } as const;
+if (user.status === USER_STATUS.BANNED) { ... }
+const RETRY_DELAY_MS = 2000;
+setTimeout(() => fetch(), RETRY_DELAY_MS);
+```
+
+❌ 严禁:
+
+```ts
+if (user.status === 1) { ... }
+setTimeout(() => fetch(), 2000);
+```

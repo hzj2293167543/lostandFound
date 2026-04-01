@@ -10,7 +10,7 @@ interface AuthState {
   user: User | null;
   token: string | null;
   isLoading: boolean;
-  login: (data: LoginDto) => Promise<void>;
+  login: (data: LoginDto) => Promise<User>;
   logout: () => void;
   editUser: (data: UserEditDto) => Promise<void>;
 }
@@ -30,6 +30,7 @@ export const useAuthStore = createSelectors(
             token,
             user,
           });
+          return user;
         },
         logout: () => {
           set({

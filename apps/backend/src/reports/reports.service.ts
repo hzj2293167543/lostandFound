@@ -12,6 +12,7 @@ import {
   TReportTargetType,
 } from '@lostfound/shared';
 import { Punishment, PunishmentType } from './entities/punishment.entity';
+import { NotificationGateway } from '../notifications/notification.gateway';
 
 type CreateReportDto =
   | CreateUserReportDto
@@ -27,7 +28,8 @@ export class ReportsService {
     @InjectRepository(ReportReason)
     private reportReasonRepository: Repository<ReportReason>,
     @InjectRepository(Punishment)
-    private punishmentRepository: Repository<Punishment>
+    private punishmentRepository: Repository<Punishment>,
+    private notificationGateway: NotificationGateway
   ) {}
 
   create(

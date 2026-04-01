@@ -31,6 +31,7 @@ export function CommentItem({
   onCommentChange?: undefined | (() => void);
   reloadRootChildren?: () => void;
 }) {
+  'use no memo';
   const isRootComment = comment.rootId === null;
 
   const [showChildren, setShowChildren] = useState(false);

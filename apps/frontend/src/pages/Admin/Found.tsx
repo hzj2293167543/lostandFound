@@ -89,7 +89,7 @@ export default function AdminFound() {
               <Badge variant={item.status === FoundItemStatus.招领中 ? 'default' : 'secondary'}>
                 {FOUND_STATUS_NAME[item.status]}
               </Badge>
-              <Link to={`/found/${item.id}`}>
+              <Link to={`/admin/found/${item.id}`}>
                 <Button size="sm" variant="outline">
                   查看
                 </Button>

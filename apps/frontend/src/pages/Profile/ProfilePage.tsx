@@ -1,7 +1,8 @@
+'use no memo';
 import { useAuthStore } from '@/stores/AuthStore';
 import { Count, User } from '@lostfound/shared';
 import { useMemo } from 'react';
-import { useLoaderData } from 'react-router-dom';
+import { useLoaderData, useSearchParams } from 'react-router-dom';
 import LostFoundList from './components/LostFoundList';
 import PersonalInformation from './components/personalInformation/PersonalInformation';
 import PersonalInformationDetails from './components/personalInformationDetails/PersonalInformationDetails';
@@ -12,9 +13,9 @@ export default function ProfilePage() {
     foundItemsCount: Count;
     user: User;
   };
+  const [searchParams] = useSearchParams();
   const userSelf = useAuthStore.use.user();
   const isSelf = user?.id === userSelf?.id;
-
   const counts = useMemo(
     () => ({
       lostCount: lostItemsCount.totalCount,
@@ -24,6 +25,8 @@ export default function ProfilePage() {
     }),
     [lostItemsCount, foundItemsCount]
   );
+  const defaultTab = searchParams.get('tab') || 'lost';
+
   if (!user) {
     return <div>用户未登录</div>;
   }
@@ -42,7 +45,7 @@ export default function ProfilePage() {
 
         {/* 右侧内容 */}
         <div className="lg:col-span-2">
-          <PersonalInformationDetails isSelf={isSelf} userRaw={user} />
+          <PersonalInformationDetails isSelf={isSelf} userRaw={user} defaultTab={defaultTab} />
         </div>
       </div>
     </div>

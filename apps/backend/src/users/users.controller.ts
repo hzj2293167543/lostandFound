@@ -19,6 +19,12 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  @Get('my-punishments')
+  @UseGuards(AuthGuard('jwt'))
+  async getMyPunishments(@CurrentUser() user: User) {
+    return await this.usersService.getMyPunishments(user.id);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(+id);

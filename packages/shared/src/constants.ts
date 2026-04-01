@@ -44,3 +44,8 @@ export const PUNISHMENT_TYPE_NAME = {
   [PUNISHMENT_TYPE.Mute]: '禁言',
   [PUNISHMENT_TYPE.Ban]: '封禁',
 } as const;
+
+export const ROLE = {
+  普通用户: 0,
+  管理员: 1,
+} as const;

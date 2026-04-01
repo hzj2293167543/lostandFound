@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
+import { Punishment } from '../reports/entities/punishment.entity';
 import * as bcrypt from 'bcrypt';
 import { UserStatus } from '@/common/constants/constants';
 
@@ -9,7 +10,9 @@ import { UserStatus } from '@/common/constants/constants';
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private usersRepository: Repository<User>
+    private usersRepository: Repository<User>,
+    @InjectRepository(Punishment)
+    private punishmentsRepository: Repository<Punishment>
   ) {}
 
   findAll(): Promise<User[]> {
@@ -18,6 +21,13 @@ export class UsersService {
 
   findOne(id: number): Promise<User> {
     return this.usersRepository.findOne({ where: { id } });
+  }
+
+  getMyPunishments(userId: number): Promise<Punishment[]> {
+    return this.punishmentsRepository.find({
+      where: { userId },
+      order: { createdAt: 'DESC' },
+    });
   }
 
   async update(id: number, updateData: Partial<User>): Promise<User> {

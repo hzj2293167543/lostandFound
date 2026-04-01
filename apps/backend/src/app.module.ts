@@ -16,6 +16,7 @@ import { UploadModule } from './common/upload/upload.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { AdminModule } from './admin/admin.module';
 import { ReportsModule } from './reports/reports.module';
+import { NotificationModule } from './notifications/notification.module';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { BanGuard } from './common/guards/ban.guard';
 import { OptionalJwtAuthGuard } from './common/guards/OptionalJwtAuthGuard.guard';
@@ -75,6 +76,7 @@ const filePath = join(__dirname, '..', 'config', `.env.${env}.yaml`);
     CommentsModule,
     AdminModule,
     ReportsModule,
+    NotificationModule,
   ],
   providers: [
     // 1️⃣ 全局管道 (因为需要传参 whitelist/transform，所以用 useFactory)

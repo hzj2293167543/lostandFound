@@ -2,8 +2,8 @@ import { ReportsService } from '@/reports/reports.service';
 import { UsersService } from '@/users/users.service';
 import { diffDay } from '@lostfound/shared';
 import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
 import { SKIP_BAN } from '../decorators/skipBan.decorator';
+import { Reflector } from '@nestjs/core';
 
 @Injectable()
 export class BanGuard implements CanActivate {

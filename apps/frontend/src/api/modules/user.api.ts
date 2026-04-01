@@ -1,4 +1,11 @@
-import { LoginDto, RegisterDto, User, UserEditDto, UserEditPasswordDto } from '@lostfound/shared';
+import {
+  LoginDto,
+  Punishment,
+  RegisterDto,
+  User,
+  UserEditDto,
+  UserEditPasswordDto,
+} from '@lostfound/shared';
 import { AxiosRequestConfig } from 'axios';
 import { get, patch, post } from '../client';
 
@@ -17,6 +24,8 @@ export const userApi = {
   updateUser: (data: UserEditDto) => patch<User>('/users', data),
 
   updatePassword: (data: UserEditPasswordDto) => patch<void>('/users/password', data),
+
+  getMyPunishments: () => get<Punishment[]>('/users/my-punishments'),
 };
 
 export default userApi;

@@ -25,6 +25,8 @@ const AdminFound = lazy(() => import('./pages/Admin/Found'));
 const AdminCategories = lazy(() => import('./pages/Admin/Categories'));
 const AdminAnnouncements = lazy(() => import('./pages/Admin/Announcements'));
 const AdminReports = lazy(() => import('./pages/Admin/Reports'));
+const AdminLostDetailPage = lazy(() => import('./pages/Admin/LostDetailPage'));
+const AdminFoundDetailPage = lazy(() => import('./pages/Admin/FoundDetailPage'));
 
 import { foundDetailLoader } from './pages/Found/FoundDetail/foundDetail.loader';
 import { foundDetailAction } from './pages/Found/FoundDetail/foundDetail.action';
@@ -51,14 +53,14 @@ function Loading() {
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
   const isAuthenticated = useIsAuthenticated();
-  // const isLoading = useAuthStore.use.isLoading();
-
-  // if (isLoading) {
-  //   return <Loading />;
-  // }
+  const isAdmin = useIsAdmin();
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
+  }
+
+  if (isAdmin) {
+    return <Navigate to="/admin" replace />;
   }
 
   return <> {children}</>;
@@ -66,11 +68,6 @@ function ProtectedRoute({ children }: { children: ReactNode }) {
 
 function AdminRoute({ children }: { children: ReactNode }) {
   const isAdmin = useIsAdmin();
-  // const isLoading = useAuthStore.use.isLoading();
-
-  // if (isLoading) {
-  //   return <Loading />;
-  // }
 
   if (!isAdmin) {
     return <Navigate to="/" replace />;
@@ -205,6 +202,22 @@ export const router = createBrowserRouter([
       {
         path: 'found',
         element: <AdminFound />,
+      },
+      {
+        path: 'lost/:id',
+        element: (
+          <Suspense fallback={<Loading />}>
+            <AdminLostDetailPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'found/:id',
+        element: (
+          <Suspense fallback={<Loading />}>
+            <AdminFoundDetailPage />
+          </Suspense>
+        ),
       },
       {
         path: 'categories',

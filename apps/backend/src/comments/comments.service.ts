@@ -3,9 +3,12 @@ import { CommentCreateDto, CommentItem, PageResponse } from '@lostfound/shared';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, Repository } from 'typeorm';
+import { NotificationGateway } from '../notifications/notification.gateway';
+import { NotificationType } from '@lostfound/shared';
 import { mapCommentToVo } from './comments.mapper';
 import { Comment } from './entities/comment.entity';
 import { CommentLike } from './entities/comment_likes.entity';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class CommentsService {
@@ -13,7 +16,10 @@ export class CommentsService {
     @InjectRepository(Comment)
     private commentsRepository: Repository<Comment>,
     @InjectRepository(CommentLike)
-    private commentLikeRepository: Repository<CommentLike>
+    private commentLikeRepository: Repository<CommentLike>,
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
+    private notificationGateway: NotificationGateway
   ) {}
 
   async findByItem(itemId: number, itemType: number, userId?: number): Promise<CommentItem[]> {
@@ -182,6 +188,23 @@ export class CommentsService {
     if (isLike) {
       if (await this.findLiked(id, userId)) throw new Error('已点赞');
       await this.commentLikeRepository.insert({ commentId: id, userId, likeTime: new Date() });
+
+      const [comment, liker] = await Promise.all([
+        this.commentsRepository.findOne({ where: { id }, relations: ['user'] }),
+        this.usersRepository.findOne({ where: { id: userId } }),
+      ]);
+
+      if (comment && comment.userId !== userId) {
+        this.notificationGateway.sendNotificationToUser({
+          userId: comment.userId,
+          type: NotificationType.Like,
+          message: `${liker?.name || '有人'}点赞了你的评论`,
+          targetId: id,
+          targetType: 'comment',
+          relatedUserId: userId,
+          relatedUserName: liker?.name,
+        });
+      }
     } else {
       await this.commentLikeRepository.delete({ commentId: id, userId });
     }
@@ -229,13 +252,17 @@ export class CommentsService {
 
   async create(data: CommentCreateDto & { userId: number }): Promise<Comment> {
     let rootId: number | null = null;
+    let notifyUserId: number | null = null;
 
     if (data.parentId !== null && data.parentId !== undefined) {
       const parent = await this.commentsRepository.findOne({
         where: { id: data.parentId },
-        select: ['rootId'],
+        select: ['rootId', 'userId'],
       });
       rootId = parent?.rootId ?? data.parentId;
+      if (parent && parent.userId !== data.userId) {
+        notifyUserId = parent.userId;
+      }
     }
 
     const comment = this.commentsRepository.create({
@@ -243,7 +270,22 @@ export class CommentsService {
       rootId,
       time: new Date(),
     });
-    return this.commentsRepository.save(comment);
+    const savedComment = await this.commentsRepository.save(comment);
+
+    if (notifyUserId) {
+      const commenter = await this.usersRepository.findOne({ where: { id: data.userId } });
+      this.notificationGateway.sendNotificationToUser({
+        userId: notifyUserId,
+        type: NotificationType.Comment,
+        message: `${commenter?.name || '有人'}回复了你的评论`,
+        targetId: savedComment.id,
+        targetType: 'comment',
+        relatedUserId: data.userId,
+        relatedUserName: commenter?.name,
+      });
+    }
+
+    return savedComment;
   }
 
   async delete(id: number): Promise<void> {

@@ -6,9 +6,10 @@ import { Comment } from './entities/comment.entity';
 import { CommentLike } from './entities/comment_likes.entity';
 import { MuteGuard } from '@/common/guards/mute.guard';
 import { Punishment } from '@/reports/entities/punishment.entity';
+import { User } from '@/users/entities/user.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Comment, CommentLike, Punishment])],
+  imports: [TypeOrmModule.forFeature([Comment, CommentLike, Punishment, User])],
   controllers: [CommentsController],
   providers: [CommentsService, MuteGuard],
   exports: [CommentsService],

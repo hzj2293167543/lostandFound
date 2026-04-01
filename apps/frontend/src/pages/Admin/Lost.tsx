@@ -94,7 +94,7 @@ export default function AdminLost() {
                   variant={item.status === LostItemStatus.寻找中 ? 'destructive' : 'secondary'}>
                   {LOST_STATUS_NAME[item.status]}
                 </Badge>
-                <Link to={`/lost/${item.id}`}>
+                <Link to={`/admin/lost/${item.id}`}>
                   <Button size="sm" variant="outline">
                     查看
                   </Button>

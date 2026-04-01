@@ -6,3 +6,4 @@ export * from './comment.schema';
 export * from './user.schema';
 export * from './announcement.schema';
 export * from './report.schema';
+export * from './notification.schema';

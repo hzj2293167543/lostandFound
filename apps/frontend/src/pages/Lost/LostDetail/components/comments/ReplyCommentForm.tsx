@@ -30,6 +30,7 @@ export function ReplyCommentForm({
   replyId: number | null;
   onSuccess: () => void;
 }) {
+  'use no memo';
   const user = useAuthStore.use.user();
   const fetcher = useFetcher();
 

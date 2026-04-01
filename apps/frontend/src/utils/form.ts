@@ -112,3 +112,20 @@ export function safeParse<T>(schema: unknown, data: unknown): T {
 export function isFormDirty<T extends FieldValues>(form: UseFormReturn<T>) {
   return Object.keys(form.formState.dirtyFields).length > 0;
 }
+
+/**
+ * 获取通知类型对应的tab
+ * @param type 通知类型
+ * @returns tab名称
+ */
+export const getTargetTab = (type: string): string => {
+  switch (type) {
+    case 'like':
+    case 'comment':
+      return 'comments';
+    case 'report':
+      return 'punishments';
+    default:
+      return 'lost';
+  }
+};

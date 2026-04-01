@@ -59,9 +59,6 @@ export default memo(function AdminLayout() {
             <span className="text-gray-600">欢迎，{user?.name}</span>
           </div>
           <div className="flex items-center space-x-4">
-            <Link to="/" className="text-gray-600 hover:text-blue-600">
-              返回首页
-            </Link>
             <Button variant="outline" size="sm" onClick={handleLogout}>
               <LogOut className="w-4 h-4 mr-1" />
               退出

@@ -1,8 +1,8 @@
 ---
 name: /fix
 description:
-  EXPLICITLY TRIGGERED when user wants to fix code, resolve lint errors, format code, or says "fix",
-  "修复", "清理".
+  'EXPLICITLY TRIGGERED when user wants to fix code, resolve lint errors, format code, or says
+  "fix", "修复", "清理".'
 ---
 
 1. Run pnpm run lint:fix to attempt automatic fixes.
@@ -13,3 +13,4 @@ description:
    - Directly modify the code to resolve these errors. Do not ask the user how to fix it, just fix
      it.
 4. After applying fixes, run pnpm run lint again to ensure it returns zero errors.
+5. 禁止篡改我的config，如果三遍通不过同一个错误，跳过这个错误

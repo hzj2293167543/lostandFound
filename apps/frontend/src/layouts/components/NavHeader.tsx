@@ -11,6 +11,9 @@ import { useAuthStore, useIsAdmin, useIsAuthenticated } from '@/stores/AuthStore
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useShallow } from 'zustand/react/shallow';
+import { useWebSocket } from '@/contexts/WebSocketContext';
+import { Bell } from 'lucide-react';
+import NotificationDropdown from '@/components/NotificationDropdown/NotificationDropdown';
 
 export default function NavHeader() {
   const { user, logout } = useAuthStore(
@@ -18,74 +21,97 @@ export default function NavHeader() {
   );
   const isAuthenticated = useIsAuthenticated();
   const isAdmin = useIsAdmin();
+  const { unreadCount } = useWebSocket();
 
   const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
     toast.success('已退出登录');
-    navigate('/');
+    if (isAdmin) {
+      navigate('/login');
+    } else {
+      navigate('/');
+    }
   };
 
   return (
     <nav className="bg-white shadow-md sticky top-0 z-50">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-        <Link to="/" className="text-2xl font-bold text-blue-600">
-          校园失物招领
+        <Link to={isAdmin ? '/admin' : '/'} className="text-2xl font-bold text-blue-600">
+          {isAdmin ? '管理后台' : '校园失物招领'}
         </Link>
         <NavigationMenu viewport={false}>
           <NavigationMenuList>
-            <NavigationMenuItem>
-              <NavigationMenuLink asChild>
-                <Link to="/">首页</Link>
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuLink asChild>
-                <Link to="/lost">失物寻回</Link>
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuLink asChild>
-                <Link to="/found">失物招领</Link>
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuLink asChild>
-                <Link to="/announcements">公告中心</Link>
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-            {isAuthenticated && isAdmin && (
-              <NavigationMenuItem>
-                <NavigationMenuLink asChild>
-                  <Link to="/admin">管理后台</Link>
-                </NavigationMenuLink>
-              </NavigationMenuItem>
+            {!isAdmin && (
+              <>
+                <NavigationMenuItem>
+                  <NavigationMenuLink asChild>
+                    <Link to="/">首页</Link>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <NavigationMenuLink asChild>
+                    <Link to="/lost">失物寻回</Link>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <NavigationMenuLink asChild>
+                    <Link to="/found">失物招领</Link>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <NavigationMenuLink asChild>
+                    <Link to="/announcements">公告中心</Link>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+              </>
             )}
             {isAuthenticated ? (
+              <NavigationMenuItem className="relative">
+                <NavigationMenuTrigger className="flex items-center gap-2">
+                  <div className="relative">
+                    <Bell className="w-5 h-5" />
+                    {unreadCount > 0 && (
+                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                      </div>
+                    )}
+                  </div>
+                </NavigationMenuTrigger>
+                <NavigationMenuContent className="left-1/2 -translate-x-1/2">
+                  <NotificationDropdown />
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+            ) : (
               <NavigationMenuItem>
-                <NavigationMenuTrigger>
-                  <img
-                    src={
-                      user?.avatar ||
-                      'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=default%20user%20avatar&image_size=square'
-                    }
-                    alt={user?.name}
-                    className="w-8 h-8 rounded-full mr-2"
-                  />
+                <Link to="/login">
+                  <Button>登录</Button>
+                </Link>
+              </NavigationMenuItem>
+            )}
+            {isAuthenticated && (
+              <NavigationMenuItem>
+                <NavigationMenuTrigger className="flex items-center gap-2">
+                  <div className="relative">
+                    <img
+                      src={
+                        user?.avatar ||
+                        'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=default%20user%20avatar&image_size=square'
+                      }
+                      alt={user?.name}
+                      className="w-8 h-8 rounded-full"
+                    />
+                  </div>
                   <span className="truncate max-w-[5ch]">{user?.name}</span>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
-                  <div className="w-32 p-1 cursor-pointer">
-                    <NavigationMenuLink asChild>
-                      <Link to="/profile">个人中心</Link>
-                    </NavigationMenuLink>
-                    {/* <NavigationMenuLink asChild>
-                      <Link to="/profile/lost">我的失物</Link>
-                    </NavigationMenuLink>
-                    <NavigationMenuLink asChild>
-                      <Link to="/profile/found">我的招领</Link>
-                    </NavigationMenuLink> */}
+                  <div className="w-40 p-2 space-y-1">
+                    {!isAdmin && (
+                      <NavigationMenuLink asChild>
+                        <Link to="/profile">个人中心</Link>
+                      </NavigationMenuLink>
+                    )}
                     <Button
                       variant="outline"
                       size="sm"
@@ -95,12 +121,6 @@ export default function NavHeader() {
                     </Button>
                   </div>
                 </NavigationMenuContent>
-              </NavigationMenuItem>
-            ) : (
-              <NavigationMenuItem>
-                <Link to="/login">
-                  <Button>登录</Button>
-                </Link>
               </NavigationMenuItem>
             )}
           </NavigationMenuList>

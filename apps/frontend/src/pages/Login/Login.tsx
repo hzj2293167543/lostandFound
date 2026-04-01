@@ -12,7 +12,6 @@ import { ROLE } from '@/stores/type';
 export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const login = useAuthStore.use.login();
-  const role = useAuthStore.use.user()?.role;
   const navigate = useNavigate();
 
   // 登录表单数据
@@ -35,9 +34,10 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      await login(formData);
+      const user = await login(formData);
       toast.success('登录成功');
-      if (role === ROLE.管理员) {
+      console.log(user);
+      if (user.role === ROLE.管理员) {
         navigate('/admin');
       } else {
         navigate('/');

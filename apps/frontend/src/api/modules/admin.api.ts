@@ -14,6 +14,15 @@ import {
   HandleReportDto,
   ReportPaginationParams,
   Punishment,
+  LocationStats,
+  HourlyDistribution,
+  WeeklyDistribution,
+  MonthlyDistribution,
+  UserActivityRanking,
+  CommentTrend,
+  ReportHandlingStats,
+  FunnelData,
+  WordCloudData,
 } from '@lostfound/shared';
 import { buildSearchParams } from '@/utils';
 
@@ -25,6 +34,39 @@ interface RecentItem {
 
 export const adminApi = {
   getStats: (config?: AxiosRequestConfig) => get<AdminStats>('/admin/stats', config),
+
+  getTopLocations: (type: 'lost' | 'found', limit?: number, config?: AxiosRequestConfig) =>
+    get<LocationStats[]>(`/admin/stats/locations/${type}${limit ? `?limit=${limit}` : ''}`, config),
+
+  getHourlyDistribution: (type: 'lost' | 'found', days?: number, config?: AxiosRequestConfig) =>
+    get<HourlyDistribution[]>(`/admin/stats/hourly/${type}${days ? `?days=${days}` : ''}`, config),
+
+  getWeeklyDistribution: (days?: number, config?: AxiosRequestConfig) =>
+    get<WeeklyDistribution[]>(`/admin/stats/weekly${days ? `?days=${days}` : ''}`, config),
+
+  getMonthlyDistribution: (months?: number, config?: AxiosRequestConfig) =>
+    get<MonthlyDistribution[]>(`/admin/stats/monthly${months ? `?months=${months}` : ''}`, config),
+
+  getUserActivityRanking: (
+    type: 'lost' | 'found' | 'comment',
+    limit?: number,
+    config?: AxiosRequestConfig
+  ) =>
+    get<UserActivityRanking[]>(
+      `/admin/stats/user-activity/${type}${limit ? `?limit=${limit}` : ''}`,
+      config
+    ),
+
+  getCommentTrend: (days?: number, config?: AxiosRequestConfig) =>
+    get<CommentTrend[]>(`/admin/stats/comment-trend${days ? `?days=${days}` : ''}`, config),
+
+  getReportHandlingStats: (config?: AxiosRequestConfig) =>
+    get<ReportHandlingStats>('/admin/stats/report-handling', config),
+
+  getFunnelData: (config?: AxiosRequestConfig) => get<FunnelData>('/admin/stats/funnel', config),
+
+  getWordCloudData: (limit?: number, config?: AxiosRequestConfig) =>
+    get<WordCloudData>(`/admin/stats/wordcloud${limit ? `?limit=${limit}` : ''}`, config),
 
   getRecentLostItems: (config?: AxiosRequestConfig) =>
     get<RecentItem[]>('/admin/lost/recent', config),

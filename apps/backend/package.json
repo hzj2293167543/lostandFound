@@ -25,6 +25,7 @@
     "@nestjs/serve-static": "^5.0.4",
     "@nestjs/typeorm": "^10.0.0",
     "@nestjs/websockets": "^11.1.17",
+    "@node-rs/jieba": "^2.0.1",
     "@types/fs-extra": "^11.0.4",
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",

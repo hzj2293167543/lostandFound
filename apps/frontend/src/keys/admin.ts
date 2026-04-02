@@ -1,6 +1,16 @@
 export const adminKeys = {
   all: ['admin'] as const,
   stats: () => [...adminKeys.all, 'stats'] as const,
+  locations: (type: 'lost' | 'found') => [...adminKeys.all, 'locations', type] as const,
+  hourly: (type: 'lost' | 'found') => [...adminKeys.all, 'hourly', type] as const,
+  weekly: () => [...adminKeys.all, 'weekly'] as const,
+  monthly: () => [...adminKeys.all, 'monthly'] as const,
+  userActivity: (type: 'lost' | 'found' | 'comment') =>
+    [...adminKeys.all, 'userActivity', type] as const,
+  commentTrend: () => [...adminKeys.all, 'commentTrend'] as const,
+  reportHandling: () => [...adminKeys.all, 'reportHandling'] as const,
+  funnel: () => [...adminKeys.all, 'funnel'] as const,
+  wordcloud: () => [...adminKeys.all, 'wordcloud'] as const,
   recentLost: () => [...adminKeys.all, 'recent-lost'] as const,
   recentFound: () => [...adminKeys.all, 'recent-found'] as const,
   users: () => [...adminKeys.all, 'users'] as const,

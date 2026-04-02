@@ -18,7 +18,7 @@ const AnnouncementDetail = lazy(
 );
 const ProfilePage = lazy(() => import('./pages/Profile/ProfilePage'));
 const AdminLayout = lazy(() => import('./pages/Admin/AdminLayout'));
-const AdminDashboard = lazy(() => import('./pages/Admin/Dashboard'));
+const AdminDashboard = lazy(() => import('./pages/Admin/Dashboard/Dashboard'));
 const AdminUsers = lazy(() => import('./pages/Admin/Users'));
 const AdminLost = lazy(() => import('./pages/Admin/Lost'));
 const AdminFound = lazy(() => import('./pages/Admin/Found'));

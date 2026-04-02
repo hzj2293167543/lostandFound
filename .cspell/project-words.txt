@@ -41,4 +41,5 @@ Vercel
 
 # Auto-added words
 Grotesk
+jieba
 maximalism

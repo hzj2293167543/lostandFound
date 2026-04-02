@@ -17,10 +17,17 @@ import { ReportReason } from '../reports/entities/report-reason.entity';
 import { Punishment } from '../reports/entities/punishment.entity';
 import { AdminController } from './admin.controller';
 import { AdminService } from './admin.service';
-import { ItemManagementService } from './item-management.service';
-import { ReportService } from './report.service';
 import { AnnouncementService } from './announcement.service';
 import { CategoryService } from './category.service';
+import { ItemManagementService } from './item-management.service';
+import { ReportService } from './report.service';
+import { StatisticsService } from './statistics.service';
+import { UserManagementService } from './user-management.service';
+import {
+  ItemStatisticsService,
+  UserStatisticsService,
+  ReportStatisticsService,
+} from './statistics';
 
 @Module({
   imports: [
@@ -45,11 +52,16 @@ import { CategoryService } from './category.service';
   controllers: [AdminController],
   providers: [
     AdminService,
-    ItemManagementService,
-    ReportService,
     AnnouncementService,
     CategoryService,
+    ItemManagementService,
+    ReportService,
+    StatisticsService,
+    UserManagementService,
+    ItemStatisticsService,
+    UserStatisticsService,
+    ReportStatisticsService,
   ],
-  exports: [AdminService],
+  exports: [AdminService, StatisticsService, UserManagementService],
 })
 export class AdminModule {}

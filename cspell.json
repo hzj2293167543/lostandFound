@@ -23,7 +23,7 @@
       "addWords": true
     }
   ],
-  "words": ["revalidator"],
+  "words": ["revalidator", "DAYOFWEEK", "wordcloud"],
   "ignoreWords": [],
   "import": []
 }

@@ -9,6 +9,7 @@ import { Toaster } from './components/ui/sonner';
 import { queryClient } from './lib/queryClient';
 import { toast } from 'sonner';
 import { WebSocketProvider } from './contexts/WebSocketContext';
+import { ThemeProvider } from './components/ThemeProvider';
 
 window.addEventListener('unhandledrejection', (event) => {
   const error = event.reason;
@@ -25,8 +26,10 @@ ReactDOM.createRoot(document.querySelector('#root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <WebSocketProvider>
-        <Toaster theme="system" position="top-center" />
-        <RouterProvider router={router} />
+        <ThemeProvider>
+          <Toaster theme="system" position="top-center" />
+          <RouterProvider router={router} />
+        </ThemeProvider>
       </WebSocketProvider>
     </QueryClientProvider>
   </React.StrictMode>

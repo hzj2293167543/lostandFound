@@ -28,7 +28,7 @@ export class User {
   @Column({ length: 255, nullable: true })
   email: string;
 
-  @Column({ type: 'tinyint', default: 1 })
+  @Column({ type: 'smallint', default: 1 })
   status: number;
 
   @Column({ type: 'timestamp', nullable: true })
@@ -40,7 +40,7 @@ export class User {
   @Column({ length: 255, nullable: true })
   password: string;
 
-  @Column({ type: 'tinyint', default: 0 })
+  @Column({ type: 'smallint', default: 0 })
   role: number;
 
   @CreateDateColumn()

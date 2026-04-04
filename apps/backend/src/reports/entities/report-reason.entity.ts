@@ -14,13 +14,13 @@ export class ReportReason {
   @Column({ length: 100 })
   reasonText: string;
 
-  @Column({ type: 'tinyint', nullable: true })
+  @Column({ type: 'smallint', nullable: true })
   targetType: number;
 
   @Column({ default: 0 })
   sortOrder: number;
 
-  @Column({ type: 'tinyint', default: 1 })
+  @Column({ type: 'smallint', default: 1 })
   isActive: number;
 
   @CreateDateColumn()

@@ -27,13 +27,13 @@ export class Punishment {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @Column({ type: 'tinyint' })
+  @Column({ type: 'smallint' })
   type: PunishmentType;
 
   @Column({ name: 'duration_days', default: 0 })
   durationDays: number;
 
-  @Column({ name: 'expire_at', type: 'datetime', nullable: true })
+  @Column({ name: 'expire_at', type: 'timestamp', nullable: true })
   expireAt: Date;
 
   @Column({ length: 500, nullable: true })

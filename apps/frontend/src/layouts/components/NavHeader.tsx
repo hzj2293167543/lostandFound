@@ -14,6 +14,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { useWebSocket } from '@/contexts/WebSocketContext';
 import { Bell } from 'lucide-react';
 import NotificationDropdown from '@/components/NotificationDropdown/NotificationDropdown';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 export default function NavHeader() {
   const { user, logout } = useAuthStore(
@@ -68,21 +69,26 @@ export default function NavHeader() {
               </>
             )}
             {isAuthenticated ? (
-              <NavigationMenuItem className="relative">
-                <NavigationMenuTrigger className="flex items-center gap-2">
-                  <div className="relative">
-                    <Bell className="w-5 h-5" />
-                    {unreadCount > 0 && (
-                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-                        {unreadCount > 9 ? '9+' : unreadCount}
-                      </div>
-                    )}
-                  </div>
-                </NavigationMenuTrigger>
-                <NavigationMenuContent className="left-1/2 -translate-x-1/2">
-                  <NotificationDropdown />
-                </NavigationMenuContent>
-              </NavigationMenuItem>
+              <>
+                <NavigationMenuItem className="relative">
+                  <NavigationMenuTrigger className="flex items-center gap-2">
+                    <div className="relative">
+                      <Bell className="w-5 h-5" />
+                      {unreadCount > 0 && (
+                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                          {unreadCount > 9 ? '9+' : unreadCount}
+                        </div>
+                      )}
+                    </div>
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent className="left-1/2 -translate-x-1/2">
+                    <NotificationDropdown />
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <ThemeToggle />
+                </NavigationMenuItem>
+              </>
             ) : (
               <NavigationMenuItem>
                 <Link to="/login">

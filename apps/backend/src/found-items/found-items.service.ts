@@ -141,7 +141,6 @@ export class FoundItemsService {
     const foundItem = this.foundItemsRepository.create({
       ...restData,
       categoryId,
-      commentCount: 0,
       viewCount: 0,
     });
     try {

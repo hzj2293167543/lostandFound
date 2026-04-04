@@ -17,6 +17,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { AdminModule } from './admin/admin.module';
 import { ReportsModule } from './reports/reports.module';
 import { NotificationModule } from './notifications/notification.module';
+import { AIModule } from './ai/ai.module';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { BanGuard } from './common/guards/ban.guard';
 import { OptionalJwtAuthGuard } from './common/guards/OptionalJwtAuthGuard.guard';
@@ -24,7 +25,7 @@ import { TransformInterceptor } from './common/response.interceptor';
 import { AllExceptionsFilter } from './common/exception.filter';
 
 const env = process.env.NODE_ENV || 'development'; // 默认开发环境
-const filePath = join(__dirname, '..', 'config', `.env.${env}.yaml`);
+const filePath = join(__dirname, '..', '..', 'config', `.env.${env}.yaml`);
 
 @Module({
   imports: [
@@ -54,7 +55,7 @@ const filePath = join(__dirname, '..', 'config', `.env.${env}.yaml`);
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        type: configService.get<string>('database.type') as 'mysql',
+        type: configService.get<string>('database.type') as 'postgres',
         host: configService.get<string>('database.host'),
         port: configService.get<number>('database.port'),
         username: configService.get<string>('database.username'),
@@ -77,6 +78,7 @@ const filePath = join(__dirname, '..', 'config', `.env.${env}.yaml`);
     AdminModule,
     ReportsModule,
     NotificationModule,
+    AIModule,
   ],
   providers: [
     // 1️⃣ 全局管道 (因为需要传参 whitelist/transform，所以用 useFactory)

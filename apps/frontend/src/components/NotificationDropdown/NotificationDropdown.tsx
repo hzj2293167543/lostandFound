@@ -1,10 +1,9 @@
+import { useWebSocket } from '@/contexts/WebSocketContext';
+import { useAuthStore } from '@/stores/AuthStore';
+import { formatDate, getTargetTab } from '@/utils';
+import { AlertTriangle, Heart, MessageCircle } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useWebSocket } from '@/contexts/WebSocketContext';
-import { formatDate, getTargetTab } from '@/utils';
-import { Heart, MessageCircle, AlertTriangle } from 'lucide-react';
-import { memo } from 'react';
-import { useAuthStore } from '@/stores/AuthStore';
 
 const NotificationIcon = ({ type }: { type: string }) => {
   switch (type) {
@@ -19,7 +18,7 @@ const NotificationIcon = ({ type }: { type: string }) => {
   }
 };
 
-const NotificationItem = memo(function NotificationItem({
+const NotificationItem = function NotificationItem({
   notification,
   onClick,
   onVisible,
@@ -76,9 +75,10 @@ const NotificationItem = memo(function NotificationItem({
       )}
     </div>
   );
-});
+};
 
-export default memo(function NotificationDropdown() {
+export default function NotificationDropdown() {
+  'use no memo';
   const navigate = useNavigate();
   const { notifications, markAsRead, markAllAsRead } = useWebSocket();
   const currentUser = useAuthStore.use.user();
@@ -138,4 +138,4 @@ export default memo(function NotificationDropdown() {
       )}
     </div>
   );
-});
+}

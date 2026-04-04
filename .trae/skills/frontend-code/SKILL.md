@@ -107,3 +107,9 @@ setTimeout(() => fetch(), RETRY_DELAY_MS);
 if (user.status === 1) { ... }
 setTimeout(() => fetch(), 2000);
 ```
+
+## 8. 业务逻辑中的api规范
+
+### 红线
+
+严禁在api文件中直接实现业务逻辑，必须在业务逻辑文件中实现业务逻辑。

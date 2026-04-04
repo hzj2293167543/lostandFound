@@ -29,7 +29,7 @@ export class FoundItem {
   @Column('text')
   description: string;
 
-  @Column({ type: 'datetime' })
+  @Column({ type: 'timestamp' })
   time: Date;
 
   @Column({ length: 255 })
@@ -41,7 +41,7 @@ export class FoundItem {
   @Column({ length: 20, nullable: true })
   contactPhone: string;
 
-  @Column({ type: 'tinyint', default: 0 })
+  @Column({ type: 'smallint', default: 0 })
   status: number;
 
   @Column({ length: 255, nullable: true })
@@ -56,9 +56,6 @@ export class FoundItem {
   @ManyToOne(() => User, (user) => user.foundItems)
   @JoinColumn({ name: 'user_id' })
   user: User;
-
-  @Column({ default: 0 })
-  commentCount: number;
 
   @CreateDateColumn()
   createdAt: Date;

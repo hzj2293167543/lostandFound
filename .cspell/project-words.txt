@@ -42,4 +42,24 @@ Vercel
 # Auto-added words
 Grotesk
 jieba
+langchain
 maximalism
+officedocument
+officeparser
+ollama
+openxmlformats
+pgvector
+pptxgen
+pptxgenjs
+simhei
+spreadsheetml
+textsplitters
+wordprocessingml
+
+# Auto-added words
+eventsource
+jspdf
+nomic
+pdfmake
+rerank
+reranked

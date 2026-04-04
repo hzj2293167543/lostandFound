@@ -20,7 +20,7 @@ export class Notification {
   @Column({ name: 'user_id', type: 'bigint' })
   userId: number;
 
-  @Column({ type: 'tinyint' })
+  @Column({ type: 'smallint' })
   type: NotificationTypeValue;
 
   @Column({ length: 500 })
@@ -38,10 +38,10 @@ export class Notification {
   @Column({ name: 'related_user_name', length: 255, nullable: true })
   relatedUserName: string | null;
 
-  @Column({ name: 'read_status', type: 'tinyint', default: 0 })
+  @Column({ name: 'read_status', type: 'smallint', default: 0 })
   readStatus: number;
 
-  @Column({ name: 'read_at', type: 'datetime', nullable: true })
+  @Column({ name: 'read_at', type: 'timestamp', nullable: true })
   readAt: Date | null;
 
   @CreateDateColumn({ name: 'created_at' })

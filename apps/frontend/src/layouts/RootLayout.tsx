@@ -2,6 +2,7 @@ import GlobalProgress from '@/components/globalProgress/GlobalProgress';
 import { Outlet } from 'react-router-dom';
 import NavHeader from './components/NavHeader';
 import { useGlobalToast } from '@/hooks/useGlobalToast';
+import { AIChatFloatingButton } from '@/components/ai-chat';
 
 export default function RootLayout() {
   useGlobalToast();
@@ -11,8 +12,9 @@ export default function RootLayout() {
       <GlobalProgress />
       <NavHeader />
       <main className="container mx-auto px-4 py-8">
-        <Outlet /> {/* 子路由将在这里渲染 */}
+        <Outlet />
       </main>
+      <AIChatFloatingButton />
     </div>
   );
 }

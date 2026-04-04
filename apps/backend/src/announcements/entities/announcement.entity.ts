@@ -20,7 +20,7 @@ export class Announcement {
   @Column('text')
   content: string;
 
-  @Column({ type: 'datetime' })
+  @Column({ type: 'timestamp' })
   time: Date;
 
   @ManyToOne(() => User)

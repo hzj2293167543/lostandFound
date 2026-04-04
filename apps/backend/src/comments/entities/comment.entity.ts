@@ -18,7 +18,7 @@ export class Comment {
   @Column('text')
   content: string;
 
-  @Column({ type: 'datetime' })
+  @Column({ type: 'timestamp' })
   time: Date;
 
   @Column({ nullable: true })
@@ -45,7 +45,7 @@ export class Comment {
   @Column()
   itemId: number;
 
-  @Column({ type: 'tinyint' })
+  @Column({ type: 'smallint' })
   itemType: number;
 
   @CreateDateColumn()

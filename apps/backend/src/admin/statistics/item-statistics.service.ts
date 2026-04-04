@@ -12,6 +12,7 @@ import {
 } from '@lostfound/shared';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { IsNull } from 'typeorm';
 import { Jieba } from '@node-rs/jieba';
 import { dict } from '@node-rs/jieba/dict';
 import { Repository } from 'typeorm';
@@ -21,6 +22,8 @@ import { STOP_WORDS } from './constants';
 
 @Injectable()
 export class ItemStatisticsService {
+  private jieba: Jieba;
+
   constructor(
     @InjectRepository(LostItem)
     private lostItemsRepository: Repository<LostItem>,
@@ -30,7 +33,6 @@ export class ItemStatisticsService {
     this.jieba = Jieba.withDict(dict);
   }
 
-  private jieba: Jieba;
   async getTopLocations(type: 'lost' | 'found', limit: number = 10): Promise<LocationStats[]> {
     const repo = type === 'lost' ? this.lostItemsRepository : this.foundItemsRepository;
     const results = await repo
@@ -60,11 +62,11 @@ export class ItemStatisticsService {
 
     const results = await repo
       .createQueryBuilder('item')
-      .select('HOUR(item.time)', 'hour')
+      .select('EXTRACT(HOUR FROM item.time)', 'hour')
       .addSelect('COUNT(*)', 'count')
       .where('item.deletedAt IS NULL')
       .andWhere('item.time >= :startDate', { startDate })
-      .groupBy('HOUR(item.time)')
+      .groupBy('EXTRACT(HOUR FROM item.time)')
       .orderBy('hour', 'ASC')
       .getRawMany();
 
@@ -83,26 +85,26 @@ export class ItemStatisticsService {
     const [lostResults, foundResults] = await Promise.all([
       this.lostItemsRepository
         .createQueryBuilder('item')
-        .select('DAYOFWEEK(item.time)', 'dayOfWeek')
+        .select('EXTRACT(DOW FROM item.time)', 'dayOfWeek')
         .addSelect('COUNT(*)', 'count')
         .where('item.deletedAt IS NULL')
         .andWhere('item.time >= :startDate', { startDate })
-        .groupBy('DAYOFWEEK(item.time)')
+        .groupBy('EXTRACT(DOW FROM item.time)')
         .getRawMany(),
       this.foundItemsRepository
         .createQueryBuilder('item')
-        .select('DAYOFWEEK(item.time)', 'dayOfWeek')
+        .select('EXTRACT(DOW FROM item.time)', 'dayOfWeek')
         .addSelect('COUNT(*)', 'count')
         .where('item.deletedAt IS NULL')
         .andWhere('item.time >= :startDate', { startDate })
-        .groupBy('DAYOFWEEK(item.time)')
+        .groupBy('EXTRACT(DOW FROM item.time)')
         .getRawMany(),
     ]);
 
     const weeklyData: WeeklyDistribution[] = [];
     for (let i = 0; i < 7; i++) {
-      const lostCount = lostResults.find((r) => Number(r.dayOfWeek) === i + 1);
-      const foundCount = foundResults.find((r) => Number(r.dayOfWeek) === i + 1);
+      const lostCount = lostResults.find((r) => Number(r.dayOfWeek) === i);
+      const foundCount = foundResults.find((r) => Number(r.dayOfWeek) === i);
       weeklyData.push({
         dayOfWeek: i,
         dayName: dayNames[i],
@@ -120,20 +122,20 @@ export class ItemStatisticsService {
     const [lostResults, foundResults] = await Promise.all([
       this.lostItemsRepository
         .createQueryBuilder('item')
-        .select('DATE_FORMAT(item.time, "%Y-%m")', 'month')
+        .select("TO_CHAR(item.time, 'YYYY-MM')", 'month')
         .addSelect('COUNT(*)', 'count')
         .where('item.deletedAt IS NULL')
         .andWhere('item.time >= :startDate', { startDate })
-        .groupBy('DATE_FORMAT(item.time, "%Y-%m")')
+        .groupBy("TO_CHAR(item.time, 'YYYY-MM')")
         .orderBy('month', 'ASC')
         .getRawMany(),
       this.foundItemsRepository
         .createQueryBuilder('item')
-        .select('DATE_FORMAT(item.time, "%Y-%m")', 'month')
+        .select("TO_CHAR(item.time, 'YYYY-MM')", 'month')
         .addSelect('COUNT(*)', 'count')
         .where('item.deletedAt IS NULL')
         .andWhere('item.time >= :startDate', { startDate })
-        .groupBy('DATE_FORMAT(item.time, "%Y-%m")')
+        .groupBy("TO_CHAR(item.time, 'YYYY-MM')")
         .orderBy('month', 'ASC')
         .getRawMany(),
     ]);
@@ -161,15 +163,15 @@ export class ItemStatisticsService {
   }
 
   private async getLostFunnel(): Promise<ItemFunnel[]> {
-    const total = await this.lostItemsRepository.count({ where: { deletedAt: null } });
+    const total = await this.lostItemsRepository.count({ where: { deletedAt: IsNull() } });
     const finding = await this.lostItemsRepository.count({
-      where: { status: LostItemStatus.寻找中, deletedAt: null },
+      where: { status: LostItemStatus.寻找中, deletedAt: IsNull() },
     });
     const found = await this.lostItemsRepository.count({
-      where: { status: LostItemStatus.已找到, deletedAt: null },
+      where: { status: LostItemStatus.已找到, deletedAt: IsNull() },
     });
     const cancelled = await this.lostItemsRepository.count({
-      where: { status: LostItemStatus.已撤销, deletedAt: null },
+      where: { status: LostItemStatus.已撤销, deletedAt: IsNull() },
     });
 
     return [
@@ -196,15 +198,15 @@ export class ItemStatisticsService {
   }
 
   private async getFoundFunnel(): Promise<ItemFunnel[]> {
-    const total = await this.foundItemsRepository.count({ where: { deletedAt: null } });
+    const total = await this.foundItemsRepository.count({ where: { deletedAt: IsNull() } });
     const recruiting = await this.foundItemsRepository.count({
-      where: { status: FoundItemStatus.招领中, deletedAt: null },
+      where: { status: FoundItemStatus.招领中, deletedAt: IsNull() },
     });
     const returned = await this.foundItemsRepository.count({
-      where: { status: FoundItemStatus.已归还, deletedAt: null },
+      where: { status: FoundItemStatus.已归还, deletedAt: IsNull() },
     });
     const cancelled = await this.foundItemsRepository.count({
-      where: { status: FoundItemStatus.已撤销, deletedAt: null },
+      where: { status: FoundItemStatus.已撤销, deletedAt: IsNull() },
     });
 
     return [
@@ -267,7 +269,7 @@ export class ItemStatisticsService {
   }
 
   private extractChineseWords(text: string): Record<string, number> {
-    const words = this.jieba.cut(text); // 正确分词
+    const words = this.jieba.cut(text);
     const wordCounts: Record<string, number> = {};
     for (const w of words) {
       if (w.length >= 2 && !STOP_WORDS.has(w)) {

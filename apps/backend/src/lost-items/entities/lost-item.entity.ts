@@ -29,13 +29,13 @@ export class LostItem {
   @Column('text')
   description: string;
 
-  @Column({ type: 'datetime' })
+  @Column({ type: 'timestamp' })
   time: Date;
 
   @Column({ length: 255 })
   location: string;
 
-  @Column({ type: 'tinyint', default: 0 })
+  @Column({ type: 'smallint', default: 0 })
   status: number;
 
   @Column({ length: 255, nullable: true })

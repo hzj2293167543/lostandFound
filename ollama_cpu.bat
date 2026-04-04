@@ -1,0 +1,3 @@
+set CUDA_VISIBLE_DEVICES=-1
+set OLLAMA_NUM_GPU=0
+ollama serve

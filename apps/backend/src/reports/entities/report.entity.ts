@@ -23,7 +23,7 @@ export class Report {
   @JoinColumn({ name: 'reporter_id' })
   reporter: User;
 
-  @Column({ type: 'tinyint' })
+  @Column({ type: 'smallint' })
   targetType: TReportTargetType;
 
   @Column({ name: 'target_id' })
@@ -45,7 +45,7 @@ export class Report {
   @Column({ type: 'json' })
   snapshot: Record<string, unknown>;
 
-  @Column({ type: 'tinyint', default: ReportStatus.Pending })
+  @Column({ type: 'smallint', default: ReportStatus.Pending })
   status: TReportStatusType;
 
   @Column({ name: 'handler_id', nullable: true })
@@ -55,7 +55,7 @@ export class Report {
   @JoinColumn({ name: 'handler_id' })
   handler: User;
 
-  @Column({ name: 'handled_at', type: 'datetime', nullable: true })
+  @Column({ name: 'handled_at', type: 'timestamp', nullable: true })
   handledAt: Date;
 
   @Column({ name: 'handling_result', length: 200, nullable: true })

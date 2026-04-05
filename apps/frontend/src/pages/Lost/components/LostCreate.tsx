@@ -41,7 +41,10 @@ export default function LostCreate({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className={`bg-blue-600 hover:bg-blue-700 ${className}`}>发布失物信息</Button>
+        <Button
+          className={`bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 ${className}`}>
+          发布失物信息
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
@@ -150,7 +153,10 @@ export default function LostCreate({
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>
                 取消
               </Button>
-              <Button type="submit" className="bg-blue-600 hover:bg-blue-700" disabled={isLoading}>
+              <Button
+                type="submit"
+                className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+                disabled={isLoading}>
                 {isLoading ? '发布中...' : '发布'}
               </Button>
             </DialogFooter>

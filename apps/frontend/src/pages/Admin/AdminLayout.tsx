@@ -1,4 +1,6 @@
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { Button } from '@/components/ui/button';
+import { NavigationMenuItem } from '@/components/ui/navigation-menu';
 import { useAuthStore, useIsAdmin } from '@/stores/AuthStore';
 import { FileText, LayoutDashboard, LogOut, Package, Users, AlertTriangle } from 'lucide-react';
 import { memo } from 'react';
@@ -48,17 +50,21 @@ export default memo(function AdminLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <header className="sticky top-0 bg-white shadow-md">
+    <div className="min-h-screen bg-muted">
+      <header className="sticky top-0 bg-background shadow-md">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <Link to="/admin" className="text-xl font-bold text-blue-600">
               后台管理
             </Link>
-            <span className="text-gray-500">|</span>
-            <span className="text-gray-600">欢迎，{user?.name}</span>
+            <span className="text-muted-foreground">|</span>
+            <span className="text-muted-foreground">欢迎，{user?.name}</span>
           </div>
+
           <div className="flex items-center space-x-4">
+            <NavigationMenuItem>
+              <ThemeToggle />
+            </NavigationMenuItem>
             <Button variant="outline" size="sm" onClick={handleLogout}>
               <LogOut className="w-4 h-4 mr-1" />
               退出
@@ -69,7 +75,7 @@ export default memo(function AdminLayout() {
 
       <div className=" container mx-auto px-4 pt-4">
         <div className=" min-h-[calc(100vh-100px)] flex gap-6">
-          <aside className="w-56 bg-white rounded-lg shadow-md p-4">
+          <aside className="w-56 bg-background rounded-lg shadow-md p-4">
             <nav className="space-y-2">
               {menuItems.map((item) => (
                 <Link
@@ -87,7 +93,7 @@ export default memo(function AdminLayout() {
             </nav>
           </aside>
 
-          <main className="flex-1 bg-white rounded-lg shadow-md p-6">
+          <main className="flex-1 bg-background rounded-lg shadow-md p-6">
             <Outlet />
           </main>
         </div>

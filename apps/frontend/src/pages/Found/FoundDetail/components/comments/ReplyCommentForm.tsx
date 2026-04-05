@@ -1,17 +1,17 @@
 import { Button } from '@/components/ui/button';
-import { FormField, FormItem, FormControl, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
 import { FOUND_DETAIL_INTENT } from '@/pages/Found/type';
 import { useAuthStore } from '@/stores/AuthStore';
 import { ItemTypeMap } from '@/types/type';
 import { getErrorMsg } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffectEvent, useEffect } from 'react';
-import { useForm, FieldErrors } from 'react-hook-form';
-import { useFetcher, Form } from 'react-router';
-import { toast } from 'sonner';
 import { CommentItem as CommentItemVo } from '@lostfound/shared';
-import z from 'zod';
+import { useEffect, useEffectEvent } from 'react';
+import { FieldErrors, useForm } from 'react-hook-form';
+import { useFetcher } from 'react-router';
+import { toast } from 'sonner';
+import * as z from 'zod';
 
 const replySchema = z.object({
   content: z.string().min(1, '回复内容不能为空'),
@@ -19,7 +19,7 @@ const replySchema = z.object({
 
 type ReplyFormValues = z.infer<typeof replySchema>;
 
-export function ReplyComment({
+export function ReplyCommentForm({
   comment,
   itemId,
   replyId,
@@ -68,7 +68,7 @@ export function ReplyComment({
   const onSubmit = async (data: ReplyFormValues) => {
     const payload = {
       intent: FOUND_DETAIL_INTENT.COMMENT,
-      parentId: replyId,
+      parentId: replyId || null,
       itemId,
       itemType: ItemTypeMap.FOUND,
       content: data.content,
@@ -101,7 +101,7 @@ export function ReplyComment({
                 <FormControl>
                   <Textarea
                     rows={3}
-                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-400 resize-none max-h-24"
+                    className="w-full p-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ai-primary resize-none max-h-24"
                     placeholder={`回复 @${comment.user.name}：`}
                     {...field}
                   />
@@ -110,14 +110,11 @@ export function ReplyComment({
               </FormItem>
             )}
           />
-          <div className="flex gap-2 mt-2">
-            <Button
-              type="submit"
-              size="sm"
-              className="px-6 bg-green-600 text-white hover:bg-green-700">
-              发布
-            </Button>
-          </div>
+          <Button
+            size="sm"
+            className="mt-2 px-6 bg-found-primary text-white hover:bg-found-primary/90">
+            发布
+          </Button>
         </form>
       </Form>
     </div>

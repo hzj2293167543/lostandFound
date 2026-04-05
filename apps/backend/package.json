@@ -9,7 +9,8 @@
     "start": "nest start",
     "debug": "nest start --debug --watch",
     "import-knowledge": "ts-node -r tsconfig-paths/register scripts/import-knowledge.ts",
-    "generate-test-data": "ts-node -r tsconfig-paths/register scripts/generate-test-data.ts"
+    "generate-test-data": "ts-node -r tsconfig-paths/register scripts/generate-test-data.ts",
+    "type-check": "tsc --noEmit"
   },
   "keywords": [],
   "author": "",

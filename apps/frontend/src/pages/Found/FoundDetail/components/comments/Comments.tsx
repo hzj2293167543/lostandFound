@@ -18,7 +18,7 @@ import { useForm } from 'react-hook-form';
 import { useActionData, useSubmit } from 'react-router-dom';
 import * as z from 'zod';
 import { FOUND_DETAIL_INTENT } from '../../../type';
-import { CommentItem } from './CommentItem';
+import CommentItem from './CommentItem';
 import { toast } from 'sonner';
 import { useItemCommentInfinite } from '@/hooks/useItemCommentInfinite';
 import { getPageNumbers, PAGE_SIZE } from '@/utils';
@@ -124,7 +124,7 @@ export default function Comments({ itemId }: { itemId: number }) {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="mt-4 bg-green-600 hover:bg-green-700">
+            <Button type="submit" className={`mt-4 bg-found-primary `}>
               提交评论
             </Button>
           </form>

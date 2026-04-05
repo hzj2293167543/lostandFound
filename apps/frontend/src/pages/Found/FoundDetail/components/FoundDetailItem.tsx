@@ -60,9 +60,9 @@ export default function FoundDetailItem({ foundDetail }: { foundDetail: FoundDet
         <CardDescription>分类：{foundDetail.category.name}</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="text-gray-600 mb-6">
+        <div className="text-muted-foreground mb-6">
           <p className="mb-4">{foundDetail.description}</p>
-          <div className="space-y-2 text-gray-700">
+          <div className="space-y-2 text-foreground/80">
             <p>
               <strong>捡到时间：</strong>
               {foundDetail.time}
@@ -83,7 +83,7 @@ export default function FoundDetailItem({ foundDetail }: { foundDetail: FoundDet
         </div>
 
         {/* 发布者信息 */}
-        <div className="border-t border-gray-200 pt-4">
+        <div className="border-t border-border pt-4">
           <h3 className="font-semibold text-lg mb-4">发布者信息</h3>
           <div className="flex items-center">
             <img
@@ -95,9 +95,11 @@ export default function FoundDetailItem({ foundDetail }: { foundDetail: FoundDet
               className="w-12 h-12 rounded-full mr-4"
             />
             <div>
-              <h4 className="font-medium text-gray-800">{foundDetail.user?.name || '未知用户'}</h4>
-              <p className="text-sm text-gray-600">{foundDetail.user?.description || ''}</p>
-              <p className="text-sm text-gray-600 mt-1">
+              <h4 className="font-medium text-foreground">
+                {foundDetail.user?.name || '未知用户'}
+              </h4>
+              <p className="text-sm text-muted-foreground">{foundDetail.user?.description || ''}</p>
+              <p className="text-sm text-muted-foreground mt-1">
                 联系方式：{foundDetail.user?.contact || '未提供'}
               </p>
             </div>

@@ -58,16 +58,20 @@ export default function LostDetailItem({ lostDetail }: { lostDetail: LostDetail 
           <div className="flex justify-between items-start">
             <CardTitle className="text-2xl">{lostDetail.title}</CardTitle>
             <span
-              className={`px-3 py-1 rounded-full text-sm ${lostDetail.status === LOST_FILTER_STATUS.寻找中 ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
+              className={`px-3 py-1 rounded-full text-sm ${
+                lostDetail.status === LOST_FILTER_STATUS.寻找中
+                  ? 'bg-destructive/10 text-destructive'
+                  : 'bg-success/10 text-success'
+              }`}>
               {LOST_STATUS_NAME[lostDetail.status]}
             </span>
           </div>
           <CardDescription>分类：{lostDetail.category.name}</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="text-gray-600 mb-6">
+          <div className="text-muted-foreground mb-6">
             <p className="mb-4">{lostDetail.description}</p>
-            <div className="space-y-2 text-gray-700">
+            <div className="space-y-2 text-foreground/80">
               <p>
                 <strong>丢失时间：</strong>
                 {lostDetail.time}
@@ -80,7 +84,7 @@ export default function LostDetailItem({ lostDetail }: { lostDetail: LostDetail 
           </div>
 
           {/* 发布者信息 */}
-          <div className="border-t border-gray-200 pt-4">
+          <div className="border-t border-border pt-4">
             <h3 className="font-semibold text-lg mb-4">发布者信息</h3>
             <div className="flex items-center">
               <img
@@ -89,9 +93,11 @@ export default function LostDetailItem({ lostDetail }: { lostDetail: LostDetail 
                 className="w-12 h-12 rounded-full mr-4"
               />
               <div>
-                <h4 className="font-medium text-gray-800">{lostDetail.user.name}</h4>
-                <p className="text-sm text-gray-600">{lostDetail.user.description}</p>
-                <p className="text-sm text-gray-600 mt-1">联系方式：{lostDetail.user.contact}</p>
+                <h4 className="font-medium text-foreground">{lostDetail.user.name}</h4>
+                <p className="text-sm text-muted-foreground">{lostDetail.user.description}</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  联系方式：{lostDetail.user.contact}
+                </p>
               </div>
             </div>
           </div>

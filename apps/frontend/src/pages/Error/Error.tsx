@@ -18,13 +18,13 @@ export default memo(function ErrorPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center bg-muted">
       <Card className="max-w-md w-full mx-4">
         <CardContent className="pt-6 pb-8 text-center">
-          <h1 className="text-6xl font-bold text-gray-300 mb-4">
+          <h1 className="text-6xl font-bold text-muted-foreground mb-4">
             {isRouteErrorResponse(error) && error.status === 404 ? '404' : '!'}
           </h1>
-          <h2 className="text-2xl font-semibold text-gray-800 mb-2">{title}</h2>
+          <h2 className="text-2xl font-semibold text-foreground mb-2">{title}</h2>
           <p className="text-gray-600 mb-8">{message}</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button

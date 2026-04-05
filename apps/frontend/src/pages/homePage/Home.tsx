@@ -13,7 +13,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-svh bg-gray-50">
+    <div className="min-h-svh bg-muted">
       <Header />
       <div className="container mx-auto px-4">
         <FoundList foundItems={foundItems} />

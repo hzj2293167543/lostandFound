@@ -34,10 +34,10 @@ export default function FoundList({ filters }: FoundListProps) {
   } = useFoundInfinite(filters);
 
   return (
-    <div ref={containerRef} className="h-full w-full relative">
+    <div ref={containerRef} className="h-[calc(100vh-264px)] w-full relative">
       {containerWidth === null ? (
         <div className="flex justify-center items-center h-64">
-          <p className="text-gray-500">加载中...</p>
+          <p className="text-muted-foreground">加载中...</p>
         </div>
       ) : (
         <>
@@ -56,7 +56,7 @@ export default function FoundList({ filters }: FoundListProps) {
             />
           )}
           {isFetching && status !== 'success' && (
-            <div className="absolute top-0 left-0 right-0 bg-green-50 text-green-600 text-center py-1 text-sm">
+            <div className="absolute top-0 left-0 right-0 bg-success/10 text-success text-center py-1 text-sm">
               加载中...
             </div>
           )}
@@ -77,9 +77,9 @@ function Cell(props: CellProps<FoundItem>) {
         <div style={style} className="p-3">
           <div className="flex justify-center items-center py-8">
             {hasNextPage ? (
-              <p className="text-gray-500">加载中...</p>
+              <p className="text-muted-foreground">加载中...</p>
             ) : (
-              <p className="text-gray-400">没有更多招领信息</p>
+              <p className="text-muted-foreground">没有更多招领信息</p>
             )}
           </div>
         </div>
@@ -103,15 +103,15 @@ function Cell(props: CellProps<FoundItem>) {
               <span>{item.title}</span>
             </CardTitle>
             <span
-              className={`px-2 py-1 rounded-full text-xs ${item.status === FOUND_FILTER_STATUS.招领中 ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
+              className={`px-2 py-1 rounded-full text-xs ${item.status === FOUND_FILTER_STATUS.招领中 ? 'bg-destructive/10 text-destructive' : 'bg-success/10 text-success'}`}>
               {FOUND_STATUS_NAME[item.status]}
             </span>
           </div>
           <CardDescription>分类：{item.category.name}</CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-gray-600 mb-4 line-clamp-3">{item.description}</p>
-          <div className="text-sm text-gray-500 space-y-1">
+          <p className="text-muted-foreground mb-4 line-clamp-3">{item.description}</p>
+          <div className="text-sm text-muted-foreground space-y-1">
             <p>捡到时间：{item.time}</p>
             <p>捡到地点：{item.location}</p>
           </div>
@@ -124,7 +124,7 @@ function Cell(props: CellProps<FoundItem>) {
               alt={item.user?.name || '未知用户'}
               className="w-8 h-8 rounded-full mr-2"
             />
-            <span className="text-sm text-gray-700">{item.user?.name || '未知用户'}</span>
+            <span className="text-sm">{item.user?.name || '未知用户'}</span>
           </div>
         </CardContent>
         <CardFooter className="flex justify-between">
@@ -132,7 +132,7 @@ function Cell(props: CellProps<FoundItem>) {
             查看详情
           </Link>
           <div className="flex items-center">
-            <span className="text-sm text-gray-500">{item.commentCount || 0} 条评论</span>
+            <span className="text-sm text-muted-foreground">{item.commentCount || 0} 条评论</span>
           </div>
         </CardFooter>
       </Card>
@@ -144,13 +144,13 @@ function FoundError({ status }: { status: 'error' | 'empty' }) {
   if (status === 'error') {
     return (
       <div className="flex justify-center items-center h-64">
-        <p className="text-red-500">加载失败，请重试</p>
+        <p className="text-destructive">加载失败，请重试</p>
       </div>
     );
   }
   return (
     <div className="flex justify-center items-center h-64">
-      <p className="text-gray-600 text-lg">没有找到匹配的失物信息</p>
+      <p className="text-muted-foreground text-lg">没有找到匹配的失物信息</p>
     </div>
   );
 }

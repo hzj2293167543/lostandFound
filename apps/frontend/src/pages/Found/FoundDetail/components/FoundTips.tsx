@@ -8,7 +8,7 @@ export default memo(function FoundTips() {
         <CardTitle>失物招领小提示</CardTitle>
       </CardHeader>
       <CardContent>
-        <ul className="space-y-2 text-gray-600">
+        <ul className="space-y-2 text-muted-foreground">
           <li className="flex items-start">
             <span className="text-green-600 mr-2">•</span>
             <span>捡到物品后请尽快发布招领信息，帮助失主早日找回</span>

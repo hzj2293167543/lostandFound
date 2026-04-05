@@ -20,10 +20,10 @@ export default function FoundAction({ foundDetail }: FoundActionProps) {
       <CardContent>
         <div className="space-y-4 flex flex-col gap-1">
           <Link to="/found">
-            <Button className="w-full bg-green-600 hover:bg-green-700">发布招领信息</Button>
+            <Button className="w-full bg-green-600 hover:bg-green-700 ">发布招领信息</Button>
           </Link>
           <Link to="/lost">
-            <Button variant="outline" className="w-full bg-white text-black hover:bg-gray-100">
+            <Button variant="outline" className="w-full">
               查看失物信息
             </Button>
           </Link>

@@ -38,14 +38,14 @@ export function TrendCharts({ monthly, commentTrend }: TrendChartsProps) {
                 type="monotone"
                 dataKey="lostCount"
                 name="失物"
-                stroke="#3b82f6"
+                stroke="var(--chart-1)"
                 strokeWidth={2}
               />
               <Line
                 type="monotone"
                 dataKey="foundCount"
                 name="招领"
-                stroke="#10b981"
+                stroke="var(--chart-2)"
                 strokeWidth={2}
               />
             </LineChart>
@@ -68,7 +68,7 @@ export function TrendCharts({ monthly, commentTrend }: TrendChartsProps) {
                 type="monotone"
                 dataKey="commentCount"
                 name="评论数"
-                stroke="#f59e0b"
+                stroke="var(--warning)"
                 strokeWidth={2}
               />
             </LineChart>

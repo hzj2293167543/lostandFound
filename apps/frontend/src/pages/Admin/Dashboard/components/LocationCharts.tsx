@@ -25,7 +25,7 @@ export function LocationCharts({ lostLocations, foundLocations }: LocationCharts
               <XAxis type="number" />
               <YAxis dataKey="location" type="category" width={100} tick={{ fontSize: 12 }} />
               <Tooltip />
-              <Bar dataKey="count" fill="#3b82f6" />
+              <Bar dataKey="count" fill="var(--chart-1)" />
             </BarChart>
           </ResponsiveContainer>
         </CardContent>
@@ -42,7 +42,7 @@ export function LocationCharts({ lostLocations, foundLocations }: LocationCharts
               <XAxis type="number" />
               <YAxis dataKey="location" type="category" width={100} tick={{ fontSize: 12 }} />
               <Tooltip />
-              <Bar dataKey="count" fill="#10b981" />
+              <Bar dataKey="count" fill="var(--chart-2)" />
             </BarChart>
           </ResponsiveContainer>
         </CardContent>

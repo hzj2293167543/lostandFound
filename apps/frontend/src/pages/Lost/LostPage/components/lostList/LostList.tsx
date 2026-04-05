@@ -54,7 +54,7 @@ function Cell(props: CellProps<LostItem>) {
         </div>
         <CardHeader>
           <div className="flex justify-between items-start">
-            <CardTitle className="line-clamp-1">{item.title}</CardTitle>
+            <CardTitle className="line-clamp-1 ">{item.title}</CardTitle>
             <span
               className={`px-2 py-1 rounded-full text-xs ${
                 item.status === LOST_FILTER_STATUS.寻找中

@@ -44,9 +44,9 @@ export default function AdminLostDetail({ lostDetail }: AdminLostDetailProps) {
               <CardDescription>分类：{lostDetail.category.name}</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-gray-600 mb-6">
+              <div className="text-muted-foreground mb-6">
                 <p className="mb-4">{lostDetail.description}</p>
-                <div className="space-y-2 text-gray-700">
+                <div className="space-y-2 text-foreground">
                   <p>
                     <strong>丢失时间：</strong>
                     {lostDetail.time}

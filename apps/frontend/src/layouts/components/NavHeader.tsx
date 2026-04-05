@@ -37,9 +37,9 @@ export default function NavHeader() {
   };
 
   return (
-    <nav className="bg-white shadow-md sticky top-0 z-50">
+    <nav className="bg-background shadow-md sticky top-0 z-50">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-        <Link to={isAdmin ? '/admin' : '/'} className="text-2xl font-bold text-blue-600">
+        <Link to={isAdmin ? '/admin' : '/'} className="text-2xl font-bold text-primary">
           {isAdmin ? '管理后台' : '校园失物招领'}
         </Link>
         <NavigationMenu viewport={false}>
@@ -121,7 +121,7 @@ export default function NavHeader() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="w-full mt-2 bg-red-400 text-white hover:bg-gray-400 hover:text-black cursor-pointer"
+                      className="w-full mt-2 bg-red-500 text-text-destructive-foreground hover:bg-muted-foreground/20 cursor-pointer"
                       onClick={handleLogout}>
                       退出登录
                     </Button>

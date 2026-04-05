@@ -16,9 +16,9 @@ import { ChevronDown, ChevronUp, ThumbsUp } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { toast } from 'sonner';
-import { ReplyComment } from './CommentReply';
+import { ReplyCommentForm } from './ReplyCommentForm';
 
-export function CommentItem({
+export default function CommentItem({
   comment,
   replyState,
   itemId,
@@ -111,41 +111,47 @@ export function CommentItem({
           <div className="flex justify-between items-start mb-1">
             <div className="flex items-center gap-2">
               <Link to={`/profile/${comment.user.id}`}>
-                <h4 className="font-medium text-gray-800">{comment.user.name}</h4>
+                <h4 className="font-medium text-foreground">{comment.user.name}</h4>
               </Link>
-              {comment.replyUser && (
+              {comment.replyUser && !isRootComment && (
                 <div>
-                  <span className="font-medium text-gray-600">回复</span>
+                  <span className="font-medium text-muted-foreground">回复</span>
                   <Link
                     to={`/profile/${comment.replyUser.id}`}
-                    className="font-medium text-green-500 hover:text-green-600">
+                    className="font-medium text-green-500 hover:text-green-500/80">
                     @{comment.replyUser.name}：
                   </Link>
                 </div>
               )}
             </div>
           </div>
-          <p className="w-full break-words whitespace-pre-wrap text-gray-600">{comment.content}</p>
+          <p className="w-full break-words whitespace-pre-wrap text-muted-foreground">
+            {comment.content}
+          </p>
 
           <div className="flex justify-start items-center mt-2 gap-x-2">
-            <span className="text-xs text-gray-500">{comment.time}</span>
+            <span className="text-xs text-muted-foreground">{comment.time}</span>
             <Button
               size="sm"
-              className="px-0 bg-transparent text-gray-500 hover:text-green-300 hover:bg-transparent cursor-pointer"
+              className="px-0 bg-transparent text-muted-foreground hover:text-ai-primary hover:bg-transparent cursor-pointer"
               onClick={handleLikeClick}
               disabled={isLiking}>
-              <ThumbsUp className={`w-4 h-4 ${isLiked && 'fill-green-400 text-green-700'}`} />
-              <span className="text-xs text-gray-500">{likeCount > 0 ? likeCount : ''}</span>
+              <ThumbsUp
+                className={`w-4 h-4 ${isLiked && 'fill-found-primary text-found-primary'}`}
+              />
+              <span className="text-xs text-muted-foreground">
+                {likeCount > 0 ? likeCount : ''}
+              </span>
             </Button>
             <Button
               size="sm"
-              className="px-0 bg-transparent text-gray-700 hover:text-green-300 hover:bg-transparent cursor-pointer"
+              className="px-0 bg-transparent text-foreground hover:text-found-primary hover:bg-transparent cursor-pointer"
               onClick={() => replyState?.setReplyState(comment.id)}>
               回复
             </Button>
             <Button
               size="sm"
-              className="px-0 bg-transparent text-gray-700 hover:text-red-300 hover:bg-transparent cursor-pointer"
+              className="px-0 bg-transparent text-foreground hover:text-destructive hover:bg-transparent cursor-pointer"
               onClick={() => setReportOpen(true)}>
               举报
             </Button>
@@ -155,7 +161,7 @@ export function CommentItem({
               variant="link"
               size="sm"
               onClick={handleExpand}
-              className="text-green-500 pl-0 mt-1">
+              className="text-found-primary pl-0 mt-1">
               <ChevronDown className="w-4 h-4 mr-1" />
               查看 {comment.childrenCount} 条回复
             </Button>
@@ -173,7 +179,7 @@ export function CommentItem({
                 />
               ))}
               {loadingChildren && (
-                <div className="absolute inset-0 flex justify-center items-center bg-white/80 z-10">
+                <div className="absolute inset-0 flex justify-center items-center bg-background/80 z-10">
                   <Spinner className="h-4" />
                 </div>
               )}
@@ -228,14 +234,14 @@ export function CommentItem({
                 variant="link"
                 size="sm"
                 onClick={() => setShowChildren(false)}
-                className="text-green-500 pl-0 mt-2">
+                className="text-found-primary pl-0 mt-2">
                 <ChevronUp className="w-4 h-4 mr-1" />
                 收起回复
               </Button>
             </div>
           )}
           {replyState?.replyId === comment.id && (
-            <ReplyComment
+            <ReplyCommentForm
               comment={comment}
               itemId={itemId}
               replyId={replyState.replyId}
@@ -244,7 +250,7 @@ export function CommentItem({
           )}
         </div>
       </div>
-      {isRootComment && <div className="my-4 border-t border-gray-200" />}
+      {isRootComment && <div className="my-4 border-t border-border" />}
       <ReportDialog
         open={reportOpen}
         onOpenChange={setReportOpen}

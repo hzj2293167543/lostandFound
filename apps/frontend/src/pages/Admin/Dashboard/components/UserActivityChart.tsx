@@ -23,7 +23,7 @@ export function UserActivityChart({ userActivity }: UserActivityChartProps) {
             <XAxis type="number" />
             <YAxis dataKey="userName" type="category" width={80} tick={{ fontSize: 12 }} />
             <Tooltip />
-            <Bar dataKey="postCount" fill="#8b5cf6" />
+            <Bar dataKey="postCount" fill="var(--chart-4)" />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>

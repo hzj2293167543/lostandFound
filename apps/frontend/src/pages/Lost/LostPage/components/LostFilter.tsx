@@ -27,7 +27,7 @@ export default function LostFilter({
   ];
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 mb-6">
+    <div className="bg-card rounded-lg shadow-md p-4 mb-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="space-y-2">
           <SearchInput

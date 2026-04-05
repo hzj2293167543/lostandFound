@@ -24,8 +24,8 @@ export function WeeklyDistributionChart({ weekly }: WeeklyDistributionChartProps
             <XAxis dataKey="dayName" />
             <YAxis />
             <Tooltip />
-            <Bar dataKey="lostCount" name="失物" fill="#3b82f6" />
-            <Bar dataKey="foundCount" name="招领" fill="#10b981" />
+            <Bar dataKey="lostCount" name="失物" fill="var(--chart-1)" />
+            <Bar dataKey="foundCount" name="招领" fill="var(--chart-2)" />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>

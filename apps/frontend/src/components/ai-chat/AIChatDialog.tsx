@@ -20,15 +20,16 @@ function MessageBubble({ message }: { message: ChatMessage }) {
   return (
     <div className={`flex gap-3 ${isUser ? 'flex-row-reverse' : ''}`}>
       <Avatar className="size-8 shrink-0">
-        <AvatarFallback className={isUser ? 'bg-blue-500 text-white' : 'bg-emerald-500 text-white'}>
+        <AvatarFallback
+          className={isUser ? 'bg-accent text-accent-foreground' : 'bg-ai-primary text-white'}>
           {isUser ? 'U' : 'AI'}
         </AvatarFallback>
       </Avatar>
       <div
         className={`max-w-[75%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
           isUser
-            ? 'bg-blue-500 text-white rounded-tr-sm'
-            : 'bg-gray-100 text-gray-800 rounded-tl-sm'
+            ? 'bg-accent text-accent-foreground rounded-tr-sm'
+            : 'bg-muted text-muted-foreground rounded-tl-sm'
         }`}>
         <ReactMarkdown
           components={{
@@ -37,10 +38,10 @@ function MessageBubble({ message }: { message: ChatMessage }) {
             ol: ({ children }) => <ol className="list-decimal pl-4 mb-2">{children}</ol>,
             li: ({ children }) => <li className="mb-1">{children}</li>,
             code: ({ children }) => (
-              <code className="bg-gray-200 rounded px-1 py-0.5 text-xs">{children}</code>
+              <code className="bg-muted-foreground/20 rounded px-1 py-0.5 text-xs">{children}</code>
             ),
             pre: ({ children }) => (
-              <pre className="bg-gray-800 text-gray-100 rounded p-2 overflow-x-auto mb-2 text-xs">
+              <pre className="bg-secondary text-secondary-foreground rounded p-2 overflow-x-auto mb-2 text-xs">
                 {children}
               </pre>
             ),
@@ -49,7 +50,7 @@ function MessageBubble({ message }: { message: ChatMessage }) {
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-500 underline">
+                className="text-accent-foreground underline">
                 {children}
               </a>
             ),
@@ -67,20 +68,20 @@ function TypingIndicator() {
   return (
     <div className="flex gap-3">
       <Avatar className="size-8 shrink-0">
-        <AvatarFallback className="bg-emerald-500 text-white">AI</AvatarFallback>
+        <AvatarFallback className="bg-ai-primary text-white">AI</AvatarFallback>
       </Avatar>
-      <div className="bg-gray-100 rounded-2xl rounded-tl-sm px-4 py-3">
+      <div className="bg-muted rounded-2xl rounded-tl-sm px-4 py-3">
         <div className="flex gap-1">
           <span
-            className="size-2 rounded-full bg-gray-400 animate-bounce"
+            className="size-2 rounded-full bg-muted-foreground animate-bounce"
             style={{ animationDelay: '0ms' }}
           />
           <span
-            className="size-2 rounded-full bg-gray-400 animate-bounce"
+            className="size-2 rounded-full bg-muted-foreground animate-bounce"
             style={{ animationDelay: '150ms' }}
           />
           <span
-            className="size-2 rounded-full bg-gray-400 animate-bounce"
+            className="size-2 rounded-full bg-muted-foreground animate-bounce"
             style={{ animationDelay: '300ms' }}
           />
         </div>
@@ -123,19 +124,19 @@ export function AIChatDialog({ open, onOpenChange }: AIChatDialogProps) {
       <DialogContent className="p-0 gap-0 max-w-md w-full h-[600px] max-h-[80vh] overflow-hidden">
         <div className="flex items-center justify-between px-6 py-4 border-b">
           <div className="flex items-center gap-3">
-            <div className="size-10 rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center">
+            <div className="size-10 rounded-full bg-gradient-to-br from-ai-primary to-ai-secondary flex items-center justify-center">
               <span className="text-white font-bold text-lg">AI</span>
             </div>
             <div>
-              <h2 className="font-semibold text-gray-900">智能助手</h2>
-              <p className="text-xs text-gray-500">失物招领平台客服</p>
+              <h2 className="font-semibold text-foreground">智能助手</h2>
+              <p className="text-xs text-muted-foreground">失物招领平台客服</p>
             </div>
           </div>
           <Button
             variant="ghost"
             size="icon"
             onClick={clearMessages}
-            className="text-gray-400 hover:text-gray-600">
+            className="text-muted-foreground hover:text-foreground">
             <TrashIcon className="size-4" />
           </Button>
         </div>
@@ -144,11 +145,11 @@ export function AIChatDialog({ open, onOpenChange }: AIChatDialogProps) {
           <div className="space-y-4">
             {messages.length === 0 && (
               <div className="text-center py-8">
-                <div className="size-16 rounded-full bg-gradient-to-br from-emerald-100 to-cyan-100 mx-auto mb-4 flex items-center justify-center">
+                <div className="size-16 rounded-full bg-gradient-to-br from-ai-primary/20 to-ai-secondary/20 mx-auto mb-4 flex items-center justify-center">
                   <span className="text-3xl">👋</span>
                 </div>
-                <h3 className="font-medium text-gray-700 mb-1">你好，有什么可以帮我？</h3>
-                <p className="text-sm text-gray-500">我可以回答关于失物招领平台的问题</p>
+                <h3 className="font-medium text-foreground mb-1">你好，有什么可以帮我？</h3>
+                <p className="text-sm text-muted-foreground">我可以回答关于失物招领平台的问题</p>
               </div>
             )}
             {messages.map((msg, i) => (
@@ -158,7 +159,7 @@ export function AIChatDialog({ open, onOpenChange }: AIChatDialogProps) {
           </div>
         </div>
 
-        <div className="px-6 py-4 border-t bg-gray-50">
+        <div className="px-6 py-4 border-t bg-muted">
           <div className="flex gap-3">
             <Textarea
               ref={inputRef}
@@ -166,14 +167,14 @@ export function AIChatDialog({ open, onOpenChange }: AIChatDialogProps) {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="输入问题..."
-              className="min-h-[44px] max-h-[120px] resize-none bg-white"
+              className="min-h-[44px] max-h-[120px] resize-none bg-background"
               rows={1}
               disabled={isStreaming}
             />
             <Button
               onClick={handleSend}
               disabled={!input.trim() || isStreaming}
-              className="shrink-0 bg-emerald-500 hover:bg-emerald-600">
+              className="shrink-0 bg-ai-primary hover:bg-ai-primary/90">
               {isStreaming ? (
                 <Loader2 className="size-4 animate-spin" />
               ) : (
@@ -181,7 +182,7 @@ export function AIChatDialog({ open, onOpenChange }: AIChatDialogProps) {
               )}
             </Button>
           </div>
-          <p className="text-xs text-gray-400 mt-2 text-center">
+          <p className="text-xs text-muted-foreground mt-2 text-center">
             AI 可能会产生不准确的信息，请谨慎参考
           </p>
         </div>

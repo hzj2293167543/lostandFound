@@ -1,6 +1,6 @@
-import React, { useMemo } from 'react';
-import ReactECharts from 'echarts-for-react';
 import type { ItemFunnel } from '@lostfound/shared';
+import ReactECharts from 'echarts-for-react';
+import { useMemo } from 'react';
 
 interface FunnelChartProps {
   data: ItemFunnel[];

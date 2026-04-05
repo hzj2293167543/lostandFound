@@ -41,7 +41,10 @@ export default function FoundCreate({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className={`bg-green-600 hover:bg-green-700 ${className}`}>发布招领信息</Button>
+        <Button
+          className={`bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 ${className}`}>
+          发布招领信息
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
@@ -178,7 +181,7 @@ export default function FoundCreate({
               </Button>
               <Button
                 type="submit"
-                className="bg-green-600 hover:bg-green-700"
+                className="bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600"
                 disabled={isLoading}>
                 {isLoading ? '发布中...' : '发布'}
               </Button>

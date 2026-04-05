@@ -30,8 +30,8 @@ export function HourlyDistributionChart({ lostHourly, foundHourly }: HourlyDistr
             <XAxis dataKey="hour" />
             <YAxis />
             <Tooltip />
-            <Bar dataKey="lost" name="失物" fill="#3b82f6" />
-            <Bar dataKey="found" name="招领" fill="#10b981" />
+            <Bar dataKey="lost" name="失物" fill="var(--chart-1)" />
+            <Bar dataKey="found" name="招领" fill="var(--chart-2)" />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>

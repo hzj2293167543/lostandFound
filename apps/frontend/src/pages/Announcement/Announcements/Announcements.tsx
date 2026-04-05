@@ -90,12 +90,12 @@ export default function Announcements() {
     useAnnouncementInfinite(filters);
 
   return (
-    <div className="container mx-auto px-4 py-8 h-[calc(100vh-64px)] flex flex-col">
+    <div className="container mx-auto px-4 py-8 flex flex-col">
       <div className="flex items-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">公告中心</h1>
+        <h1 className="text-3xl font-bold text-primary">公告中心</h1>
       </div>
 
-      <div className="bg-white rounded-lg shadow-md p-4 mb-6">
+      <div className="bg-card rounded-lg shadow-md p-4 mb-6">
         <div className="space-y-2">
           <SearchInput
             placeholder="搜索公告标题或内容"
@@ -105,12 +105,12 @@ export default function Announcements() {
         </div>
       </div>
 
-      <div ref={containerRef} className="flex-1 h-[calc(100vh-64px)] relative">
+      <div ref={containerRef} className="flex-1  relative">
         {status === 'error' && <AnnouncementError status="error" />}
         {status === 'success' && allItems.length === 0 && <AnnouncementError status="empty" />}
         {status === 'success' && (
           <List
-            style={{ scrollbarWidth: 'none' }}
+            style={{ scrollbarWidth: 'none', height: 'calc(100vh - 256px)' }}
             rowCount={rowCount!}
             rowHeight={ITEM_HEIGHT}
             onScroll={handleScroll}

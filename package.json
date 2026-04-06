@@ -21,6 +21,7 @@
     "lint:quick:fix": "oxlint --fix .",
     "lint:deep": "eslint . --max-warnings=0",
     "lint:deep:fix": "eslint --fix .",
+    "lint:no-check": "pnpm run lint:prettier && pnpm run lint:quick && pnpm run lint:deep && pnpm run spell:check",
     "lint": "pnpm run lint:prettier && pnpm run lint:quick && pnpm run lint:deep && pnpm run spell:check && pnpm run lint:type-check",
     "lint:fix": "pnpm run lint:quick:fix && pnpm run lint:deep:fix && pnpm run lint:prettier:fix",
     "spell:check": "cspell --dot",

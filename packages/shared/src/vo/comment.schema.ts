@@ -10,6 +10,18 @@ export const CommentItemSchema = z.object({
       avatar: z.string().url().optional(),
     })
     .nullable(),
+  parent: z
+    .object({
+      id: z.coerce.number(),
+      content: z.string(),
+      user: z.object({
+        id: z.coerce.number(),
+        name: z.string(),
+        avatar: z.string().url().optional(),
+      }),
+    })
+    .nullable()
+    .optional(),
   content: z.string(),
   time: z.string(),
   user: z.object({

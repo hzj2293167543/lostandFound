@@ -7,4 +7,5 @@ export const commentKeys = {
   userCommentList: (userId: number) => [...commentKeys.all, 'user', userId] as const,
   itemComments: (itemId: number, itemType: number) =>
     [...commentKeys.all, 'item', itemId, itemType] as const,
+  repliesToMe: (userId: number) => [...commentKeys.all, 'replies', userId] as const,
 };

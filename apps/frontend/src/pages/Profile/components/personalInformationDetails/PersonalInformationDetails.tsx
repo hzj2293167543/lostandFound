@@ -5,6 +5,7 @@ import PersonalInfoDetailComments from './PersonalInfoDetailComments';
 import PersonalInfoDetailFoundList from './PersonalInfoDetailFoundList';
 import PersonalInfoDetailLostList from './PersonalInfoDetailLostList';
 import PersonalInfoDetailPunishments from './PersonalInfoDetailPunishments';
+import PersonalInfoDetailReplies from './PersonalInfoDetailReplies';
 import PersonalInfoDetailSettingList from './PersonalInfoDetailSettingList';
 
 export default memo(function PersonalInformationDetails({
@@ -18,10 +19,11 @@ export default memo(function PersonalInformationDetails({
 }) {
   return (
     <Tabs defaultValue={defaultTab}>
-      <TabsList className="grid w-full grid-cols-5">
+      <TabsList className="grid w-full grid-cols-6">
         <TabsTrigger value="lost">我的失物</TabsTrigger>
         <TabsTrigger value="found">我的招领</TabsTrigger>
         <TabsTrigger value="comments">我的评论</TabsTrigger>
+        <TabsTrigger value="replies">回复我的</TabsTrigger>
         <TabsTrigger value="punishments">处罚记录</TabsTrigger>
         <TabsTrigger value="settings">账户设置</TabsTrigger>
       </TabsList>
@@ -33,6 +35,9 @@ export default memo(function PersonalInformationDetails({
       </TabsContent>
       <TabsContent value="comments" className="mt-6 flex flex-col gap-4">
         <PersonalInfoDetailComments userId={userRaw.id} />
+      </TabsContent>
+      <TabsContent value="replies" className="mt-6 flex flex-col gap-4">
+        <PersonalInfoDetailReplies userId={userRaw.id} />
       </TabsContent>
       <TabsContent value="punishments" className="mt-6 flex flex-col gap-4">
         <PersonalInfoDetailPunishments userId={userRaw.id} />

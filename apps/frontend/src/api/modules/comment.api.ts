@@ -23,6 +23,11 @@ export const commentApi = {
 
   getCommentsByUserIdCount: (userId: number) => get<Count>(`/comments/user/${userId}/count`),
 
+  getRepliesToMe: (userId: number, page?: number, limit?: number) =>
+    get<PageResponse<CommentItem>>(`/comments/replies/${userId}`, {
+      params: { page, limit },
+    }),
+
   likeComment: (id: number, isLiked: boolean) =>
     post<void>(`/comments/${id}/like`, null, { params: { isLiked } }),
 

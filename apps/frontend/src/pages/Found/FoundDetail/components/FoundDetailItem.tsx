@@ -13,11 +13,9 @@ import { toast } from 'sonner';
 export default function FoundDetailItem({ foundDetail }: { foundDetail: FoundDetail }) {
   const handleContact = async () => {
     if (foundDetail.contactPhone) {
-      // 可以显示联系方式弹窗
       await navigator.clipboard.writeText(foundDetail.contactPhone);
       toast.success(`联系电话：${foundDetail.contactPhone} 已复制到剪贴板`);
     } else if (foundDetail.user?.contact) {
-      // 使用临时联系电话
       await navigator.clipboard.writeText(foundDetail.user.contact);
       toast.success(`联系电话：${foundDetail.user.contact} 已复制到剪贴板`);
     } else {
@@ -25,11 +23,9 @@ export default function FoundDetailItem({ foundDetail }: { foundDetail: FoundDet
     }
   };
 
-  // 分享信息
   const handleShare = async () => {
     const shareUrl = window.location.href;
     try {
-      // 尝试使用Web Share API
       if (navigator.share) {
         await navigator.share({
           title: foundDetail.title,
@@ -37,22 +33,22 @@ export default function FoundDetailItem({ foundDetail }: { foundDetail: FoundDet
           url: shareUrl,
         });
       } else {
-        // 回退方案：复制链接
         await navigator.clipboard.writeText(shareUrl);
         toast.success('链接已复制到剪贴板');
       }
     } catch {
-      // 最终回退：显示链接
       prompt('复制链接', shareUrl);
     }
   };
   return (
-    <Card className="mb-8">
-      <div className="h-80 overflow-hidden">
+    <Card className="mb-8 overflow-hidden rounded-xl">
+      <div className="h-80 flex items-center justify-center bg-muted">
         <img
-          src={foundDetail.image}
+          src={
+            foundDetail.image || new URL('@/assets/image/not-image.png', import.meta.url).toString()
+          }
           alt={foundDetail.title}
-          className="w-full h-full object-cover"
+          className="max-w-full max-h-full object-contain"
         />
       </div>
       <CardHeader>
@@ -82,7 +78,6 @@ export default function FoundDetailItem({ foundDetail }: { foundDetail: FoundDet
           </div>
         </div>
 
-        {/* 发布者信息 */}
         <div className="border-t border-border pt-4">
           <h3 className="font-semibold text-lg mb-4">发布者信息</h3>
           <div className="flex items-center">

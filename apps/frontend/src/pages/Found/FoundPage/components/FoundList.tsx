@@ -95,7 +95,11 @@ function Cell(props: CellProps<FoundItem>) {
     <div style={style} className="p-3">
       <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow h-full">
         <div className="h-48 overflow-hidden">
-          <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+          <img
+            src={item.image || new URL('@/assets/image/not-image.png', import.meta.url).toString()}
+            alt={item.title}
+            className="w-full h-full object-cover"
+          />
         </div>
         <CardHeader>
           <div className="flex justify-between items-start">

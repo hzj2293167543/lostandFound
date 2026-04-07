@@ -121,8 +121,9 @@ export function isFormDirty<T extends FieldValues>(form: UseFormReturn<T>) {
 export const getTargetTab = (type: string): string => {
   switch (type) {
     case 'like':
-    case 'comment':
       return 'comments';
+    case 'comment':
+      return 'replies';
     case 'report':
       return 'punishments';
     default:

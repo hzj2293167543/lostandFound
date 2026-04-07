@@ -25,6 +25,17 @@ export function mapCommentToVo(
           avatar: comment.parent?.user.avatar,
         }
       : null,
+    parent: comment?.parentId
+      ? {
+          id: comment.parent?.id,
+          content: comment.parent?.content,
+          user: {
+            id: comment.parent?.userId,
+            name: comment.parent?.user.name,
+            avatar: comment.parent?.user.avatar,
+          },
+        }
+      : null,
     isLiked,
     likeCount,
     childrenCount,

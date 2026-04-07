@@ -17,8 +17,14 @@ export default function FoundList({ foundItems }: { foundItems: FoundItem[] }) {
           <div
             key={item.id}
             className="bg-card rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-            <div className="h-48 overflow-hidden">
-              <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+            <div className="h-48 overflow-hidden bg-muted-foreground/10 rounded-t-lg">
+              <img
+                src={
+                  item.image || new URL('@/assets/image/not-image.png', import.meta.url).toString()
+                }
+                alt={item.title}
+                className="w-full h-full object-contain"
+              />
             </div>
             <div className="p-4">
               <div className="flex justify-between items-start mb-2">

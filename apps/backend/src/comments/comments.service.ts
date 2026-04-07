@@ -23,22 +23,12 @@ export class CommentsService {
   ) {}
 
   async findByItem(itemId: number, itemType: number, userId?: number): Promise<CommentItem[]> {
-    const rowsItems = await this.commentsRepository.find({
+    const items = await this.commentsRepository.find({
       where: { itemId, itemType },
       relations: ['user'],
       order: { createdAt: 'DESC' },
     });
-
-    const likeCountSet = await this.getLikedCommentIds(
-      rowsItems.map((item) => item.id),
-      userId
-    );
-
-    const likeCountMap = await this.getCommentLikeCounts(rowsItems.map((item) => item.id));
-
-    return rowsItems.map((item) =>
-      mapCommentToVo(item, likeCountSet.has(item.id), likeCountMap.get(item.id) || 0)
-    );
+    return this.enrichComments(items, userId);
   }
 
   async findByItemPaginated(
@@ -56,68 +46,12 @@ export class CommentsService {
       skip,
       take: limit,
     });
-
-    const likeCountSet = await this.getLikedCommentIds(
-      items.map((item) => item.id),
-      userId
-    );
-
-    const likeCountMap = await this.getCommentLikeCounts(items.map((item) => item.id));
-    const childrenCountMap = await this.getChildrenCountMap(items.map((item) => item.id));
-
-    return {
-      items: items.map((item) =>
-        mapCommentToVo(
-          item,
-          likeCountSet.has(item.id),
-          likeCountMap.get(item.id) || 0,
-          childrenCountMap.get(item.id) || 0
-        )
-      ),
+    return this.buildPageResponse(
+      await this.enrichCommentsWithChildrenCount(items, userId),
       total,
       page,
-      limit,
-      totalPages: Math.ceil(total / limit),
-    };
-  }
-
-  private async getChildrenCountMap(commentIds: number[]): Promise<Map<number, number>> {
-    if (commentIds.length === 0) return new Map();
-
-    const counts = await this.commentsRepository
-      .createQueryBuilder('comment')
-      .select('comment.rootId', 'rootId')
-      .addSelect('COUNT(*)', 'count')
-      .where('comment.rootId IN (:...ids)', { ids: commentIds })
-      .groupBy('comment.rootId')
-      .getRawMany();
-
-    return new Map(counts.map((row) => [Number(row.rootId), Number(row.count)]));
-  }
-
-  async getLikedCommentIds(commentIds: number[], userId?: number): Promise<Set<number>> {
-    if (commentIds.length === 0) return new Set();
-
-    const counts = await this.commentLikeRepository
-      .createQueryBuilder('comment_like')
-      .select('comment_like.commentId', 'commentId')
-      .where('comment_like.userId = :userId', { userId })
-      .andWhere('comment_like.commentId IN (:...ids)', { ids: commentIds })
-      .getRawMany();
-
-    return new Set(counts.map((entry) => Number(entry.commentId)));
-  }
-
-  async getCommentLikeCounts(commentIds: number[]): Promise<Map<number, number>> {
-    if (commentIds.length === 0) return new Map();
-    const counts = await this.commentLikeRepository
-      .createQueryBuilder('like')
-      .select('like.commentId', 'commentId')
-      .addSelect('COUNT(*)', 'count')
-      .where('like.commentId IN (:...ids)', { ids: commentIds })
-      .groupBy('like.commentId')
-      .getRawMany();
-    return new Map(counts.map((row) => [Number(row.commentId), Number(row.count)]));
+      limit
+    );
   }
 
   async findChildrenPaginated(
@@ -134,32 +68,43 @@ export class CommentsService {
       skip,
       take: limit,
     });
-
-    const likeCountSet = await this.getLikedCommentIds(
-      items.map((item) => item.id),
-      userId
-    );
-
-    const likeCountMap = await this.getCommentLikeCounts(items.map((item) => item.id));
-    return {
-      items: items.map((item) =>
-        mapCommentToVo(item, likeCountSet.has(item.id), likeCountMap.get(item.id) || 0)
-      ),
-      total,
-      page,
-      limit,
-      totalPages: Math.ceil(total / limit),
-    };
+    return this.buildPageResponse(await this.enrichComments(items, userId), total, page, limit);
   }
 
-  findLikes(id: number): Promise<number> {
-    return this.commentLikeRepository.count({ where: { commentId: id } });
-  }
-
-  findLiked(id: number, userId: number): Promise<boolean> {
-    return this.commentLikeRepository.exists({
-      where: { commentId: id, userId },
+  async findByUser(
+    userId: number,
+    page: number = 1,
+    limit: number = 10
+  ): Promise<PageResponse<CommentItem>> {
+    const skip = (page - 1) * limit;
+    const [items, total] = await this.commentsRepository.findAndCount({
+      where: { userId },
+      relations: ['user'],
+      order: { createdAt: 'DESC' },
+      skip,
+      take: limit,
     });
+    return this.buildPageResponse(await this.enrichComments(items, userId), total, page, limit);
+  }
+
+  async findRepliesToMe(
+    userId: number,
+    page: number = 1,
+    limit: number = 10
+  ): Promise<PageResponse<CommentItem>> {
+    const skip = (page - 1) * limit;
+    const [items, total] = await this.commentsRepository
+      .createQueryBuilder('comment')
+      .leftJoinAndSelect('comment.user', 'user')
+      .leftJoinAndSelect('comment.parent', 'parent')
+      .leftJoinAndSelect('parent.user', 'parentUser')
+      .where('parent.userId = :userId', { userId })
+      .andWhere('comment.userId != :userId', { userId })
+      .orderBy('comment.createdAt', 'DESC')
+      .skip(skip)
+      .take(limit)
+      .getManyAndCount();
+    return this.buildPageResponse(await this.enrichComments(items, userId), total, page, limit);
   }
 
   async getItemCommentCountMapByType(
@@ -167,7 +112,6 @@ export class CommentsService {
     itemType: CommentItemTypeType
   ): Promise<Map<number, number>> {
     if (itemIds.length === 0) return new Map();
-
     const counts = await this.commentsRepository
       .createQueryBuilder('comment')
       .select('comment.itemId', 'itemId')
@@ -176,24 +120,17 @@ export class CommentsService {
       .andWhere('comment.itemId IN (:...ids)', { ids: itemIds })
       .groupBy('comment.itemId')
       .getRawMany();
-
-    const map = new Map<number, number>();
-    counts.forEach((entry) => {
-      map.set(Number(entry.itemId), Number(entry.count));
-    });
-    return map;
+    return new Map(counts.map((entry) => [Number(entry.itemId), Number(entry.count)]));
   }
 
   async likeComment(id: number, userId: number, isLike: boolean): Promise<void> {
     if (isLike) {
       if (await this.findLiked(id, userId)) throw new Error('已点赞');
       await this.commentLikeRepository.insert({ commentId: id, userId, likeTime: new Date() });
-
       const [comment, liker] = await Promise.all([
         this.commentsRepository.findOne({ where: { id }, relations: ['user'] }),
         this.usersRepository.findOne({ where: { id: userId } }),
       ]);
-
       if (comment && comment.userId !== userId) {
         this.notificationGateway.sendNotificationToUser({
           userId: comment.userId,
@@ -210,6 +147,14 @@ export class CommentsService {
     }
   }
 
+  findLikes(id: number): Promise<number> {
+    return this.commentLikeRepository.count({ where: { commentId: id } });
+  }
+
+  findLiked(id: number, userId: number): Promise<boolean> {
+    return this.commentLikeRepository.exists({ where: { commentId: id, userId } });
+  }
+
   findTop(count?: number): Promise<Comment[]> {
     return this.commentsRepository.find({
       relations: ['user'],
@@ -218,42 +163,9 @@ export class CommentsService {
     });
   }
 
-  async findByUser(
-    userId: number,
-    page: number = 1,
-    limit: number = 10
-  ): Promise<PageResponse<CommentItem>> {
-    const skip = (page - 1) * limit;
-    const [items, total] = await this.commentsRepository.findAndCount({
-      where: { userId },
-      relations: ['user'],
-      order: { createdAt: 'DESC' },
-      skip,
-      take: limit,
-    });
-
-    const likeCountSet = await this.getLikedCommentIds(
-      items.map((item) => item.id),
-      userId
-    );
-
-    const likeCountMap = await this.getCommentLikeCounts(items.map((item) => item.id));
-
-    return {
-      items: items.map((item) =>
-        mapCommentToVo(item, likeCountSet.has(item.id), likeCountMap.get(item.id) || 0)
-      ),
-      total,
-      page,
-      limit,
-      totalPages: Math.ceil(total / limit),
-    };
-  }
-
   async create(data: CommentCreateDto & { userId: number }): Promise<Comment> {
     let rootId: number | null = null;
     let notifyUserId: number | null = null;
-
     if (data.parentId !== null && data.parentId !== undefined) {
       const parent = await this.commentsRepository.findOne({
         where: { id: data.parentId },
@@ -264,14 +176,8 @@ export class CommentsService {
         notifyUserId = parent.userId;
       }
     }
-
-    const comment = this.commentsRepository.create({
-      ...data,
-      rootId,
-      time: new Date(),
-    });
+    const comment = this.commentsRepository.create({ ...data, rootId, time: new Date() });
     const savedComment = await this.commentsRepository.save(comment);
-
     if (notifyUserId) {
       const commenter = await this.usersRepository.findOne({ where: { id: data.userId } });
       this.notificationGateway.sendNotificationToUser({
@@ -284,11 +190,89 @@ export class CommentsService {
         relatedUserName: commenter?.name,
       });
     }
-
     return savedComment;
   }
 
   async delete(id: number): Promise<void> {
     await this.commentsRepository.delete(id);
+  }
+
+  private async enrichComments(items: Comment[], userId?: number): Promise<CommentItem[]> {
+    if (items.length === 0) return [];
+    const [likeCountSet, likeCountMap] = await Promise.all([
+      this.getLikedCommentIds(
+        items.map((item) => item.id),
+        userId
+      ),
+      this.getCommentLikeCounts(items.map((item) => item.id)),
+    ]);
+    return items.map((item) =>
+      mapCommentToVo(item, likeCountSet.has(item.id), likeCountMap.get(item.id) || 0)
+    );
+  }
+
+  private async enrichCommentsWithChildrenCount(
+    items: Comment[],
+    userId?: number
+  ): Promise<CommentItem[]> {
+    if (items.length === 0) return [];
+    const commentIds = items.map((item) => item.id);
+    const [likeCountSet, likeCountMap, childrenCountMap] = await Promise.all([
+      this.getLikedCommentIds(commentIds, userId),
+      this.getCommentLikeCounts(commentIds),
+      this.getChildrenCountMap(commentIds),
+    ]);
+    return items.map((item) =>
+      mapCommentToVo(
+        item,
+        likeCountSet.has(item.id),
+        likeCountMap.get(item.id) || 0,
+        childrenCountMap.get(item.id) || 0
+      )
+    );
+  }
+
+  private async getChildrenCountMap(commentIds: number[]): Promise<Map<number, number>> {
+    if (commentIds.length === 0) return new Map();
+    const counts = await this.commentsRepository
+      .createQueryBuilder('comment')
+      .select('comment.rootId', 'rootId')
+      .addSelect('COUNT(*)', 'count')
+      .where('comment.rootId IN (:...ids)', { ids: commentIds })
+      .groupBy('comment.rootId')
+      .getRawMany();
+    return new Map(counts.map((row) => [Number(row.rootId), Number(row.count)]));
+  }
+
+  private async getLikedCommentIds(commentIds: number[], userId?: number): Promise<Set<number>> {
+    if (commentIds.length === 0) return new Set();
+    const counts = await this.commentLikeRepository
+      .createQueryBuilder('comment_like')
+      .select('comment_like.commentId', 'commentId')
+      .where('comment_like.userId = :userId', { userId })
+      .andWhere('comment_like.commentId IN (:...ids)', { ids: commentIds })
+      .getRawMany();
+    return new Set(counts.map((entry) => Number(entry.commentId)));
+  }
+
+  private async getCommentLikeCounts(commentIds: number[]): Promise<Map<number, number>> {
+    if (commentIds.length === 0) return new Map();
+    const counts = await this.commentLikeRepository
+      .createQueryBuilder('like')
+      .select('like.commentId', 'commentId')
+      .addSelect('COUNT(*)', 'count')
+      .where('like.commentId IN (:...ids)', { ids: commentIds })
+      .groupBy('like.commentId')
+      .getRawMany();
+    return new Map(counts.map((row) => [Number(row.commentId), Number(row.count)]));
+  }
+
+  private buildPageResponse(
+    items: CommentItem[],
+    total: number,
+    page: number,
+    limit: number
+  ): PageResponse<CommentItem> {
+    return { items, total, page, limit, totalPages: Math.ceil(total / limit) };
   }
 }

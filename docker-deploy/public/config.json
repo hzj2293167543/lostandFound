@@ -1,0 +1,6 @@
+{
+  "apiBaseUrl": "",
+  "wsUrl": "",
+  "wsPath": "/notifications/socket.io",
+  "staticBaseUrl": ""
+}

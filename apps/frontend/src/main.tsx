@@ -1,5 +1,4 @@
 // frontend/src/main.tsx
-import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
@@ -10,6 +9,7 @@ import { queryClient } from './lib/queryClient';
 import { toast } from 'sonner';
 import { WebSocketProvider } from './contexts/WebSocketContext';
 import { ThemeProvider } from './components/ThemeProvider';
+import { StrictMode } from 'react';
 
 window.addEventListener('unhandledrejection', (event) => {
   const error = event.reason;
@@ -23,7 +23,7 @@ window.addEventListener('unhandledrejection', (event) => {
 });
 
 ReactDOM.createRoot(document.querySelector('#root')!).render(
-  <React.StrictMode>
+  <StrictMode>
     <QueryClientProvider client={queryClient}>
       <WebSocketProvider>
         <ThemeProvider>
@@ -32,5 +32,5 @@ ReactDOM.createRoot(document.querySelector('#root')!).render(
         </ThemeProvider>
       </WebSocketProvider>
     </QueryClientProvider>
-  </React.StrictMode>
+  </StrictMode>
 );

@@ -10,7 +10,7 @@
     "build:utils": "pnpm --filter @monorepo/utils build",
     "build:components": "pnpm --filter @monorepo/components build",
     "dev": "concurrently \"docker start pgvector\" \"ollama_cpu.bat\" \"pnpm run --parallel --filter @monorepo/frontend --filter @lostfound/shared dev\"",
-    "dev:all": "concurrently \"docker start pgvector\" \"ollama_cpu.bat\" \"pnpm run --parallel --filter @monorepo/frontend --filter @lostfound/shared --filter @monorepo/backend dev\"",
+    "dev:all": "concurrently \"docker start pgvector\" \"ollama_cpu.bat\" \"pnpm run --parallel --filter @lostfound/shared --filter @monorepo/backend --filter @monorepo/frontend dev\"",
     "debug:lost-backend": "pnpm --filter @monorepo/backend dev",
     "test": "vitest",
     "test:run": "vitest run",
@@ -48,12 +48,12 @@
   "packageManager": "pnpm@10.19.0",
   "corepack": "enabled",
   "engines": {
-    "node": ">=23",
+    "node": ">=24",
     "pnpm": ">=10.19.0",
     "npm": ">=9.4.0"
   },
   "volta": {
-    "node": "23.11.1",
+    "node": "24.14.1",
     "pnpm": "10.19.0",
     "yarn": "1.22.19"
   },

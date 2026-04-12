@@ -58,6 +58,8 @@ wordprocessingml
 
 # Auto-added words
 eventsource
+healthcheck
+isready
 jspdf
 nomic
 pdfmake

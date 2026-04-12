@@ -32,8 +32,8 @@ export class UploadService {
         reject(err);
       });
     });
-    const baseUrl = this.configService.get('app.baseUrl') || 'http://localhost:3000';
-    return `${baseUrl}/uploads/${type}/${fileName}`;
+
+    return `/uploads/${type}/${fileName}`;
   }
 
   deleteFile(rowFilePath: string) {

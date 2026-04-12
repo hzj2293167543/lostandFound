@@ -4,13 +4,13 @@ import {
   useEffect,
   useState,
   useCallback,
+  useRef,
   ReactNode,
-  useEffectEvent,
 } from 'react';
-import { io, Socket } from 'socket.io-client';
+import { Manager, Socket } from 'socket.io-client';
 import { useAuthStore } from '@/stores/AuthStore';
-import { NotificationSchema, NotificationType } from '@lostfound/shared';
-import type { Notification } from '@lostfound/shared';
+import { getWsConfig } from '@/api/client';
+import { type Notification, NotificationSchema, NotificationType } from '@lostfound/shared';
 
 interface WebSocketNotification {
   id: number | string;
@@ -61,13 +61,15 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [notifications, setNotifications] = useState<WebSocketNotification[]>([]);
-  const token = useAuthStore((state) => state.token);
-  const user = useAuthStore((state) => state.user);
+  const token = useAuthStore.use.token();
+  const user = useAuthStore.use.user();
+  const socketRef = useRef<Socket | null>(null);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   const refreshNotifications = useCallback(async () => {
     if (!user) return;
+
     try {
       const { notificationApi } = await import('@/api/modules/notification.api');
       const data = await notificationApi.getNotifications();
@@ -101,46 +103,53 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     setNotifications([]);
   }, []);
 
-  const handleNoToken = useEffectEvent(() => {
-    if (!socket) return;
-    socket.disconnect();
-    setSocket(null);
-    setIsConnected(false);
-    setNotifications([]);
-  });
-
   useEffect(() => {
-    if (!token) {
-      handleNoToken();
-    }
+    if (!token) return;
 
-    const socketInstance = io(import.meta.env.VITE_WS_URL || 'http://localhost:3000', {
-      auth: { token },
-      transports: ['websocket', 'polling'],
-    });
+    let active = true;
+    let currentSocket: Socket | null = null;
 
-    socketInstance.on('connect', () => {
-      setIsConnected(true);
-    });
+    getWsConfig().then((config) => {
+      if (!active) return;
 
-    socketInstance.on('disconnect', () => {
-      setIsConnected(false);
-    });
+      const manager = new Manager(config.wsUrl || '', {
+        transports: ['websocket', 'polling'],
+      });
 
-    socketInstance.on('notification', (data: unknown) => {
-      console.log('Received notification:', data);
-      const validData = NotificationSchema.safeParse(data);
-      if (!validData.success) {
-        console.error('Invalid notification data:', validData.error);
-        return;
+      const socket = manager.socket('/notifications', {
+        auth: { token },
+      });
+
+      currentSocket = socket;
+      socketRef.current = socket;
+
+      socket.on('connect', () => active && setIsConnected(true));
+      socket.on('disconnect', () => active && setIsConnected(false));
+      socket.on('notification', (data: unknown) => {
+        if (!active) return;
+
+        const validData = NotificationSchema.safeParse(data);
+        if (!validData.success) {
+          console.error('Invalid notification data:', validData.error);
+          return;
+        }
+        setNotifications((prev) => [...prev, mapApiToNotification(validData.data)]);
+      });
+
+      if (active) {
+        setSocket(socket);
       }
-      setNotifications((prev) => [mapApiToNotification(validData.data), ...prev]);
     });
-
-    setSocket(socketInstance);
 
     return () => {
-      socketInstance.disconnect();
+      active = false;
+      if (currentSocket) {
+        currentSocket.removeAllListeners();
+        currentSocket.disconnect();
+      }
+      if (socketRef.current === currentSocket) {
+        socketRef.current = null;
+      }
     };
   }, [token]);
 
@@ -149,7 +158,6 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
       refreshNotifications();
     }
   }, [user, isConnected, refreshNotifications]);
-
   return (
     <WebSocketContext.Provider
       value={{

@@ -1,4 +1,3 @@
-'use no memo';
 import { useRef, useCallback } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useMutation } from '@tanstack/react-query';

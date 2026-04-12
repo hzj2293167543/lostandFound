@@ -1,0 +1,83 @@
+services:
+  postgres:
+    build:
+      context: ./docker/postgres
+      dockerfile: Dockerfile
+    container_name: lostfound-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-lostfound}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-lostfound123}
+      POSTGRES_DB: ${POSTGRES_DB:-lostfound}
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-lostfound}']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+    container_name: lostfound-backend
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=${POSTGRES_USER:-lostfound}
+      - DB_PASSWORD=${POSTGRES_PASSWORD:-lostfound123}
+      - DB_NAME=${POSTGRES_DB:-lostfound}
+      - JWT_SECRET=${JWT_SECRET:-change-me}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-7d}
+      - AI_LLM_MODEL=${AI_LLM_MODEL:-glm-4-flash}
+      - AI_LLM_API_KEY=${AI_LLM_API_KEY:-}
+      - AI_LLM_CHAT_URL=${AI_LLM_CHAT_URL:-}
+      - AI_LLM_SEARCH_URL=${AI_LLM_SEARCH_URL:-}
+      - AI_OLLAMA_MODEL=${AI_OLLAMA_MODEL:-nomic-embed-text:latest}
+      - AI_OLLAMA_URL=${AI_OLLAMA_URL:-http://ollama:11434}
+      - APP_PORT=3000
+      - APP_BASE_URL=${BACKEND_URL:-http://localhost:3000}
+    ports:
+      - '3000:3000'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+
+  frontend:
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile
+    container_name: lostfound-frontend
+    environment:
+      - VITE_API_BASE_URL=${BACKEND_URL:-http://localhost:3000}/api
+      - VITE_WS_URL=${WS_URL:-http://localhost:3000}
+    ports:
+      - '8080:80'
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  # Ollama LLM 服务（Embedding 模型）
+  ollama:
+    build:
+      context: ./apps/ollama
+      dockerfile: Dockerfile
+    container_name: lostfound-ollama
+    ports:
+      - '11434:11434'
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_MODEL=${AI_OLLAMA_MODEL:-nomic-embed-text:latest}
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  ollama_data:

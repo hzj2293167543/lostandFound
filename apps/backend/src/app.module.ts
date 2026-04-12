@@ -8,9 +8,6 @@ import { FoundItemsModule } from './found-items/found-items.module';
 import { AnnouncementsModule } from './announcements/announcements.module';
 import { CommentsModule } from './comments/comments.module';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
-import { join } from 'path';
-import * as yaml from 'js-yaml';
-import * as fs from 'fs';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UploadModule } from './common/upload/upload.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
@@ -23,33 +20,23 @@ import { BanGuard } from './common/guards/ban.guard';
 import { OptionalJwtAuthGuard } from './common/guards/OptionalJwtAuthGuard.guard';
 import { TransformInterceptor } from './common/response.interceptor';
 import { AllExceptionsFilter } from './common/exception.filter';
-
-const env = process.env.NODE_ENV || 'development'; // 默认开发环境
-const filePath = join(__dirname, '..', '..', 'config', `.env.${env}.yaml`);
+import configuration from './configuration';
 
 @Module({
   imports: [
     ServeStaticModule.forRootAsync({
-      imports: [ConfigModule], // 导入 ConfigModule 确保 ConfigService 可用
-      inject: [ConfigService], // 注入 ConfigService
-      useFactory: (configService: ConfigService) => {
-        const rootPath =
-          configService.get('upload.directory') || join(__dirname, '..', '..', 'uploads');
-        return [
-          {
-            rootPath,
-            serveRoot: '/uploads',
-          },
-        ];
-      },
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => [
+        {
+          rootPath: configService.get<string>('upload.directory') || '',
+          serveRoot: '/uploads',
+        },
+      ],
     }),
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [
-        () => {
-          return yaml.load(fs.readFileSync(filePath, 'utf8')) as object;
-        },
-      ],
+      load: [configuration],
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -81,7 +68,6 @@ const filePath = join(__dirname, '..', '..', 'config', `.env.${env}.yaml`);
     AIModule,
   ],
   providers: [
-    // 1️⃣ 全局管道 (因为需要传参 whitelist/transform，所以用 useFactory)
     {
       provide: APP_PIPE,
       useFactory: () =>
@@ -90,17 +76,14 @@ const filePath = join(__dirname, '..', '..', 'config', `.env.${env}.yaml`);
           transform: true,
         }),
     },
-    // 2️⃣ 全局拦截器
     {
       provide: APP_INTERCEPTOR,
       useClass: TransformInterceptor,
     },
-    // 3️⃣ 全局异常过滤器
     {
       provide: APP_FILTER,
-      useClass: AllExceptionsFilter, // NestJS 会自动把 ConfigService 注入给它！
+      useClass: AllExceptionsFilter,
     },
-    // 4️⃣ 全局守卫 (顺序：先解包token -> 再查封禁)
     {
       provide: APP_GUARD,
       useClass: OptionalJwtAuthGuard,

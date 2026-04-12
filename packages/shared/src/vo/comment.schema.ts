@@ -7,7 +7,7 @@ export const CommentItemSchema = z.object({
     .object({
       id: z.number().int().nonnegative(),
       name: z.string(),
-      avatar: z.string().url().optional(),
+      avatar: z.string().optional(),
     })
     .nullable(),
   parent: z
@@ -17,7 +17,7 @@ export const CommentItemSchema = z.object({
       user: z.object({
         id: z.coerce.number(),
         name: z.string(),
-        avatar: z.string().url().optional(),
+        avatar: z.string().optional(),
       }),
     })
     .nullable()
@@ -27,7 +27,7 @@ export const CommentItemSchema = z.object({
   user: z.object({
     id: z.number().int().nonnegative(),
     name: z.string(),
-    avatar: z.string().url().optional(),
+    avatar: z.string().optional(),
   }),
   isLiked: z.boolean(),
   likeCount: z.number().int().nonnegative(),

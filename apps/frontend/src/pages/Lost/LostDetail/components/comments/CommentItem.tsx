@@ -115,7 +115,7 @@ export default function CommentItem({
               <Link to={`/profile/${comment.user.id}`}>
                 <h4 className="font-medium text-gray-800">{comment.user.name}</h4>
               </Link>
-              {comment.replyUser && (
+              {comment.replyUser && !isRootComment && (
                 <div>
                   <span className="font-medium text-gray-600">回复</span>
                   <Link

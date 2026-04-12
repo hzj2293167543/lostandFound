@@ -7,7 +7,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-lostfound123}
       POSTGRES_DB: ${POSTGRES_DB:-lostfound}
     ports:
-      - '5432:5432'
+      - '${DATA_PORT:-5432}:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -31,7 +31,6 @@ services:
       - JWT_SECRET=${JWT_SECRET:-change-me}
       - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-7d}
       - CORS_ORIGINS=${CORS_ORIGINS}
-      - UPLOAD_DIRECTORY=/app/uploads
       - AI_LLM_MODEL=${AI_LLM_MODEL:-glm-4-flash}
       - AI_LLM_API_KEY=${AI_LLM_API_KEY:-}
       - AI_LLM_CHAT_URL=${AI_LLM_CHAT_URL:-}
@@ -43,7 +42,7 @@ services:
     volumes:
       - uploads_data:/app/uploads
     ports:
-      - '3000:3000'
+      - '${BACKEND_PORT:-3000}:3000'
     depends_on:
       postgres:
         condition: service_healthy
@@ -57,7 +56,7 @@ services:
     volumes:
       - ./public:/usr/share/nginx/html/public:ro
     ports:
-      - '8080:80'
+      - '${FRONTEND_PORT:-8080}:80'
     depends_on:
       - backend
     restart: unless-stopped
@@ -66,7 +65,7 @@ services:
     image: ${REGISTRY}:ollama
     container_name: lostfound-ollama
     ports:
-      - '11434:11434'
+      - '${OLLAMA_PORT:-11434}:11434'
     volumes:
       - ollama_data:/root/.ollama
     environment:

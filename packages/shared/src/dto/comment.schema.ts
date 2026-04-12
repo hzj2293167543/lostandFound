@@ -6,7 +6,7 @@ export const commentDtoSchema = z.object({
   itemType: z.number().int().nonnegative(),
   user: z.object({
     id: z.number().int().nonnegative(),
-    avatar: z.string().url().optional(),
+    avatar: z.string().optional(),
     name: z.string().min(1),
   }),
   content: z.string().min(1),

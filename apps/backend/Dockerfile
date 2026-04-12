@@ -26,7 +26,9 @@ FROM node:24-alpine AS runner
 WORKDIR /app
 
 RUN addgroup --system --gid 1001 nodejs && \
-    adduser --system --uid 1001 nestjs
+    adduser --system --uid 1001 nestjs && \
+    mkdir -p /app/uploads && \
+    chown -R nestjs:nodejs /app/uploads
 
 COPY --from=builder --chown=nestjs:nodejs /app/deploy/. ./
 

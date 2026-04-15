@@ -1,8 +1,34 @@
 import { z } from 'zod';
 
 export const KnowledgeTypeSchema = z.enum(['faq', 'notice', 'rule']);
+export type TKnowledgeType = z.infer<typeof KnowledgeTypeSchema>;
+export const KnowledgeType = {
+  FAQ: 'faq',
+  NOTICE: 'notice',
+  RULE: 'rule',
+} as const;
 
-export type KnowledgeType = z.infer<typeof KnowledgeTypeSchema>;
+export const KnowledgeImportConfigSchema = z.object({
+  validExtensions: z.array(z.string()).readonly(),
+  maxSize: z.number(),
+  mimeTypes: z.array(z.string()).readonly(),
+});
+
+export type KnowledgeImportConfig = z.infer<typeof KnowledgeImportConfigSchema>;
+
+export const KNOWLEDGE_IMPORT_CONFIG: KnowledgeImportConfig = {
+  validExtensions: ['.txt', '.md', '.pdf', '.docx', '.xlsx', '.xls', '.pptx'],
+  maxSize: 50 * 1024 * 1024,
+  mimeTypes: [
+    'text/plain',
+    'text/markdown',
+    'application/pdf',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.presentational.presentation',
+  ],
+};
 
 export const KnowledgeBaseItemSchema = z.object({
   id: z.number(),
@@ -45,3 +71,11 @@ export const EmbeddingResponseSchema = z.object({
 });
 
 export type EmbeddingResponse = z.infer<typeof EmbeddingResponseSchema>;
+
+export const ImportResultSchema = z.object({
+  totalChunks: z.number(),
+  imported: z.number(),
+  skipped: z.number(),
+  errors: z.array(z.string()),
+});
+export type ImportResult = z.infer<typeof ImportResultSchema>;

@@ -1,9 +1,15 @@
 import { announcementApi, foundApi, lostApi } from '@/api';
 import { queryClient } from '@/lib/queryClient';
 import { announcementKeys, foundKeys, lostKeys } from '@/queryKeys';
+import { useAuthStore } from '@/stores/AuthStore';
+import { ROLE } from '@/stores/type';
+import { redirect } from 'react-router-dom';
 
 export async function homeLoader() {
   try {
+    const role = useAuthStore.getState().user?.role;
+    if (role === ROLE.管理员) return redirect('/admin');
+
     // 并行获取数据;
     const [lostData, foundData, annData] = await Promise.all([
       queryClient.ensureQueryData({

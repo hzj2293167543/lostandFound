@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PDFParse } from 'pdf-parse';
-import mammoth from 'mammoth';
-import * as XLSX from 'xlsx';
-import * as officeparser from 'officeparser';
+import XLSX from 'xlsx';
+import officeparser from 'officeparser';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const mammoth = require('mammoth');
 
 export interface ParsedDocument {
   content: string;

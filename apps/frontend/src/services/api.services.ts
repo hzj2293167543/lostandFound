@@ -1,4 +1,5 @@
 import { ChatParams } from '@/api/modules/ai.api';
+import { getApiBaseUrl } from '@/api/client';
 import { useAuthStore } from '@/stores/AuthStore';
 
 interface StreamSource {
@@ -18,7 +19,8 @@ export async function streamChat(
   onChunk: (chunk: string) => void
 ): Promise<StreamResponse> {
   const token = useAuthStore.getState().token;
-  const response = await fetch('/api/ai/chat/stream', {
+  const apiBaseUrl = await getApiBaseUrl();
+  const response = await fetch(`${apiBaseUrl}/ai/chat/stream`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

@@ -1,6 +1,6 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { adminApi } from '@/api';
-import { adminKeys } from '@/keys/admin';
+import { adminKeys } from '@/queryKeys/admin.key';
 import {
   LostItem,
   PageResponse,

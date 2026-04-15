@@ -11,7 +11,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useAdminInfiniteUsers } from '@/hooks/useAdminInfinite';
-import { adminKeys } from '@/keys/admin';
+import { adminKeys } from '@/queryKeys/admin.key';
 import { formatDate } from '@/utils';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';

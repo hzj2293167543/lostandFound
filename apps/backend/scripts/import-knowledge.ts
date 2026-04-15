@@ -2,7 +2,7 @@
 // oxlint-disable no-await-in-loop
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from '../src/app.module';
-import { KnowledgeBase, KnowledgeType } from '../src/ai/entities/knowledge-base.entity';
+import { KnowledgeBase } from '../src/ai/entities/knowledge-base.entity';
 import { EmbeddingService } from '../src/ai/embedding.service';
 import { DocumentParserService } from '../src/ai/document-parser.service';
 import { DataSource, Repository } from 'typeorm';
@@ -12,6 +12,7 @@ import { Document } from '@langchain/core/documents';
 import * as fs from 'fs';
 import * as path from 'path';
 import { KNOWLEDGE_ENTRIES } from './knowledge-entries.constant';
+import { TKnowledgeType } from '@lostfound/shared';
 
 const TEXT_DIR = path.join(__dirname, 'testData');
 
@@ -229,7 +230,7 @@ async function bootstrap() {
         knowledgeRepo.create({
           content: entry.content,
           embedding: embedding,
-          type: entry.type as KnowledgeType,
+          type: entry.type as TKnowledgeType,
         })
       );
 

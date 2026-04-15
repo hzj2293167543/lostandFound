@@ -1,20 +1,24 @@
 import {
+  ChatRequest,
+  ChatRequestSchema,
+  KNOWLEDGE_IMPORT_CONFIG,
+  KnowledgeType,
+} from '@lostfound/shared';
+import {
+  BadRequestException,
+  Body,
   Controller,
   Post,
-  Body,
   Res,
+  UploadedFile,
   UseGuards,
   UseInterceptors,
-  UploadedFile,
-  BadRequestException,
 } from '@nestjs/common';
-import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Response } from 'express';
 import { OptionalJwtAuthGuard } from '../common/guards/OptionalJwtAuthGuard.guard';
 import { ChatService } from './chat.service';
 import { KnowledgeImportService } from './knowledge-import.service';
-import { ChatRequestSchema, ChatRequest } from '@lostfound/shared';
-import { KnowledgeType } from './entities/knowledge-base.entity';
 import type { Express } from 'express';
 
 @Controller('ai')
@@ -60,7 +64,7 @@ export class AIController {
   @UseGuards(OptionalJwtAuthGuard)
   @UseInterceptors(
     FileInterceptor('file', {
-      limits: { fileSize: 50 * 1024 * 1024 },
+      limits: { fileSize: KNOWLEDGE_IMPORT_CONFIG.maxSize },
     })
   )
   async importKnowledge(@UploadedFile() file: Express.Multer.File, @Body('type') typeStr: string) {
@@ -68,7 +72,7 @@ export class AIController {
       throw new BadRequestException('No file uploaded');
     }
 
-    const typeMap: Record<string, KnowledgeType> = {
+    const typeMap: Record<string, (typeof KnowledgeType)[keyof typeof KnowledgeType]> = {
       faq: KnowledgeType.FAQ,
       notice: KnowledgeType.NOTICE,
       rule: KnowledgeType.RULE,

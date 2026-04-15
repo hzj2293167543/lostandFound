@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useAdminInfiniteReports } from '@/hooks/useAdminInfinite';
-import { adminKeys } from '@/keys/admin';
+import { adminKeys } from '@/queryKeys/admin.key';
 import { ReportStatus, ReportTargetType, ReportVo, TReportStatusType } from '@lostfound/shared';
 import { useQuery } from '@tanstack/react-query';
 import { useVirtualizer } from '@tanstack/react-virtual';

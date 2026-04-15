@@ -12,14 +12,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useAdminInfiniteAnnouncements } from '@/hooks/useAdminInfinite';
-import { adminKeys } from '@/keys/admin';
+import { adminKeys } from '@/queryKeys/admin.key';
 import { useAuthStore } from '@/stores/AuthStore';
 import { formatDateForInput } from '@/utils';
 import { Announcement, AnnouncementCreateDto, AnnouncementEditDto } from '@lostfound/shared';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { Loader2 } from 'lucide-react';
-import { ChangeEvent, useCallback, useMemo, useRef, useState } from 'react';
+import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 const ITEM_HEIGHT = 190;
@@ -28,6 +28,7 @@ export default function AdminAnnouncements() {
   const usrId = useAuthStore.use.user()?.id;
   const userName = useAuthStore.use.user()?.name;
   const parentRef = useRef<HTMLDivElement>(null);
+  const sentinelRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingAnnouncement, setEditingAnnouncement] = useState<Announcement | null>(null);
@@ -89,13 +90,23 @@ export default function AdminAnnouncements() {
     overscan: 5,
   });
 
-  const handleScroll = useCallback(() => {
+  useEffect(() => {
     const el = parentRef.current;
-    if (!el) return;
-    const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 500;
-    if (nearBottom && hasNextPage && !isFetchingNextPage) {
-      fetchNextPage();
-    }
+    const sentinel = sentinelRef.current;
+    if (!el || !sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries[0]) return;
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { root: el, rootMargin: '500px' }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const closeDialog = () => {
@@ -203,11 +214,7 @@ export default function AdminAnnouncements() {
       {announcements.length === 0 ? (
         <p className="text-gray-500 text-center py-8">暂无公告数据</p>
       ) : (
-        <div
-          ref={parentRef}
-          className="h-[650px] overflow-auto"
-          style={{ scrollbarWidth: 'none' }}
-          onScroll={handleScroll}>
+        <div ref={parentRef} className="h-[650px] overflow-auto" style={{ scrollbarWidth: 'none' }}>
           <div
             style={{
               height: `${rowVirtualizer.getTotalSize()}px`,
@@ -232,6 +239,7 @@ export default function AdminAnnouncements() {
                 </div>
               );
             })}
+            <div ref={sentinelRef} style={{ height: 1 }} />
           </div>
         </div>
       )}

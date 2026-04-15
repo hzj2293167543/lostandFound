@@ -24,6 +24,7 @@ const AdminLost = lazy(() => import('./pages/Admin/Lost'));
 const AdminFound = lazy(() => import('./pages/Admin/Found'));
 const AdminCategories = lazy(() => import('./pages/Admin/Categories'));
 const AdminAnnouncements = lazy(() => import('./pages/Admin/Announcements'));
+const AdminKnowledgeImport = lazy(() => import('./pages/Admin/KnowledgeImport'));
 const AdminReports = lazy(() => import('./pages/Admin/Reports'));
 const AdminLostDetailPage = lazy(() => import('./pages/Admin/LostDetailPage'));
 const AdminFoundDetailPage = lazy(() => import('./pages/Admin/FoundDetailPage'));
@@ -226,6 +227,10 @@ export const router = createBrowserRouter([
       {
         path: 'announcements',
         element: <AdminAnnouncements />,
+      },
+      {
+        path: 'knowledge',
+        element: <AdminKnowledgeImport />,
       },
       {
         path: 'reports',

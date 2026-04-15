@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AIModule } from '../ai/ai.module';
+import { KnowledgeBase } from '../ai/entities/knowledge-base.entity';
 import { AnnouncementsModule } from '../announcements/announcements.module';
 import { Announcement } from '../announcements/entities/announcement.entity';
 import { CategoriesModule } from '../categories/categories.module';
@@ -28,7 +30,7 @@ import {
   UserStatisticsService,
   ReportStatisticsService,
 } from './statistics';
-
+import { KnowledgeService } from './knowledge.service';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -41,6 +43,7 @@ import {
       Report,
       ReportReason,
       Punishment,
+      KnowledgeBase,
     ]),
     UsersModule,
     CategoriesModule,
@@ -48,6 +51,7 @@ import {
     LostItemsModule,
     FoundItemsModule,
     CommentsModule,
+    AIModule,
   ],
   controllers: [AdminController],
   providers: [
@@ -61,6 +65,7 @@ import {
     ItemStatisticsService,
     UserStatisticsService,
     ReportStatisticsService,
+    KnowledgeService,
   ],
   exports: [AdminService, StatisticsService, UserManagementService],
 })

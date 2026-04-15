@@ -1,3 +1,4 @@
+// oxlint-disable max-lines
 import { CurrentUser } from '@/common/decorators/currentUser.decorator';
 import { ZodValidationPipe } from '@/common/pipe';
 import {
@@ -7,6 +8,7 @@ import {
   AnnouncementEditDtoSchema,
   HandleReportDto,
   HandleReportDtoSchema,
+  KNOWLEDGE_IMPORT_CONFIG,
   ReportPaginationParams,
   ReportPaginationParamsSchema,
 } from '@lostfound/shared';
@@ -21,20 +23,26 @@ import {
   Post,
   Put,
   Query,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { User } from '../users/entities/user.entity';
-import { AdminService } from './admin.service';
 import { AnnouncementService } from './announcement.service';
 import { CategoryService } from './category.service';
 import { ItemManagementService } from './item-management.service';
+import { KnowledgeService } from './knowledge.service';
 import { ReportService } from './report.service';
 import { StatisticsService } from './statistics.service';
 import { UserManagementService } from './user-management.service';
+import type { Express } from 'express';
+import { AuthGuard } from '@nestjs/passport';
+import { AdminGuard } from '@/common/guards/admin.guard';
 
 @Controller('admin')
 @UseGuards(AuthGuard('jwt'))
+@UseGuards(AdminGuard)
 export class AdminController {
   constructor(
     private statisticsService: StatisticsService,
@@ -43,7 +51,7 @@ export class AdminController {
     private announcementService: AnnouncementService,
     private categoryService: CategoryService,
     private reportService: ReportService,
-    private adminService: AdminService
+    private knowledgeService: KnowledgeService
   ) {}
 
   @Get('stats')
@@ -288,5 +296,25 @@ export class AdminController {
   @Get('users/:userId/punishments')
   getUserPunishments(@Param('userId') userId: string) {
     return this.reportService.getUserPunishments(+userId);
+  }
+
+  @Get('knowledge/documents')
+  getKnowledgeDocuments() {
+    return this.knowledgeService.getDocumentList();
+  }
+
+  @Delete('knowledge/documents/:sourceFile')
+  deleteKnowledgeDocument(@Param('sourceFile') sourceFile: string) {
+    return this.knowledgeService.deleteDocument(sourceFile);
+  }
+
+  @Post('knowledge/import')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      limits: { fileSize: KNOWLEDGE_IMPORT_CONFIG.maxSize },
+    })
+  )
+  async importKnowledge(@UploadedFile() file: Express.Multer.File, @Body('type') typeStr: string) {
+    return await this.knowledgeService.importKnowledge(file, typeStr);
   }
 }

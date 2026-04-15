@@ -4,14 +4,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { DocumentParserService, ParsedDocument } from './document-parser.service';
 import { EmbeddingService } from './embedding.service';
-import { KnowledgeBase, KnowledgeType } from './entities/knowledge-base.entity';
-
-export interface ImportResult {
-  totalChunks: number;
-  imported: number;
-  skipped: number;
-  errors: string[];
-}
+import { KnowledgeBase } from './entities/knowledge-base.entity';
+import { ImportResult, KnowledgeType } from '@lostfound/shared';
 
 @Injectable()
 export class KnowledgeImportService {
@@ -29,7 +23,7 @@ export class KnowledgeImportService {
     buffer: Buffer,
     fileName: string,
     mimeType: string,
-    type: KnowledgeType
+    type: (typeof KnowledgeType)[keyof typeof KnowledgeType]
   ): Promise<ImportResult> {
     const result: ImportResult = {
       totalChunks: 0,
@@ -65,6 +59,7 @@ export class KnowledgeImportService {
             content: chunk,
             embedding,
             type,
+            sourceFile: fileName,
           });
 
           await this.knowledgeRepo.save(entity);

@@ -2,7 +2,15 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import { Button } from '@/components/ui/button';
 import { NavigationMenuItem } from '@/components/ui/navigation-menu';
 import { useAuthStore, useIsAdmin } from '@/stores/AuthStore';
-import { FileText, LayoutDashboard, LogOut, Package, Users, AlertTriangle } from 'lucide-react';
+import {
+  FileText,
+  LayoutDashboard,
+  LogOut,
+  Package,
+  Users,
+  AlertTriangle,
+  Brain,
+} from 'lucide-react';
 import { memo } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -16,6 +24,7 @@ const menuItems = [
   { id: 'lost', label: '失物管理', icon: Package, path: '/admin/lost' },
   { id: 'found', label: '招领管理', icon: Package, path: '/admin/found' },
   { id: 'announcements', label: '公告管理', icon: FileText, path: '/admin/announcements' },
+  { id: 'knowledge', label: '知识库导入', icon: Brain, path: '/admin/knowledge' },
 ];
 
 export default memo(function AdminLayout() {

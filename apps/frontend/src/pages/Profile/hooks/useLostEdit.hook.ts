@@ -127,7 +127,6 @@ export function useLostEdit(lostItemId: number) {
   };
 
   const onError = (errors: FieldErrors<LostUpdateDto>) => {
-    console.log(errors);
     const firstError = getFirstError(errors);
     toast.error(firstError || '请检查失物信息');
   };

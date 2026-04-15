@@ -92,7 +92,7 @@ export function useFoundCreate(categories: Category[]) {
     if (!shouldClose()) return;
 
     if (actionData?.success) {
-      queryClient.refetchQueries({ queryKey: foundKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: foundKeys.lists() });
       setOpen(false);
       form.reset();
       toast.success('招领信息发布成功！');

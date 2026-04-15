@@ -22,4 +22,5 @@ export const adminKeys = {
   categories: () => [...adminKeys.all, 'categories'] as const,
   announcements: () => [...adminKeys.all, 'announcements'] as const,
   announcementsInfinite: () => [...adminKeys.all, 'announcements-infinite'] as const,
+  knowledgeDocuments: () => [...adminKeys.all, 'knowledge-documents'] as const,
 };

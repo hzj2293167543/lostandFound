@@ -23,6 +23,7 @@ import {
   ReportHandlingStats,
   FunnelData,
   WordCloudData,
+  ImportResult,
 } from '@lostfound/shared';
 import { buildSearchParams } from '@/utils';
 
@@ -156,6 +157,26 @@ export const adminApi = {
   revokePunishment: (id: number) => remove<void>(`/admin/punishments/${id}`),
 
   getUserPunishments: (userId: number) => get<Punishment[]>(`/admin/users/${userId}/punishments`),
+
+  getKnowledgeDocuments: () => get<DocumentInfo[]>('/admin/knowledge/documents'),
+
+  deleteKnowledgeDocument: (sourceFile: string) =>
+    remove<{ deleted: number }>(`/admin/knowledge/documents/${encodeURIComponent(sourceFile)}`),
+
+  importKnowledge: (file: File, type: string) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('type', type);
+    return post<ImportResult>('/admin/knowledge/import', formData);
+  },
 };
+
+interface DocumentInfo {
+  sourceFile: string;
+  type: string;
+  chunkCount: number;
+  uploadedAt: string;
+  preview: string;
+}
 
 export default adminApi;

@@ -1,10 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
-
-export enum KnowledgeType {
-  FAQ = 'faq',
-  NOTICE = 'notice',
-  RULE = 'rule',
-}
+import { KnowledgeType } from '@lostfound/shared';
 
 @Entity('knowledge_base')
 export class KnowledgeBase {
@@ -22,7 +17,10 @@ export class KnowledgeBase {
     enum: KnowledgeType,
     default: KnowledgeType.FAQ,
   })
-  type: KnowledgeType;
+  type: (typeof KnowledgeType)[keyof typeof KnowledgeType];
+
+  @Column({ name: 'source_file', nullable: true })
+  sourceFile: string;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

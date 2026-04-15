@@ -141,7 +141,6 @@ export function useFoundEdit(foundItemId: number) {
   };
 
   const onError = (errors: FieldErrors<FoundUpdateDto>) => {
-    console.log(errors);
     const firstError = getFirstError(errors);
     toast.error(firstError || '请检查招领信息');
   };

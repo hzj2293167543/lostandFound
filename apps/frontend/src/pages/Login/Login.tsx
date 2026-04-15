@@ -36,7 +36,6 @@ export default function Login() {
     try {
       const user = await login(formData);
       toast.success('登录成功');
-      console.log(user);
       if (user.role === ROLE.管理员) {
         navigate('/admin');
       } else {

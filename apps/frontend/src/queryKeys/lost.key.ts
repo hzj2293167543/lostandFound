@@ -5,6 +5,7 @@ export const lostKeys = {
   list: <T extends Record<string, unknown>>(userId: number, filters?: T) =>
     [...lostKeys.lists(), userId, filters] as const,
   listTop3: () => [...lostKeys.lists(), 'top3'] as const,
-  infinite: (filters?: Record<string, unknown>) => [...lostKeys.all, 'infinite', filters] as const,
+  infinite: (filters?: Record<string, unknown>) =>
+    [...lostKeys.lists(), 'infinite', filters] as const,
   userLostList: (userId: number) => [...lostKeys.all, 'user', userId] as const,
 };

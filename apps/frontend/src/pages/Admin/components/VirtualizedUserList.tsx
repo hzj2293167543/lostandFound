@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { adminApi } from '@/api';
 import { useQueryClient } from '@tanstack/react-query';
-import { adminKeys } from '@/keys/admin';
+import { adminKeys } from '@/queryKeys/admin.key';
 import { toast } from 'sonner';
 
 const ITEM_HEIGHT = 240;

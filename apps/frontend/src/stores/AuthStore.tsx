@@ -5,6 +5,7 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { ROLE } from './type';
+import { setSentryUser } from '@/lib/sentry';
 
 interface AuthState {
   user: User | null;
@@ -30,9 +31,11 @@ export const useAuthStore = createSelectors(
             token,
             user,
           });
+          setSentryUser(user);
           return user;
         },
         logout: () => {
+          setSentryUser(null);
           set({
             token: null,
             user: null,

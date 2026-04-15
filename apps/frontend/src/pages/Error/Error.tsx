@@ -2,10 +2,17 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowLeft, Home } from 'lucide-react';
 import { isRouteErrorResponse, Link, useRouteError } from 'react-router-dom';
-import { memo } from 'react';
+import { memo, useEffect } from 'react';
+import { Sentry } from '@/lib/sentry';
 
 export default memo(function ErrorPage() {
   const error = useRouteError();
+
+  useEffect(() => {
+    if (error instanceof Error) {
+      Sentry.captureException(error);
+    }
+  }, [error]);
 
   let title = '出错了！';
   let message = '发生了未知错误';

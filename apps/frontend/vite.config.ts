@@ -3,6 +3,8 @@ import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import { mockDevServerPlugin } from 'vite-plugin-mock-dev-server';
 import { defineConfig } from 'vitest/config';
+import viteSentry from 'vite-plugin-sentry';
+import sentryConfig from './config/sentryConfig';
 
 export default defineConfig({
   plugins: [
@@ -17,7 +19,11 @@ export default defineConfig({
       log: 'info',
       prefix: '^/mock',
     }),
+    ...(process.env.NODE_ENV === 'production' ? [viteSentry(sentryConfig)] : []),
   ],
+  build: {
+    sourcemap: true,
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

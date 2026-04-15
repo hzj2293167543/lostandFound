@@ -10,6 +10,11 @@ import { toast } from 'sonner';
 import { WebSocketProvider } from './contexts/WebSocketContext';
 import { ThemeProvider } from './components/ThemeProvider';
 import { StrictMode } from 'react';
+import { initSentry } from './lib/sentry';
+import { ErrorBoundary } from '@sentry/react';
+import { FallbackComponent } from './pages/Error/FallbackComponent';
+
+initSentry();
 
 window.addEventListener('unhandledrejection', (event) => {
   const error = event.reason;
@@ -24,13 +29,15 @@ window.addEventListener('unhandledrejection', (event) => {
 
 ReactDOM.createRoot(document.querySelector('#root')!).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <WebSocketProvider>
-        <ThemeProvider>
-          <Toaster theme="system" position="top-center" />
-          <RouterProvider router={router} />
-        </ThemeProvider>
-      </WebSocketProvider>
-    </QueryClientProvider>
+    <ErrorBoundary fallback={<FallbackComponent />}>
+      <QueryClientProvider client={queryClient}>
+        <WebSocketProvider>
+          <ThemeProvider>
+            <Toaster theme="system" position="top-center" />
+            <RouterProvider router={router} />
+          </ThemeProvider>
+        </WebSocketProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   </StrictMode>
 );

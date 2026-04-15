@@ -39,7 +39,6 @@ export default memo(function AdminLayout() {
   const location = useLocation();
 
   const activeTab = menuItems.find((item) => location.pathname === item.path)?.id || 'dashboard';
-
   if (!isAdmin) {
     return (
       <div className="min-h-screen flex items-center justify-center">

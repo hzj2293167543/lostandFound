@@ -187,6 +187,7 @@ export const router = createBrowserRouter([
         <AdminLayout />
       </AdminRoute>
     ),
+    errorElement: <Error />,
     children: [
       {
         index: true,

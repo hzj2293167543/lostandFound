@@ -25,7 +25,7 @@ export function initSentry() {
 
   Sentry.init({
     dsn: SENTRY_DSN,
-    debug: true,
+    debug: import.meta.env.DEV,
     integrations: [browserTracingIntegration(), replayIntegration()],
     environment: SENTRY_ENVIRONMENT,
     tracesSampleRate: 0.1,

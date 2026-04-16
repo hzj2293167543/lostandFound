@@ -65,3 +65,12 @@ nomic
 pdfmake
 rerank
 reranked
+
+# Auto-added words
+Buildx
+Trae
+buildx
+lostandfound
+tencentyun
+trae
+yourdomain

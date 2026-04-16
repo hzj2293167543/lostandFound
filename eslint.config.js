@@ -125,7 +125,72 @@ export default [
       'react/prop-types': 'off', // 关闭 prop-types（如果用 TS）
     },
   },
-  // // 7. Prettier 集成
+  // 7. 测试文件宽松配置
+  {
+    files: [
+      '**/__test__/**/*.{js,ts,jsx,tsx}',
+      '**/*.test.{js,ts,jsx,tsx}',
+      '**/__tests__/**/*.{js,ts,jsx,tsx}',
+    ],
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+        vi: true,
+        describe: true,
+        it: true,
+        expect: true,
+        beforeEach: true,
+        afterEach: true,
+        beforeAll: true,
+        afterAll: true,
+      },
+    },
+    rules: {
+      // 函数长度限制
+      'max-lines-per-function': 'off',
+      'max-lines': 'off',
+      'max-statements': 'off',
+      'max-nested-callbacks': 'off',
+
+      // 未使用变量
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
+
+      // 表达式和函数
+      'no-unused-expressions': 'off',
+      'no-empty-function': 'off',
+      '@typescript-eslint/no-empty-function': 'off',
+
+      // console 和 debugger
+      'no-console': 'off',
+      'no-debugger': 'off',
+
+      // 参数相关
+      'no-param-reassign': 'off',
+
+      // Unicorn 规则
+      'unicorn/consistent-function-scoping': 'off',
+      'unicorn/no-null': 'off',
+      'unicorn/prevent-abbreviations': 'off',
+
+      // TypeScript 规则
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-non-null-assertion': 'off',
+      '@typescript-eslint/ban-ts-comment': 'off',
+      '@typescript-eslint/prefer-ts-expect-error': 'off',
+      '@typescript-eslint/unbound-method': 'off',
+
+      // Import 规则
+      'import/no-extraneous-dependencies': 'off',
+
+      // 其他
+      'global-require': 'off',
+      'promise/always-return': 'off',
+      'unicorn/no-useless-undefined': 'off',
+    },
+  },
+  // // 8. Prettier 集成
   // {
   //   plugins: {
   //     prettier: prettierPlugin,
@@ -134,7 +199,7 @@ export default [
   //     'prettier/prettier': 'warn',
   //   },
   // },
-  // 8. 忽略 TypeScript 类型检查配置
+  // 9. 忽略 TypeScript 类型检查配置
   {
     files: ['vitest.config.ts', 'vite.config.ts', 'playwright.config.ts'],
     ...tseslint.configs.disableTypeChecked,

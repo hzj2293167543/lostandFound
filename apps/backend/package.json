@@ -10,6 +10,8 @@
     "debug": "nest start --debug --watch",
     "import-knowledge": "ts-node -r tsconfig-paths/register scripts/import-knowledge.ts",
     "generate-test-data": "ts-node -r tsconfig-paths/register scripts/generate-test-data.ts",
+    "test": "vitest",
+    "test:run": "vitest run",
     "type-check": "tsc --noEmit"
   },
   "keywords": [],

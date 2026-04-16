@@ -1,0 +1,10 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "module": "NodeNext", // 或 "ESNext"，但需要与 moduleResolution 匹配
+    "moduleResolution": "NodeNext", // 或 "bundler"（如果 TS 版本 >= 5.0）
+    "types": ["vitest/globals", "node"]
+  },
+  "include": ["vitest.config.ts", "**/*.test.ts", "setup/**/*.ts", "__tests__/**/*.ts"],
+  "exclude": []
+}

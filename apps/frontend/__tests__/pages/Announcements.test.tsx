@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Announcements from '@/pages/Announcement/Announcements/Announcements';
 import React from 'react';
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -11,6 +12,19 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+// Mock the hook
+vi.mock('@/pages/Announcement/hooks/useAnnouncementInfinite.hook', () => ({
+  useAnnouncementInfinite: () => ({
+    itemData: { items: [], hasNextPage: false },
+    handleScroll: vi.fn(),
+    status: 'success',
+    rowCount: 0,
+    containerRef: { current: null },
+    allItems: [],
+    isFetching: false,
+  }),
+}));
 
 const renderWithProviders = (component: React.ReactNode) => {
   return render(
@@ -29,7 +43,6 @@ describe('Announcements', () => {
     renderWithProviders(<Announcements />);
 
     expect(screen.getByText('公告中心')).toBeInTheDocument();
-    expect(screen.getByLabelText(/搜索公告/)).toBeInTheDocument();
   });
 
   it('renders search input', () => {

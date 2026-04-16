@@ -147,6 +147,7 @@ async function importFile(
       content: chunk,
       embedding: embeddings[index],
       type: fileType,
+      sourceFile: filePath,
     })
   );
 

@@ -55,9 +55,6 @@ services:
       context: .
       dockerfile: apps/frontend/Dockerfile
     container_name: lostfound-frontend
-    environment:
-      - VITE_API_BASE_URL=${BACKEND_URL:-http://localhost:3000}/api
-      - VITE_WS_URL=${WS_URL:-http://localhost:3000}
     ports:
       - '8080:80'
     depends_on:

@@ -31,13 +31,11 @@
 
 ### 应用配置
 
-| Secret 名称         | 说明                      | 示例值                           |
-| ------------------- | ------------------------- | -------------------------------- |
-| `BACKEND_URL`       | 后端 API 地址             | `https://api.yourdomain.com`     |
-| `WS_URL`            | WebSocket 地址            | `wss://api.yourdomain.com`       |
-| `STATIC_BASE_URL`   | 静态资源地址              | `https://static.yourdomain.com`  |
-| `VITE_API_BASE_URL` | 前端构建时 API 地址       | `https://api.yourdomain.com/api` |
-| `VITE_WS_URL`       | 前端构建时 WebSocket 地址 | `wss://api.yourdomain.com`       |
+| Secret 名称       | 说明           | 示例值                          |
+| ----------------- | -------------- | ------------------------------- |
+| `BACKEND_URL`     | 后端 API 地址  | `https://api.yourdomain.com`    |
+| `WS_URL`          | WebSocket 地址 | `wss://api.yourdomain.com`      |
+| `STATIC_BASE_URL` | 静态资源地址   | `https://static.yourdomain.com` |
 
 ### JWT 配置
 

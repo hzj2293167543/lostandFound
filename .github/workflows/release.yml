@@ -26,7 +26,7 @@ jobs:
           persist-credentials: false # 改用 GITHUB_TOKEN，避免密钥泄露
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@v5
         with:
           run_install: false
 

@@ -6,28 +6,29 @@ on:
   pull_request:
     branches: [master]
 
-# 关键优化：自动取消旧的 PR 工作流，节省资源
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  # ---------- 1. 依赖安装缓存层（所有 job 共享）----------
-  install:
+  ci:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v5
-      - uses: actions/setup-node@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: 'pnpm' # 缓存 pnpm store
+          cache: 'pnpm'
 
       - name: Get pnpm store directory
         id: pnpm-store
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
 
       - name: Cache pnpm store
         uses: actions/cache@v4
@@ -40,62 +41,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --prefer-offline
 
-      # 将 node_modules 缓存起来供后续 jobs 使用（可选但强烈推荐）
-      - name: Cache node_modules
-        uses: actions/cache@v4
-        with:
-          path: |
-            **/node_modules
-            !**/node_modules/.cache  # 排除缓存文件夹（可选）
-          key: ${{ runner.os }}-node_modules-${{ hashFiles('**/pnpm-lock.yaml') }}
+      - name: Lint
+        run: pnpm run lint
 
-  # ---------- 2. Lint（依赖 install，但不再重复安装）----------
-  lint:
-    runs-on: ubuntu-latest
-    needs: install
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v5
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: 'pnpm'
-
-      - name: Restore node_modules
-        uses: actions/cache@v4
-        with:
-          path: |
-            **/node_modules
-            !**/node_modules/.cache
-          key: ${{ runner.os }}-node_modules-${{ hashFiles('**/pnpm-lock.yaml') }}
-
-      - run: pnpm run lint
-
-  # ---------- 3. Test（并行 lint）----------
-  test:
-    runs-on: ubuntu-latest
-    needs: install
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v5
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: 'pnpm'
-
-      - name: Restore node_modules
-        uses: actions/cache@v4
-        with:
-          path: |
-            **/node_modules
-            !**/node_modules/.cache
-          key: ${{ runner.os }}-node_modules-${{ hashFiles('**/pnpm-lock.yaml') }}
-
-      # 缓存 Playwright 浏览器（大幅加速）
       - name: Cache Playwright browsers
-        id: playwright-cache
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
@@ -105,40 +54,20 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install chromium --with-deps
 
-      # 运行所有包的测试
       - name: Run Frontend Tests
         run: pnpm --filter @monorepo/frontend test:run
 
       - name: Run Backend Tests
         run: pnpm --filter @monorepo/backend test:run
 
-      - name: Run Root Tests (utils, components)
+      - name: Run Root Tests
         run: pnpm run test:run
 
-  # ---------- 4. Build（等待 lint 和 test 都通过）----------
-  build:
-    runs-on: ubuntu-latest
-    needs: [lint, test] # 并行依赖，更快反馈
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v5
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: 'pnpm'
+      - name: Build
+        run: pnpm run build
 
-      - name: Restore node_modules
-        uses: actions/cache@v4
-        with:
-          path: |
-            **/node_modules
-            !**/node_modules/.cache
-          key: ${{ runner.os }}-node_modules-${{ hashFiles('**/pnpm-lock.yaml') }}
-
-      - run: pnpm run build
-
-      - uses: actions/upload-artifact@v4
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
         with:
           name: dist
           path: packages/*/dist/

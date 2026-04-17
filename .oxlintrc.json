@@ -45,6 +45,7 @@
     "no-self-assign": "warn",
     "no-setter-return": "warn",
     "no-shadow-restricted-names": "warn",
+    "no-shadow": "off",
     "no-sparse-arrays": "warn",
     "no-this-before-super": "warn",
     "no-unassigned-vars": "warn",
@@ -118,7 +119,6 @@
     "unicorn/no-array-sort": "off",
     "no-inline-comments": "off",
     "react/exhaustive-deps": "warn",
-    "react/jsx-uses-react": "off",
     "react/react-in-jsx-scope": "off",
     "typescript/no-extraneous-class": [
       "warn",
@@ -131,7 +131,8 @@
       {
         "allowExpressions": true
       }
-    ]
+    ],
+    "react/jsx-no-constructed-context-values": "off"
   },
   "overrides": [
     {
@@ -185,13 +186,11 @@
         "no-console": "off",
         "unicorn/consistent-function-scoping": "off",
         "unicorn/no-null": "off",
-        "unicorn/prevent-abbreviations": "off",
         "typescript/no-explicit-any": "off",
         "typescript/no-non-null-assertion": "off",
         "typescript/no-empty-function": "off",
         "typescript/ban-ts-comment": "off",
         "typescript/prefer-ts-expect-error": "off",
-        "import/no-extraneous-dependencies": "off",
         "global-require": "off",
         "promise/always-return": "off",
         "no-param-reassign": "off",
@@ -201,7 +200,7 @@
   ],
   "settings": {
     "jsx-a11y": {
-      "polymorphicPropName": null,
+      "polymorphicPropName": "className",
       "components": {},
       "attributes": {}
     },

@@ -1,9 +1,8 @@
 import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const __dirname = import.meta.dirname;
 const pkgDir = path.resolve(__dirname, '..');
 const distDir = path.join(pkgDir, 'dist');
 

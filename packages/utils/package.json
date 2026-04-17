@@ -8,8 +8,7 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "node scripts/build.js",
-    "dev": "node scripts/dev.js"
+    "build": "rollup -c rollup.config.js"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^12.3.0",

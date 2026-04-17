@@ -47,6 +47,7 @@ export function SearchInput({
   });
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     handleUpdateLocal();
   }, [externalValue]);
 

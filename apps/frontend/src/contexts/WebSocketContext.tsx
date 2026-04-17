@@ -5,6 +5,7 @@ import {
   useState,
   useCallback,
   useRef,
+  useMemo,
   ReactNode,
 } from 'react';
 import { Manager, Socket } from 'socket.io-client';
@@ -155,24 +156,51 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (user && isConnected) {
+      /* eslint-disable-next-line react-hooks/set-state-in-effect */
       refreshNotifications();
     }
   }, [user, isConnected, refreshNotifications]);
-  return (
-    <WebSocketContext.Provider
-      value={{
-        socket,
-        isConnected,
-        notifications,
-        unreadCount,
-        markAsRead,
-        markAllAsRead,
-        clearNotifications,
-        refreshNotifications,
-      }}>
-      {children}
-    </WebSocketContext.Provider>
+
+  useEffect(() => {
+    if (!user || !isConnected) return;
+
+    const fetchNotifications = async () => {
+      try {
+        const { notificationApi } = await import('@/api/modules/notification.api');
+        const data = await notificationApi.getNotifications();
+        setNotifications(data.map((item) => mapApiToNotification(item)));
+      } catch (error) {
+        console.error('Failed to fetch notifications:', error);
+      }
+    };
+
+    fetchNotifications();
+  }, [user, isConnected]);
+
+  const contextValue = useMemo(
+    () => ({
+      socket,
+      isConnected,
+      notifications,
+      unreadCount,
+      markAsRead,
+      markAllAsRead,
+      clearNotifications,
+      refreshNotifications,
+    }),
+    [
+      socket,
+      isConnected,
+      notifications,
+      unreadCount,
+      markAsRead,
+      markAllAsRead,
+      clearNotifications,
+      refreshNotifications,
+    ]
   );
+
+  return <WebSocketContext.Provider value={contextValue}>{children}</WebSocketContext.Provider>;
 }
 
 export function useWebSocket() {

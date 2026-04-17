@@ -152,8 +152,8 @@ export function AIChatDialog({ open, onOpenChange }: AIChatDialogProps) {
                 <p className="text-sm text-muted-foreground">我可以回答关于失物招领平台的问题</p>
               </div>
             )}
-            {messages.map((msg, i) => (
-              <MessageBubble key={i + msg.role} message={msg} />
+            {messages.map((msg) => (
+              <MessageBubble key={msg.role + msg} message={msg} />
             ))}
             {isStreaming && messages.at(-1)?.role !== 'assistant' && <TypingIndicator />}
           </div>

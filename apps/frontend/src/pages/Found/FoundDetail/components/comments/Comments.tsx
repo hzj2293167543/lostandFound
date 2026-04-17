@@ -58,6 +58,7 @@ export default function Comments({ itemId }: { itemId: number }) {
   useEffect(() => {
     if (actionData?.intent !== FOUND_DETAIL_INTENT.COMMENT) return;
     if (actionData.success) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       handleSuccessEffect();
     } else if (!actionData.success) {
       toast.error(actionData.error || '发布失败');

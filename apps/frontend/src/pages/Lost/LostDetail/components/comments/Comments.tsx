@@ -72,13 +72,13 @@ export default memo(function Comments({ itemId }: { itemId: number }) {
     setReplyState((prev) => ({ replyId: prev.replyId === id ? undefined : id }));
   };
 
-  const onSubmit = async (data: CommentFormValues) => {
+  const onSubmit = async (formData: CommentFormValues) => {
     const payload = {
       intent: LOST_DETAIL_INTENT.COMMENT,
       parentId: null,
       itemId,
       itemType: ItemTypeMap.LOST,
-      content: data.content,
+      content: formData.content,
     };
     await submit(JSON.stringify(payload), { method: 'POST', encType: 'application/json' });
   };

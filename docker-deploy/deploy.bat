@@ -88,6 +88,11 @@ if /i "%TARGET%"=="frontend" set "SERVICES=frontend"
 if /i "%TARGET%"=="backend" set "SERVICES=postgres backend"
 if /i "%TARGET%"=="all" set "SERVICES=postgres backend frontend"
 
+if defined DOCKER_PASSWORD (
+    echo [INFO] 登录镜像仓库...
+    echo %DOCKER_PASSWORD% | docker login %REGISTRY% -u %DOCKER_USERNAME% --password-stdin
+)
+
 echo [INFO] 拉取最新镜像...
 docker compose -f docker-compose.prod.yml pull %SERVICES%
 

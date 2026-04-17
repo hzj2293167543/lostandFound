@@ -87,7 +87,8 @@ jobs:
       - name: Build and push backend
         uses: docker/build-push-action@v6
         with:
-          context: ./apps/backend
+          context: .
+          file: ./apps/backend/Dockerfile
           push: true
           tags: |
             ${{ steps.vars.outputs.REGISTRY }}:backend
@@ -98,7 +99,7 @@ jobs:
       - name: Build and push frontend
         uses: docker/build-push-action@v6
         with:
-          context: ./apps/frontend
+          context: .
           file: ./apps/frontend/Dockerfile
           push: true
           tags: |
@@ -168,6 +169,9 @@ jobs:
 
             echo "[INFO] 部署目标: ${{ inputs.deploy_target || 'all' }}"
             echo "[INFO] 清除数据库: ${{ inputs.clean_db || 'false' }}"
+
+            echo "[INFO] 登录镜像仓库..."
+            echo "${{ secrets.DOCKER_PASSWORD }}" | docker login ${{ secrets.DOCKER_REGISTRY }} -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
 
             echo "[INFO] 拉取最新镜像..."
             if ! docker compose -f docker-compose.prod.yml pull; then

@@ -64,7 +64,7 @@ services:
   # Ollama LLM 服务（Embedding 模型）
   ollama:
     build:
-      context: ./apps/ollama
+      context: docker/ollama
       dockerfile: Dockerfile
     container_name: lostfound-ollama
     ports:

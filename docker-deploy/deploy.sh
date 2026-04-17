@@ -128,6 +128,9 @@ for svc in $COMMON_SERVICES; do
     docker compose -f docker-compose.prod.yml stop "$svc" 2>/dev/null || true
 done
 
+echo "[INFO] 登录镜像仓库..."
+echo "$DOCKER_PASSWORD" | docker login "$REGISTRY" -u "$DOCKER_USERNAME" --password-stdin
+
 echo "[INFO] 拉取最新镜像..."
 docker compose -f docker-compose.prod.yml pull $SERVICES
 

@@ -1,48 +1,56 @@
-name: Docker Deploy
+name: Deploy to Server
 
 on:
   push:
-    branches: [master]
+    branches: ['master']
   workflow_dispatch:
     inputs:
-      deploy_target:
-        description: '部署目标'
-        required: true
-        default: 'all'
-        type: choice
-        options:
-          - all
-          - frontend
-          - backend
-          - postgres
-          - ollama
+      # deploy_target:
+      #   description: '部署目标 (postgres|ollama|frontend|backend|all)'
+      #   required: false
+      #   default: 'all'
+      #   type: choice
+      #   options:
+      #     - all
+      #     - postgres
+      #     - ollama
+      #     - frontend
+      #     - backend
       clean_db:
-        description: '是否清除数据库卷'
+        description: '清除数据库'
         required: false
+        default: 'false'
         type: boolean
-        default: false
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-jobs:
-  # 1. CI 检查（复用现有 CI 工作流）
-  ci-check:
-    uses: ./.github/workflows/ci.yml
-    secrets: inherit
+env:
+  REGISTRY: ${{ secrets.DOCKER_REGISTRY }}
 
-  # 2. 构建并推送 Docker 镜像
-  build-and-push:
+jobs:
+  ci:
+    name: CI
+    uses: ./.github/workflows/ci.yml
+
+  docker-build-and-push:
+    name: Build and Push Docker Images
+    needs: ci
     runs-on: ubuntu-latest
-    needs: ci-check
-    permissions:
-      contents: read
-      packages: write
+    outputs:
+      TAG: ${{ steps.vars.outputs.TAG }}
+      REGISTRY: ${{ steps.vars.outputs.REGISTRY }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Set image tag
+        id: vars
+        run: |
+          echo "TAG=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+          echo "REGISTRY=${{ secrets.DOCKER_REGISTRY }}" >> $GITHUB_OUTPUT
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -54,14 +62,8 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Set image tag
-        id: vars
-        run: |
-          echo "TAG=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
-          echo "REGISTRY=${{ secrets.DOCKER_REGISTRY }}" >> $GITHUB_OUTPUT
-
-      - name: Build and push PostgreSQL
-        uses: docker/build-push-action@v5
+      - name: Build and push postgres
+        uses: docker/build-push-action@v6
         with:
           context: ./docker/postgres
           push: true
@@ -71,10 +73,10 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Build and push Ollama
-        uses: docker/build-push-action@v5
+      - name: Build and push ollama
+        uses: docker/build-push-action@v6
         with:
-          context: ./apps/ollama
+          context: ./docker/ollama
           push: true
           tags: |
             ${{ steps.vars.outputs.REGISTRY }}:ollama
@@ -82,11 +84,10 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Build and push Backend
-        uses: docker/build-push-action@v5
+      - name: Build and push backend
+        uses: docker/build-push-action@v6
         with:
-          context: .
-          file: ./apps/backend/Dockerfile
+          context: ./apps/backend
           push: true
           tags: |
             ${{ steps.vars.outputs.REGISTRY }}:backend
@@ -94,10 +95,10 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Build and push Frontend
-        uses: docker/build-push-action@v5
+      - name: Build and push frontend
+        uses: docker/build-push-action@v6
         with:
-          context: .
+          context: ./apps/frontend
           file: ./apps/frontend/Dockerfile
           push: true
           tags: |
@@ -106,11 +107,10 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  # 3. 部署到服务器
-  deploy-to-server:
+  deploy:
+    name: Deploy to Server
+    needs: docker-build-and-push
     runs-on: ubuntu-latest
-    needs: build-and-push
-    if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
 
     steps:
       - name: Checkout
@@ -120,12 +120,8 @@ jobs:
         run: |
           mkdir -p deploy
           cp docker-deploy/docker-compose.prod.yml deploy/
-          cp docker-deploy/deploy.sh deploy/
-          cp -r docker-deploy/public deploy/ 2>/dev/null || true
 
-      - name: Create .env file
-        run: |
-          cat > deploy/.env << EOF
+          cat > deploy/.env << 'ENVEOF'
           REGISTRY=${{ secrets.DOCKER_REGISTRY }}
           POSTGRES_USER=${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
@@ -142,13 +138,18 @@ jobs:
           AI_LLM_SEARCH_URL=${{ secrets.AI_LLM_SEARCH_URL }}
           AI_OLLAMA_MODEL=${{ secrets.AI_OLLAMA_MODEL }}
           AI_OLLAMA_URL=${{ secrets.AI_OLLAMA_URL }}
-          EOF
+          ENVEOF
 
-      - name: Upload deploy artifacts
-        uses: actions/upload-artifact@v4
+      - name: Copy files to server via SCP
+        uses: appleboy/scp-action@v0.1.4
         with:
-          name: deploy-files
-          path: deploy/
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT || 22 }}
+          source: 'deploy/*'
+          target: '~/lostfound/'
+          strip_components: 1
 
       - name: Deploy to server via SSH
         uses: appleboy/ssh-action@v1.0.3
@@ -158,71 +159,34 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_PORT || 22 }}
           script: |
-            cd /opt/lostfound
+            cd ~/lostfound
 
-            # 备份当前配置
+            echo "[INFO] 备份当前配置..."
             if [ -f docker-compose.prod.yml ]; then
               cp docker-compose.prod.yml docker-compose.prod.yml.bak
             fi
 
-            # 创建临时目录
-            rm -rf /tmp/lostfound-deploy
-            mkdir -p /tmp/lostfound-deploy
-
             echo "[INFO] 部署目标: ${{ inputs.deploy_target || 'all' }}"
             echo "[INFO] 清除数据库: ${{ inputs.clean_db || 'false' }}"
 
-      - name: Final deploy (clean or all)
-        uses: appleboy/ssh-action@v1.0.3
-        if: inputs.clean_db == true
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          port: ${{ secrets.SERVER_PORT || 22 }}
-          script: |
-            cd /opt/lostfound
-            echo "[INFO] 执行清除模式部署..."
-            chmod +x deploy.sh
-            ./deploy.sh clean
+            echo "[INFO] 拉取最新镜像..."
+            if ! docker compose -f docker-compose.prod.yml pull; then
+              echo "[ERROR] 拉取镜像失败，中止部署"
+              exit 1
+            fi
 
-      - name: Final deploy (specific target)
-        uses: appleboy/ssh-action@v1.0.3
-        if: inputs.clean_db != true && inputs.deploy_target != 'all'
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          port: ${{ secrets.SERVER_PORT || 22 }}
-          script: |
-            cd /opt/lostfound
-            echo "[INFO] 执行 ${{ inputs.deploy_target }} 部署..."
-            chmod +x deploy.sh
-            ./deploy.sh ${{ inputs.deploy_target }}
+            echo "[INFO] 停止旧容器..."
+            docker compose -f docker-compose.prod.yml down
 
-      - name: Final deploy (all)
-        uses: appleboy/ssh-action@v1.0.3
-        if: inputs.clean_db != true && (inputs.deploy_target == 'all' || inputs.deploy_target == '')
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          port: ${{ secrets.SERVER_PORT || 22 }}
-          script: |
-            cd /opt/lostfound
-            echo "[INFO] 执行全部部署..."
-            chmod +x deploy.sh
-            ./deploy.sh all
+            if [ "${{ inputs.clean_db }}" == "true" ]; then
+              echo "[INFO] 清除数据库..."
+              docker volume rm lostfound_postgres_data 2>/dev/null || true
+            fi
 
-      - name: Verify deployment
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          port: ${{ secrets.SERVER_PORT || 22 }}
-          script: |
-            cd /opt/lostfound
+            echo "[INFO] 启动新容器..."
+            docker compose -f docker-compose.prod.yml up -d
+
             echo "[INFO] 检查容器状态..."
             docker compose -f docker-compose.prod.yml ps
+
             echo "[INFO] 部署完成！"

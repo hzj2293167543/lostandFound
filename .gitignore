@@ -110,3 +110,5 @@ Desktop.ini
 # 数据库
 # ============================
 **/*.sql
+# 允许 Docker 初始化数据库脚本
+!docker/postgres/docker-entrypoint-initdb.d/*.sql

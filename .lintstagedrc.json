@@ -1,5 +1,5 @@
 {
   "*.{js, ts, tsx, vue}": ["pnpm run lint"],
   "*.{json,yml,yaml,css,scss,less,md}": ["prettier --check"],
-  "*.{md,json,yml,yaml,txt}": ["cspell --dot"]
+  "*.{md,json,yml,yaml,txt}": ["cspell --dot --no-must-find-files"]
 }

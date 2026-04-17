@@ -74,3 +74,6 @@ lostandfound
 tencentyun
 trae
 yourdomain
+
+# Auto-added words
+ENVEOF

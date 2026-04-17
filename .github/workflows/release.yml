@@ -1,8 +1,7 @@
-# name: Release
-
-# on:
-#   push:
-#     branches: [master]
+name: Release
+on:
+  push:
+    branches: ['__disabled__']
 #   workflow_dispatch:
 
 # concurrency:
